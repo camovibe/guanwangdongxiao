@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>产品渠道动销与利润罗盘系统 - 只读看板</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;}
+  .tab-active{background:#4f46e5 !important;color:#fff !important;}
+  .scrollbar-thin::-webkit-scrollbar{height:8px;width:8px;}
+  .scrollbar-thin::-webkit-scrollbar-thumb{background:#c7d2fe;border-radius:4px;}
+  table td,table th{white-space:nowrap;}
+  .flt{width:100%;min-width:60px;border:1px solid #e2e8f0;border-radius:6px;padding:2px 6px;font-size:12px;outline:none;}
+  .flt:focus{border-color:#6366f1;}
+  .alert-card{scroll-margin-top:80px;}
+  #backTop{transition:opacity .3s, transform .3s, visibility .3s;}
+  #backTop.hidden-btn{opacity:0;visibility:hidden;transform:translateY(12px);pointer-events:none;}
+</style>
+</head>
+<body class="bg-slate-100 text-slate-800">
+<div class="max-w-screen-2xl mx-auto p-3 sm:p-6">
+
+  <!-- 头部 -->
+  <header class="mb-5">
+    <h1 class="text-xl sm:text-2xl font-bold text-slate-900 flex items-center gap-2">
+      <span class="inline-block w-2 h-6 bg-indigo-600 rounded"></span>
+      产品渠道动销与利润罗盘系统 <span class="text-xs font-normal text-slate-400">v1.4-readonly</span>
+    </h1>
+    <p class="text-sm text-slate-500 mt-1">库销比 · 滚动周转 · 效期报损预警(随日期动态倒扣) · 智能促销边界 · 渠道利润看板</p>
+    <div id="updateInfo" class="mt-2 text-xs text-amber-700 font-medium bg-amber-50 rounded-lg px-3 py-1.5 inline-block">正在加载数据...</div>
+  </header>
+
+  <!-- Tab 导航（只读版：仅保留 3 个 Tab） -->
+  <nav class="flex flex-wrap gap-2 mb-5">
+    <button data-tab="dashboard" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium bg-white shadow-sm hover:bg-indigo-50 transition">渠道看板</button>
+    <button data-tab="overview" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium bg-white shadow-sm hover:bg-indigo-50 transition">数据总览</button>
+    <button data-tab="alerts" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium bg-white shadow-sm hover:bg-indigo-50 transition">预警与营销建议</button>
+  </nav>
+
+  <!-- ============ 渠道看板 ============ -->
+  <section id="tab-dashboard" class="tab-panel">
+    <div class="grid grid-cols-2 lg:grid-cols-5 gap-3 mb-5">
+      <div class="bg-white rounded-xl shadow-sm p-4">
+        <div class="text-xs text-slate-400">累计GMV（到手价×累计销量）</div>
+        <div id="kpi-gmv" class="text-lg sm:text-2xl font-bold text-slate-900 mt-1">-</div>
+      </div>
+      <div class="bg-white rounded-xl shadow-sm p-4">
+        <div class="text-xs text-slate-400">累计利润</div>
+        <div id="kpi-profit" class="text-lg sm:text-2xl font-bold text-emerald-600 mt-1">-</div>
+      </div>
+      <div class="bg-white rounded-xl shadow-sm p-4">
+        <div class="text-xs text-slate-400">加权利润率</div>
+        <div id="kpi-margin" class="text-lg sm:text-2xl font-bold text-indigo-600 mt-1">-</div>
+      </div>
+      <div id="card-alert" onclick="showAlertList()" class="bg-white rounded-xl shadow-sm p-4 cursor-pointer hover:ring-2 hover:ring-rose-200 transition select-none">
+        <div class="text-xs text-slate-400 flex items-center justify-between">预警产品数 <span class="text-indigo-500">清单 ›</span></div>
+        <div id="kpi-alert" class="text-lg sm:text-2xl font-bold text-rose-600 mt-1">-</div>
+      </div>
+      <div id="card-expiry" onclick="showExpiryList()" class="bg-white rounded-xl shadow-sm p-4 cursor-pointer hover:ring-2 hover:ring-amber-200 transition select-none">
+        <div class="text-xs text-slate-400 flex items-center justify-between">预计效期报损 <span class="text-indigo-500">清单 ›</span></div>
+        <div id="kpi-expiry" class="text-lg sm:text-2xl font-bold text-amber-600 mt-1">-</div>
+      </div>
+    </div>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
+      <div class="bg-white rounded-xl shadow-sm p-4">
+        <h3 class="text-sm font-semibold mb-3">各品类 累计GMV 与 累计利润</h3>
+        <canvas id="chartCategory" height="140"></canvas>
+      </div>
+      <div class="bg-white rounded-xl shadow-sm p-4">
+        <div class="flex justify-between items-center mb-1">
+          <h3 class="text-sm font-semibold">库存健康度分布</h3>
+          <button onclick="showAlertList()" class="text-xs text-indigo-600 hover:underline">预警清单 ›</button>
+        </div>
+        <p class="text-xs text-slate-400 mb-2">点击饼图任一分区，可查看该状态的产品清单</p>
+        <canvas id="chartHealth" height="140" class="cursor-pointer"></canvas>
+      </div>
+    </div>
+    <div class="bg-white rounded-xl shadow-sm p-4">
+      <h3 class="text-sm font-semibold mb-3">各产品 库销比（柱）与 滚动周转率（点）</h3>
+      <canvas id="chartMix" height="120"></canvas>
+    </div>
+  </section>
+
+  <!-- ============ 数据总览 ============ -->
+  <section id="tab-overview" class="tab-panel hidden">
+    <div class="bg-white rounded-xl shadow-sm p-4 overflow-x-auto scrollbar-thin">
+      <div class="flex justify-between items-center mb-2 flex-wrap gap-2">
+        <h3 class="text-sm font-semibold">全部产品指标（剩余效期已按今天动态倒扣）<span id="ovCount" class="text-xs font-normal text-slate-400 ml-2"></span></h3>
+        <div class="flex gap-2">
+          <button onclick="clearOverviewFilters()" class="px-3 py-1.5 text-xs bg-slate-200 rounded-lg hover:bg-slate-300">清空筛选</button>
+          <button onclick="exportData()" class="px-3 py-1.5 text-xs bg-emerald-600 text-white rounded-lg hover:bg-emerald-700">导出当前数据CSV</button>
+        </div>
+      </div>
+      <p class="text-xs text-slate-400 mb-3">筛选提示：数值列支持 <code>&gt;3</code>、<code>&lt;1</code>、<code>&gt;=2</code>、<code>1-3</code>（区间）等写法；文本 / 状态列按关键字模糊匹配（如状态输入「积压」「断货」「滞销」「报损」「临期」）。<strong>剩余效期</strong>列显示的是按今天推算后的真实剩余天数。</p>
+      <table class="w-full text-xs sm:text-sm border-collapse">
+        <thead>
+          <tr class="bg-slate-50 text-slate-500 text-left">
+            <th class="p-2">产品</th><th class="p-2">SKU</th><th class="p-2">品类</th>
+            <th class="p-2 text-right">成本</th><th class="p-2 text-right">控价</th><th class="p-2 text-right">到手价</th>
+            <th class="p-2 text-right">单件利润</th><th class="p-2 text-right">利润率</th>
+            <th class="p-2 text-right">日均销</th><th class="p-2 text-right">期末库存</th>
+            <th class="p-2 text-right">库销比</th><th class="p-2 text-right">可售天数</th>
+            <th class="p-2 text-right">剩余效期</th><th class="p-2 text-right">预计报损</th>
+            <th class="p-2 text-right">滚动周转</th><th class="p-2">状态</th>
+          </tr>
+          <tr class="bg-white border-b">
+            <th class="p-1"><input id="flt_name" oninput="renderOverview()" class="flt" placeholder="产品名"></th>
+            <th class="p-1"><input id="flt_sku" oninput="renderOverview()" class="flt" placeholder="SKU"></th>
+            <th class="p-1"><input id="flt_cat" oninput="renderOverview()" class="flt" placeholder="品类"></th>
+            <th class="p-1"><input id="flt_cost" oninput="renderOverview()" class="flt" placeholder=">10"></th>
+            <th class="p-1"><input id="flt_price" oninput="renderOverview()" class="flt" placeholder=">50"></th>
+            <th class="p-1"><input id="flt_actual" oninput="renderOverview()" class="flt" placeholder="<80"></th>
+            <th class="p-1"><input id="flt_profit" oninput="renderOverview()" class="flt" placeholder=">0"></th>
+            <th class="p-1"><input id="flt_margin" oninput="renderOverview()" class="flt" placeholder=">15"></th>
+            <th class="p-1"><input id="flt_daily" oninput="renderOverview()" class="flt" placeholder=">10"></th>
+            <th class="p-1"><input id="flt_endInv" oninput="renderOverview()" class="flt" placeholder="0-500"></th>
+            <th class="p-1"><input id="flt_isr" oninput="renderOverview()" class="flt" placeholder=">3"></th>
+            <th class="p-1"><input id="flt_sellDays" oninput="renderOverview()" class="flt" placeholder="<15"></th>
+            <th class="p-1"><input id="flt_shelf" oninput="renderOverview()" class="flt" placeholder="<30"></th>
+            <th class="p-1"><input id="flt_loss" oninput="renderOverview()" class="flt" placeholder=">0"></th>
+            <th class="p-1"><input id="flt_turnover" oninput="renderOverview()" class="flt" placeholder="<1"></th>
+            <th class="p-1"><input id="flt_status" oninput="renderOverview()" class="flt" placeholder="如 报损/临期"></th>
+          </tr>
+        </thead>
+        <tbody id="overviewBody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ============ 预警与建议 ============ -->
+  <section id="tab-alerts" class="tab-panel hidden">
+    <div id="alertsContainer" class="grid grid-cols-1 gap-4"></div>
+  </section>
+
+</div>
+
+<!-- 产品清单弹窗 -->
+<div id="listModal" class="fixed inset-0 z-50 hidden">
+  <div class="absolute inset-0 bg-black/40" onclick="closeListModal()"></div>
+  <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-white rounded-xl shadow-xl w-11/12 max-w-2xl flex flex-col" style="max-height:80vh;">
+    <div class="flex justify-between items-center p-4 border-b">
+      <h3 id="listModalTitle" class="font-semibold text-sm"></h3>
+      <button onclick="closeListModal()" class="text-slate-400 hover:text-slate-700 text-2xl leading-none">&times;</button>
+    </div>
+    <div id="listModalBody" class="p-3 overflow-y-auto scrollbar-thin"></div>
+    <div class="p-3 border-t text-xs text-slate-400 text-center">点击任一产品，将跳转到「预警与营销建议」并定位该单品</div>
+  </div>
+</div>
+
+<!-- 回到顶部浮动按钮 -->
+<button id="backTop" onclick="goTop()" title="回到顶部"
+  class="hidden-btn fixed bottom-6 right-6 z-40 w-12 h-12 rounded-full bg-indigo-600 text-white shadow-lg hover:bg-indigo-700 flex items-center justify-center">
+  <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+    <path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7"/>
+  </svg>
+</button>
+
+<!-- Toast -->
+<div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-sm px-4 py-2 rounded-lg shadow-lg opacity-0 pointer-events-none transition-opacity z-50"></div>
+
+<script>
+/* ================= 状态 ================= */
+let products = [];
+let settings = {
+  feeTax: 8, feeOther: 3, targetMargin: 15,
+  isrLow: 0.5, isrHealthy: 2, isrHigh: 3,
+  toSlow: 1, toHealthy: 3, toGood: 6,
+  shelfWarnDays: 30, shelfCoverSafe: 1.5
+};
+let charts = {};
+let currentHealthLabels = [];
+let updatedAt = '';
+
+/* ============ 日期辅助 ============ */
+function daysElapsed(dateStr){
+  if(!dateStr) return 0;
+  const d0 = new Date(dateStr + 'T00:00:00');
+  if(isNaN(d0.getTime())) return 0;
+  const today = new Date(); today.setHours(0,0,0,0);
+  return Math.max(0, Math.round((today - d0) / 86400000));
+}
+
+/* ============ 计算核心 ============ */
+function compute(p){
+  const feeTax = (p.feeTax!==''&&p.feeTax!=null&&!isNaN(p.feeTax))?Number(p.feeTax):settings.feeTax;
+  const feeOther = (p.feeOther!==''&&p.feeOther!=null&&!isNaN(p.feeOther))?Number(p.feeOther):settings.feeOther;
+  const totalFee = (feeTax+feeOther)/100;
+  const actual = (p.actualPrice!=null&&p.actualPrice!==''&&!isNaN(p.actualPrice)&&Number(p.actualPrice)>0)?Number(p.actualPrice):p.price;
+  const daily = p.weekSales/7;
+  const monthSales = daily*30;
+  const isr = monthSales>0 ? p.endInv/monthSales : (p.endInv>0?Infinity:0);
+  const sellDays = daily>0 ? p.endInv/daily : (p.endInv>0?Infinity:0);
+  const avgInv = (Number(p.beginInv)+Number(p.endInv))/2;
+  const turnover = avgInv>0 ? p.ytdSales/avgInv : null;
+  const unitProfit = actual*(1-totalFee)-p.cost;
+  const margin = actual>0 ? unitProfit/actual : 0;
+  const breakeven = p.cost/(1-totalFee);
+  const denom = 1-totalFee-settings.targetMargin/100;
+  const targetFloor = denom>0 ? p.cost/denom : null;
+  const ytdGMV = actual*p.ytdSales, ytdProfit = unitProfit*p.ytdSales;
+
+  const shelfLifeRaw = (p.shelfLife!=null&&p.shelfLife!==''&&!isNaN(p.shelfLife)&&Number(p.shelfLife)>0)?Number(p.shelfLife):null;
+  const shelfElapsed = shelfLifeRaw!=null ? daysElapsed(p.date) : 0;
+  let shelfLife=null, shelfCover=null, expiryQty=null, expiryLoss=null, needDaily=null;
+  if(shelfLifeRaw!=null){
+    shelfLife = Math.max(0, shelfLifeRaw - shelfElapsed);
+    if(shelfLife<=0){
+      expiryQty  = p.endInv;
+      expiryLoss = p.endInv*p.cost;
+      needDaily  = Infinity;
+      shelfCover = p.endInv>0 ? 0 : Infinity;
+    }else{
+      const sellableByExpiry = daily*shelfLife;
+      expiryQty  = Math.max(0, p.endInv - sellableByExpiry);
+      expiryLoss = expiryQty*p.cost;
+      needDaily  = p.endInv/shelfLife;
+      if(p.endInv<=0) shelfCover=Infinity;
+      else if(daily<=0) shelfCover=0;
+      else shelfCover = shelfLife/(p.endInv/daily);
+    }
+  }
+  return {feeTax,feeOther,totalFee,actual,daily,isr,sellDays,turnover,unitProfit,margin,breakeven,targetFloor,ytdGMV,ytdProfit,
+          shelfLife,shelfLifeRaw,shelfElapsed,shelfCover,expiryQty,expiryLoss,needDaily};
+}
+
+function invStatus(isr){
+  if(isr===Infinity) return {t:'积压(无动销)',c:'rose',lv:3};
+  if(isr<settings.isrLow) return {t:'断货风险',c:'amber',lv:2};
+  if(isr<=settings.isrHealthy) return {t:'健康',c:'emerald',lv:0};
+  if(isr<=settings.isrHigh) return {t:'库存偏高',c:'yellow',lv:1};
+  return {t:'积压严重',c:'rose',lv:3};
+}
+function turnStatus(to){
+  if(to===null) return {t:'无数据',c:'slate',lv:0};
+  if(to<settings.toSlow) return {t:'滞销',c:'rose',lv:3};
+  if(to<settings.toHealthy) return {t:'周转偏慢',c:'yellow',lv:1};
+  if(to<=settings.toGood) return {t:'周转健康',c:'emerald',lv:0};
+  return {t:'周转优秀',c:'indigo',lv:0};
+}
+function shelfStatus(m){
+  if(m.shelfLife==null) return {t:'—',c:'slate',lv:0,none:true};
+  if(m.shelfLife<=0) return {t:'已过效期',c:'rose',lv:3};
+  if(m.shelfCover<1) return {t:'效期报损风险',c:'rose',lv:3};
+  if(m.shelfLife<settings.shelfWarnDays) return {t:'临期需关注',c:'amber',lv:2};
+  if(m.shelfCover<settings.shelfCoverSafe) return {t:'效期偏紧',c:'yellow',lv:1};
+  return {t:'效期安全',c:'emerald',lv:0};
+}
+
+function advise(p,m){
+  const inv=invStatus(m.isr), turn=turnStatus(m.turnover), shelf=shelfStatus(m);
+  const level = Math.max(inv.lv, turn.lv, shelf.lv);
+  const tags = [inv, turn]; if(!shelf.none) tags.push(shelf);
+  let advice = [];
+  const disc = (fp)=> (p.price>0&&fp!=null)?(fp/p.price*10).toFixed(1)+'折':'—';
+  const fmtP = (v)=> v==null?'—':'¥'+v.toFixed(2);
+
+  if(!shelf.none){
+    if(m.shelfLife<=0){
+      advice.push(`🔴 该批次<b>已超出效期</b>（数据日期至今已过 ${m.shelfElapsed} 天，超过录入的 ${m.shelfLifeRaw} 天效期），当前库存 <b>${fmt(p.endInv)}</b> 件基本全部面临报废，潜在报损 <b>¥${fmt(m.expiryLoss)}</b>（成本口径）。请立即核实实物批次并做<strong>下架 / 报损 / 退供处理</strong>，同步核减库存并更新数据。`);
+    } else if(m.shelfCover<1){
+      const ratio = m.daily>0 ? (m.needDaily/m.daily).toFixed(1) : '∞';
+      advice.push(`🔴 剩余效期仅 <b>${m.shelfLife}</b> 天，按当前日均 ${m.daily.toFixed(1)} 件，到期预计卖不完约 <b>${Math.round(m.expiryQty)}</b> 件，潜在报损 <b>¥${fmt(m.expiryLoss)}</b>（成本口径）。需把日均动销拉到 <b>${m.needDaily.toFixed(1)}</b> 件/天（约当前 ${ratio} 倍）才能到期前清完。建议<strong>立即临期清仓</strong>：因报损=全额亏损，清仓价可<strong>击穿保本价 ${fmtP(m.breakeven)}</strong>，只要能回收部分成本即优于报废；优先叠加渠道调拨、买赠、临期专区、直播秒杀。`);
+    } else if(shelf.lv===2){
+      advice.push(`🟠 剩余效期 ${m.shelfLife} 天，虽按当前动销可在到期前售罄（效期覆盖系数 ${m.shelfCover.toFixed(2)}），但时间窗偏紧。建议<strong>提前排一轮温和促销</strong>（目标底价 ${fmtP(m.targetFloor)} 约 ${disc(m.targetFloor)}）预留缓冲，避免临近到期被迫深度砍价。`);
+    } else if(shelf.lv===1){
+      advice.push(`🟡 效期覆盖系数 ${m.shelfCover.toFixed(2)}（安全线 ${settings.shelfCoverSafe}）略偏紧。保持动销监控，若两周内周转下滑再启动促销。`);
+    }
+  }
+
+  if(inv.lv===2 && inv.t==='断货风险'){
+    advice.push(`⚠️ 可售天数约 ${isFinite(m.sellDays)?Math.round(m.sellDays)+'天':'—'}，库存紧张。建议<strong>优先补货</strong>，暂缓一切促销以免加速断货；若为爆品可小幅提价平衡供需。`);
+  }
+  if(inv.lv===3 || (inv.lv===1)){
+    if(m.margin>=settings.targetMargin/100){
+      advice.push(`📦 库存${inv.t}，但利润率${(m.margin*100).toFixed(1)}%有空间。<strong>建议促销去化</strong>：保住目标利润(${settings.targetMargin}%)的最低到手价 ${fmtP(m.targetFloor)}（约${disc(m.targetFloor)}）；需快速清仓的极限保本价 ${fmtP(m.breakeven)}（约${disc(m.breakeven)}）。`);
+    } else if(m.margin>0){
+      advice.push(`📦 库存${inv.t}且利润偏薄(${(m.margin*100).toFixed(1)}%)。促销空间有限，最低仅可至保本价 ${fmtP(m.breakeven)}（约${disc(m.breakeven)}）。建议<strong>捆绑搭售、满赠引流</strong>而非直接降价，并收紧补货。`);
+    } else {
+      advice.push(`🔴 库存${inv.t}且当前已亏损。建议<strong>清仓止损</strong>或渠道调拨，停止补货，重新评估该SKU定位。`);
+    }
+  }
+  if(turn.lv>=1 && inv.lv<=0){
+    advice.push(`🐢 库存表面健康但滚动周转${turn.t}(${m.turnover?m.turnover.toFixed(2):'—'})，存在慢动销风险。建议加强内容曝光/关联推荐，观察2周动销变化再决定是否促销。`);
+  }
+  if(level===0 && advice.length===0){
+    advice.push(`✅ 库销、周转${shelf.none?'':'与效期'}均健康，利润率${(m.margin*100).toFixed(1)}%。<strong>维持现有节奏</strong>，可按目标利润底价 ${fmtP(m.targetFloor)} 作为大促时的价格护栏。`);
+  }
+  return {level,tags,advice,shelf,inv,turn};
+}
+
+const badge=(c,t)=>`<span class="inline-block px-2 py-0.5 rounded text-xs bg-${c}-100 text-${c}-700">${t}</span>`;
+const fmt=(v,d=0)=> (v==null||!isFinite(v))?'∞':Number(v).toLocaleString('zh-CN',{maximumFractionDigits:d});
+
+function render(){
+  renderOverview(); renderDashboard(); renderAlerts();
+}
+
+function textMatch(field,expr){ if(!expr) return true; return String(field).toLowerCase().includes(expr.toLowerCase()); }
+function matchNum(v,expr){
+  if(!expr) return true;
+  const val = (v===Infinity)?1e15:(v==null?NaN:Number(v));
+  const e = expr.replace(/\s/g,'');
+  let m;
+  if(m=e.match(/^(-?\d*\.?\d+)-(-?\d*\.?\d+)$/)) return !isNaN(val)&&val>=+m[1]&&val<=+m[2];
+  if(m=e.match(/^(>=|<=|>|<|=)(-?\d*\.?\d+)$/)){
+    if(isNaN(val)) return false;
+    const n=+m[2];
+    switch(m[1]){case'>':return val>n;case'<':return val<n;case'>=':return val>=n;case'<=':return val<=n;default:return Math.abs(val-n)<1e-6;}
+  }
+  if(m=e.match(/^(-?\d*\.?\d+)$/)) return (!isNaN(val)&&Math.abs(val-+m[1])<1e-6) || String(v).includes(e);
+  return true;
+}
+function getOverviewFilters(){
+  const g=id=>{const el=document.getElementById(id);return el?el.value.trim():'';};
+  return {name:g('flt_name'),sku:g('flt_sku'),cat:g('flt_cat'),cost:g('flt_cost'),price:g('flt_price'),
+    actual:g('flt_actual'),profit:g('flt_profit'),margin:g('flt_margin'),daily:g('flt_daily'),
+    endInv:g('flt_endInv'),isr:g('flt_isr'),sellDays:g('flt_sellDays'),shelf:g('flt_shelf'),loss:g('flt_loss'),
+    turnover:g('flt_turnover'),status:g('flt_status')};
+}
+function clearOverviewFilters(){
+  ['flt_name','flt_sku','flt_cat','flt_cost','flt_price','flt_actual','flt_profit','flt_margin','flt_daily','flt_endInv','flt_isr','flt_sellDays','flt_shelf','flt_loss','flt_turnover','flt_status']
+    .forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  renderOverview();
+}
+
+function renderOverview(){
+  const tb=document.getElementById('overviewBody'); tb.innerHTML='';
+  const ovc=document.getElementById('ovCount');
+  const COLS=16;
+  if(!products.length){tb.innerHTML=`<tr><td colspan="${COLS}" class="p-6 text-center text-slate-400">暂无数据，请检查 data.json 是否已正确部署</td></tr>`;if(ovc)ovc.textContent='';return;}
+  const f=getOverviewFilters();
+  let shown=0;
+  products.forEach(p=>{
+    const m=compute(p); const inv=invStatus(m.isr), turn=turnStatus(m.turnover), shelf=shelfStatus(m);
+    const statusText=inv.t+' '+turn.t+' '+(shelf.none?'':shelf.t);
+    const pass =
+      textMatch(p.name,f.name)&&textMatch(p.sku,f.sku)&&textMatch(p.cat,f.cat)&&
+      matchNum(p.cost,f.cost)&&matchNum(p.price,f.price)&&matchNum(m.actual,f.actual)&&
+      matchNum(m.unitProfit,f.profit)&&matchNum(m.margin*100,f.margin)&&matchNum(m.daily,f.daily)&&
+      matchNum(p.endInv,f.endInv)&&matchNum(m.isr,f.isr)&&matchNum(m.sellDays,f.sellDays)&&
+      matchNum(m.shelfLife,f.shelf)&&matchNum(m.expiryLoss,f.loss)&&
+      matchNum(m.turnover,f.turnover)&&textMatch(statusText,f.status);
+    if(!pass) return;
+    shown++;
+    const shelfCell = m.shelfLife==null ? '<span class="text-slate-300">—</span>'
+      : `<span class="${shelf.lv>=2?'text-rose-600 font-semibold':''}" title="录入${m.shelfLifeRaw}天 / 已过${m.shelfElapsed}天">${m.shelfLife}天</span>`;
+    const lossCell = (m.expiryLoss&&m.expiryLoss>0) ? `<span class="text-amber-600 font-medium">¥${fmt(m.expiryLoss)}</span>` : '<span class="text-slate-300">—</span>';
+    tb.innerHTML+=`<tr class="border-t hover:bg-slate-50 cursor-pointer" onclick="gotoAlert('${p.sku}')">
+      <td class="p-2 font-medium">${p.name}</td><td class="p-2 text-slate-400">${p.sku}</td><td class="p-2">${p.cat}</td>
+      <td class="p-2 text-right">${fmt(p.cost,2)}</td><td class="p-2 text-right">${fmt(p.price,2)}</td>
+      <td class="p-2 text-right font-medium">${fmt(m.actual,2)}</td>
+      <td class="p-2 text-right ${m.unitProfit<0?'text-rose-600':'text-emerald-600'}">${fmt(m.unitProfit,2)}</td>
+      <td class="p-2 text-right ${m.margin<0?'text-rose-600':''}">${(m.margin*100).toFixed(1)}%</td>
+      <td class="p-2 text-right">${fmt(m.daily,1)}</td><td class="p-2 text-right">${fmt(p.endInv)}</td>
+      <td class="p-2 text-right font-semibold">${fmt(m.isr,2)}</td>
+      <td class="p-2 text-right">${isFinite(m.sellDays)?fmt(m.sellDays)+'天':'∞'}</td>
+      <td class="p-2 text-right">${shelfCell}</td>
+      <td class="p-2 text-right">${lossCell}</td>
+      <td class="p-2 text-right font-semibold">${m.turnover?m.turnover.toFixed(2):'—'}</td>
+      <td class="p-2">${badge(inv.c,inv.t)} ${badge(turn.c,turn.t)}${shelf.none?'':' '+badge(shelf.c,shelf.t)}</td>
+    </tr>`;
+  });
+  if(shown===0) tb.innerHTML=`<tr><td colspan="${COLS}" class="p-6 text-center text-slate-400">无符合筛选条件的产品</td></tr>`;
+  if(ovc) ovc.textContent=`显示 ${shown} / ${products.length} 条` + (shown<products.length?'（已筛选）':'');
+}
+
+function renderDashboard(){
+  let gmv=0,profit=0,alerts=0,expiryLossTotal=0;
+  const catMap={}; const health={'健康':0,'库存偏高':0,'积压严重':0,'积压(无动销)':0,'断货风险':0};
+  const mixLabels=[],mixIsr=[],mixTo=[];
+  products.forEach(p=>{
+    const m=compute(p); gmv+=m.ytdGMV; profit+=m.ytdProfit;
+    const inv=invStatus(m.isr),turn=turnStatus(m.turnover),shelf=shelfStatus(m);
+    if(Math.max(inv.lv,turn.lv,shelf.lv)>=2) alerts++;
+    if(m.expiryLoss) expiryLossTotal+=m.expiryLoss;
+    if(health[inv.t]!==undefined) health[inv.t]++;
+    catMap[p.cat]=catMap[p.cat]||{gmv:0,profit:0}; catMap[p.cat].gmv+=m.ytdGMV; catMap[p.cat].profit+=m.ytdProfit;
+    mixLabels.push(p.name); mixIsr.push(isFinite(m.isr)?+m.isr.toFixed(2):settings.isrHigh*1.5); mixTo.push(m.turnover?+m.turnover.toFixed(2):0);
+  });
+  document.getElementById('kpi-gmv').textContent='¥'+fmt(gmv);
+  document.getElementById('kpi-profit').textContent='¥'+fmt(profit);
+  document.getElementById('kpi-margin').textContent=gmv>0?(profit/gmv*100).toFixed(1)+'%':'—';
+  document.getElementById('kpi-alert').textContent=alerts;
+  document.getElementById('kpi-expiry').textContent='¥'+fmt(expiryLossTotal);
+
+  const cats=Object.keys(catMap);
+  drawChart('chartCategory','bar',{labels:cats,datasets:[
+    {label:'累计GMV',data:cats.map(c=>+catMap[c].gmv.toFixed(0)),backgroundColor:'#a5b4fc'},
+    {label:'累计利润',data:cats.map(c=>+catMap[c].profit.toFixed(0)),backgroundColor:'#6366f1'}
+  ]});
+
+  const hLabels=Object.keys(health).filter(k=>health[k]>0);
+  currentHealthLabels=hLabels;
+  drawChart('chartHealth','doughnut',{labels:hLabels,datasets:[{data:hLabels.map(k=>health[k]),
+    backgroundColor:['#34d399','#fbbf24','#f43f5e','#9f1239','#f59e0b']}]},{
+      cutout:'55%',
+      onClick:(evt,els)=>{
+        if(els&&els.length){
+          const status=currentHealthLabels[els[0].index];
+          openProductList('库存状态：'+status+'（点击查看单品建议）', getProductsByStatus(status));
+        } else {
+          showAlertList();
+        }
+      }
+  });
+
+  drawChart('chartMix','bar',{labels:mixLabels,datasets:[
+    {type:'bar',label:'库销比',data:mixIsr,backgroundColor:'#c7d2fe',yAxisID:'y'},
+    {type:'line',label:'滚动周转率',data:mixTo,borderColor:'#4f46e5',backgroundColor:'#4f46e5',yAxisID:'y1'}
+  ]},{scales:{y:{position:'left',title:{display:true,text:'库销比'}},y1:{position:'right',grid:{drawOnChartArea:false},title:{display:true,text:'周转率'}}}});
+}
+
+function drawChart(id,type,data,extra={}){
+  const ctx=document.getElementById(id); if(!ctx)return;
+  if(charts[id]) charts[id].destroy();
+  charts[id]=new Chart(ctx,{type,data,options:{responsive:true,plugins:{legend:{labels:{boxWidth:12,font:{size:11}}}},...extra}});
+}
+
+function renderAlerts(){
+  const c=document.getElementById('alertsContainer'); c.innerHTML='';
+  if(!products.length){c.innerHTML='<div class="bg-white rounded-xl p-6 text-center text-slate-400">暂无数据</div>';return;}
+  const scoredList=products.map(p=>{const m=compute(p);const a=advise(p,m);return {p,m,a};})
+    .sort((x,y)=>y.a.level-x.a.level);
+  const levelBar={3:'border-rose-400',2:'border-amber-400',1:'border-yellow-300',0:'border-emerald-300'};
+  scoredList.forEach(({p,m,a})=>{
+    const fmtP=(v)=> v==null?'—':'¥'+v.toFixed(2);
+    const disc=(fp)=> (p.price>0&&fp!=null)?(fp/p.price*10).toFixed(1)+'折':'—';
+    const shelfMetric = m.shelfLife!=null
+      ? `<div>剩余效期 <b class="${a.shelf.lv>=2?'text-rose-600':'text-slate-800'}">${m.shelfLife}天</b><span class="text-slate-400"> (录入${m.shelfLifeRaw}/已过${m.shelfElapsed})</span></div>`
+      : `<div>剩余效期 <b class="text-slate-300">—</b></div>`;
+    c.innerHTML+=`<div id="alert-${p.sku}" class="alert-card bg-white rounded-xl shadow-sm p-4 border-l-4 ${levelBar[a.level]} transition">
+      <div class="flex flex-wrap justify-between items-center gap-2 mb-2">
+        <div class="font-semibold">${p.name} <span class="text-xs text-slate-400">${p.sku} · ${p.cat}</span></div>
+        <div class="flex gap-1 flex-wrap">${a.tags.map(t=>badge(t.c,t.t)).join('')}</div>
+      </div>
+      <div class="grid grid-cols-2 sm:grid-cols-6 gap-2 text-xs text-slate-500 mb-3">
+        <div>库销比 <b class="text-slate-800">${fmt(m.isr,2)}</b></div>
+        <div>可售天数 <b class="text-slate-800">${isFinite(m.sellDays)?fmt(m.sellDays)+'天':'∞'}</b></div>
+        ${shelfMetric}
+        <div>滚动周转 <b class="text-slate-800">${m.turnover?m.turnover.toFixed(2):'—'}</b></div>
+        <div>利润率 <b class="text-slate-800">${(m.margin*100).toFixed(1)}%</b></div>
+        <div>单件利润 <b class="text-slate-800">${fmt(m.unitProfit,2)}</b></div>
+      </div>
+      <div class="space-y-1 text-sm text-slate-700 mb-3">${a.advice.map(x=>`<p>${x}</p>`).join('')}</div>
+      <div class="bg-slate-50 rounded-lg p-3 text-xs grid grid-cols-1 sm:grid-cols-4 gap-2">
+        <div>🏷 控价：<b>${fmtP(p.price)}</b></div>
+        <div>💰 当前到手价：<b>${fmtP(m.actual)}</b></div>
+        <div>🎯 目标利润底价：<b class="text-indigo-600">${fmtP(m.targetFloor)}</b>（${disc(m.targetFloor)}）</div>
+        <div>🩸 保本极限底价：<b class="text-rose-600">${fmtP(m.breakeven)}</b>（${disc(m.breakeven)}）</div>
+      </div>
+      ${(m.expiryLoss&&m.expiryLoss>0)?`<div class="mt-2 text-xs bg-rose-50 text-rose-700 rounded-lg p-2">⏳ 效期测算：预计报损约 <b>${Math.round(m.expiryQty)}</b> 件 / <b>¥${fmt(m.expiryLoss)}</b>${isFinite(m.needDaily)?`，清完所需日均 <b>${m.needDaily.toFixed(1)}</b> 件`:'（已过效期）'}</div>`:''}
+    </div>`;
+  });
+}
+
+function scoreProduct(p){const m=compute(p);const inv=invStatus(m.isr);const turn=turnStatus(m.turnover);const shelf=shelfStatus(m);return {p,m,inv,turn,shelf,level:Math.max(inv.lv,turn.lv,shelf.lv)};}
+function getWarningList(){ return products.map(scoreProduct).filter(x=>x.level>=2).sort((a,b)=>b.level-a.level); }
+function getProductsByStatus(status){ return products.map(scoreProduct).filter(x=>x.inv.t===status).sort((a,b)=>b.level-a.level); }
+function getExpiryRiskList(){ return products.map(scoreProduct).filter(x=>!x.shelf.none && x.shelf.lv>=2).sort((a,b)=>(b.m.expiryLoss||0)-(a.m.expiryLoss||0)); }
+
+function showAlertList(){ const list=getWarningList(); openProductList(`预警产品清单（共 ${list.length} 个）`, list); }
+function showExpiryList(){ const list=getExpiryRiskList(); openProductList(`效期风险清单（临期/报损，共 ${list.length} 个）`, list); }
+
+function openProductList(title,list){
+  document.getElementById('listModalTitle').textContent=title;
+  const body=document.getElementById('listModalBody');
+  if(!list.length){
+    body.innerHTML='<div class="p-6 text-center text-slate-400">暂无符合条件的产品 🎉</div>';
+  }else{
+    body.innerHTML=list.map(({p,m,inv,turn,shelf})=>{
+      const shelfBadge = shelf.none?'':badge(shelf.c,shelf.t);
+      const lossLine = (m.expiryLoss&&m.expiryLoss>0)? ` · 预计报损¥${fmt(m.expiryLoss)}`:'';
+      const shelfLine = m.shelfLife!=null? ` · 效期${m.shelfLife}天`:'';
+      return `<button onclick="gotoAlert('${p.sku}')" class="w-full text-left border rounded-lg p-3 mb-2 hover:bg-indigo-50 hover:border-indigo-300 transition flex justify-between items-center gap-3">
+        <div class="min-w-0">
+          <div class="font-medium text-sm truncate">${p.name} <span class="text-xs text-slate-400">${p.sku} · ${p.cat}</span></div>
+          <div class="text-xs text-slate-500 mt-1">库销比 <b>${fmt(m.isr,2)}</b> · 可售 ${isFinite(m.sellDays)?fmt(m.sellDays)+'天':'∞'}${shelfLine} · 周转 ${m.turnover?m.turnover.toFixed(2):'—'}${lossLine}</div>
+        </div>
+        <div class="flex flex-col items-end gap-1 shrink-0">
+          <div class="flex gap-1 flex-wrap justify-end">${badge(inv.c,inv.t)}${badge(turn.c,turn.t)}${shelfBadge}</div>
+          <span class="text-xs text-indigo-500">查看建议 →</span>
+        </div>
+      </button>`;
+    }).join('');
+  }
+  document.getElementById('listModal').classList.remove('hidden');
+}
+function closeListModal(){ document.getElementById('listModal').classList.add('hidden'); }
+function gotoAlert(sku){
+  closeListModal();
+  switchTab('alerts');
+  setTimeout(()=>{
+    const el=document.getElementById('alert-'+sku);
+    if(el){
+      el.scrollIntoView({behavior:'smooth',block:'center'});
+      el.classList.add('ring-2','ring-indigo-400','bg-indigo-50');
+      setTimeout(()=>el.classList.remove('ring-2','ring-indigo-400','bg-indigo-50'),2600);
+    }
+  },120);
+}
+
+/* ============ CSV 导出（只读保留） ============ */
+const HEADERS=['产品名称','SKU编码','品类','成本','控价','实际支付到手价','最近一周销售件数','最新期末库存','年初期初库存','业务年累计销售件数','数据日期','税运仓储比例%','其他费用比例%','剩余效期天数'];
+function exportData(){
+  let rows=[HEADERS.join(',')];
+  products.forEach(p=>rows.push([p.name,p.sku,p.cat,p.cost,p.price,p.actualPrice,p.weekSales,p.endInv,p.beginInv,p.ytdSales,p.date,p.feeTax,p.feeOther,p.shelfLife].join(',')));
+  downloadFile('﻿'+rows.join('
+'),'渠道数据导出.csv');
+}
+function downloadFile(content,name){
+  const blob=new Blob([content],{type:'text/csv;charset=utf-8;'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; a.click();
+}
+
+/* ============ Tab & Toast ============ */
+function switchTab(name){
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.add('hidden'));
+  document.getElementById('tab-'+name).classList.remove('hidden');
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('tab-active',b.dataset.tab===name));
+  if(name==='dashboard') renderDashboard();
+  goTop();
+}
+document.querySelectorAll('.tab-btn').forEach(b=>b.addEventListener('click',()=>switchTab(b.dataset.tab)));
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeListModal(); });
+let toastTimer;
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.style.opacity=1;clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.style.opacity=0,2000);}
+
+/* ============ 回到顶部 ============ */
+function getScrollTop(){
+  return window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
+}
+function setScrollTop(y){
+  try{ window.scrollTo(0,y); }catch(e){}
+  if(document.documentElement) document.documentElement.scrollTop = y;
+  if(document.body) document.body.scrollTop = y;
+}
+function goTop(){
+  const startY = getScrollTop();
+  if(startY <= 0){ setScrollTop(0); return; }
+  const duration = 400, start = performance.now();
+  function step(now){
+    const t = Math.min(1,(now-start)/duration);
+    const ease = 1-Math.pow(1-t,3);
+    setScrollTop(startY*(1-ease));
+    if(t<1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+(function(){
+  const btn=document.getElementById('backTop');
+  const onScroll=()=>{
+    if(getScrollTop()>300) btn.classList.remove('hidden-btn');
+    else btn.classList.add('hidden-btn');
+  };
+  window.addEventListener('scroll',onScroll,{passive:true});
+  document.addEventListener('scroll',onScroll,{passive:true,capture:true});
+  onScroll();
+})();
+
+/* ============ 初始化：从 data.json 加载 ============ */
+fetch('./data.json?t=' + Date.now(), {cache:'no-store'})
+  .then(r=>{ if(!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+  .then(d=>{
+    products = d.products || [];
+    if(d.settings) settings = {...settings, ...d.settings};
+    updatedAt = d.updatedAt || '未知';
+    const el = document.getElementById('updateInfo');
+    if(el) el.textContent = '数据更新时间：' + updatedAt + ' · 本页面为只读看板，如需修改请联系管理员';
+    render();
+    switchTab('dashboard');
+  })
+  .catch(e=>{
+    const el = document.getElementById('updateInfo');
+    if(el) el.textContent = '数据加载失败：' + e.message + '（请确认 data.json 已部署且可访问）';
+  });
+</script>
+</body>
+</html>
