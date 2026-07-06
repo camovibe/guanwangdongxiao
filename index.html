@@ -18,8 +18,33 @@
   #backTop{transition:opacity .3s, transform .3s, visibility .3s;}
   #backTop.hidden-btn{opacity:0;visibility:hidden;transform:translateY(12px);pointer-events:none;}
 </style>
+<style>
+  #password-screen{position:fixed;inset:0;z-index:9999;background:linear-gradient(135deg,#1e1b4b,#312e81);display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;}
+  #password-screen .card{background:rgba(255,255,255,0.05);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:40px;max-width:380px;width:90%;text-align:center;box-shadow:0 25px 50px -12px rgba(0,0,0,0.25);}
+  #password-screen h2{font-size:20px;font-weight:700;margin-bottom:8px;}
+  #password-screen p{font-size:13px;color:#a5b4fc;margin-bottom:24px;line-height:1.6;}
+  #password-screen input{width:100%;padding:12px 16px;border-radius:10px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.08);color:#fff;font-size:15px;outline:none;margin-bottom:16px;transition:border-color .2s;}
+  #password-screen input:focus{border-color:#818cf8;}
+  #password-screen input::placeholder{color:#818cf8;}
+  #password-screen button{width:100%;padding:12px;border-radius:10px;border:none;background:#4f46e5;color:#fff;font-size:15px;font-weight:600;cursor:pointer;transition:background .2s;}
+  #password-screen button:hover{background:#4338ca;}
+  #password-screen .error{color:#f87171;font-size:13px;margin-top:12px;min-height:20px;}
+  #password-screen .hint{color:#818cf8;font-size:11px;margin-top:16px;}
+  #main-content{display:none;}
+</style>
 </head>
 <body class="bg-slate-100 text-slate-800">
+<div id="password-screen">
+  <div class="card">
+    <h2>🔐 产品渠道动销与利润罗盘</h2>
+    <p>本页面含成本、利润等敏感经营数据，请输入密码后访问。</p>
+    <input type="password" id="pwdInput" placeholder="输入密码" onkeydown="if(event.key==='Enter')checkPwd()">
+    <button onclick="checkPwd()">进入看板</button>
+    <div class="error" id="pwdError"></div>
+    <div class="hint">⚠️ 本页面为简易密码保护，懂技术的人仍可能绕过。如需更高安全级别，请使用 Cloudflare Access 等服务端鉴权方案。</div>
+  </div>
+</div>
+<div id="main-content">
 <div class="max-w-screen-2xl mx-auto p-3 sm:p-6">
 
   <!-- 头部 -->
@@ -161,6 +186,32 @@
 <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-sm px-4 py-2 rounded-lg shadow-lg opacity-0 pointer-events-none transition-opacity z-50"></div>
 
 <script>
+/* ============ 密码保护（简易版，部署前请修改密码） ============ */
+const DASHBOARD_PASSWORD = "2026";  // ← 部署前务必修改此密码
+const DASHBOARD_PASSWORD_HASH = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"; // SHA256 of empty string, will be replaced
+
+function sha256(str){
+  const buf = new TextEncoder().encode(str);
+  return crypto.subtle.digest('SHA-256', buf).then(hash => {
+    return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2,'0')).join('');
+  });
+}
+async function checkPwd(){
+  const input = document.getElementById('pwdInput').value.trim();
+  const err = document.getElementById('pwdError');
+  if(!input){err.textContent='请输入密码';return;}
+  const hash = await sha256(input);
+  // 预计算常见密码的哈希供比对：用 "gnc2024" 作为默认示例
+  const expectedHash = await sha256(DASHBOARD_PASSWORD);
+  if(hash === expectedHash){
+    document.getElementById('password-screen').style.display='none';
+    document.getElementById('main-content').style.display='block';
+    loadDashboardData();
+  }else{
+    err.textContent='密码错误，请重试';
+  }
+}
+
 /* ================= 状态 ================= */
 let products = [];
 let settings = {
@@ -559,22 +610,25 @@ function goTop(){
   onScroll();
 })();
 
-/* ============ 初始化：从 data.json 加载 ============ */
-fetch('./data.json?t=' + Date.now(), {cache:'no-store'})
-  .then(r=>{ if(!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
-  .then(d=>{
-    products = d.products || [];
-    if(d.settings) settings = {...settings, ...d.settings};
-    updatedAt = d.updatedAt || '未知';
-    const el = document.getElementById('updateInfo');
-    if(el) el.textContent = '数据更新时间：' + updatedAt + ' · 本页面为只读看板，如需修改请联系管理员';
-    render();
-    switchTab('dashboard');
-  })
-  .catch(e=>{
-    const el = document.getElementById('updateInfo');
-    if(el) el.textContent = '数据加载失败：' + e.message + '（请确认 data.json 已部署且可访问）';
-  });
+/* ============ 加载数据（密码验证后调用） ============ */
+function loadDashboardData(){
+  fetch('./data.json?t=' + Date.now(), {cache:'no-store'})
+    .then(r=>{ if(!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+    .then(d=>{
+      products = d.products || [];
+      if(d.settings) settings = {...settings, ...d.settings};
+      updatedAt = d.updatedAt || '未知';
+      const el = document.getElementById('updateInfo');
+      if(el) el.textContent = '数据更新时间：' + updatedAt + ' · 本页面为只读看板，如需修改请联系管理员';
+      render();
+      switchTab('dashboard');
+    })
+    .catch(e=>{
+      const el = document.getElementById('updateInfo');
+      if(el) el.textContent = '数据加载失败：' + e.message + '（请确认 data.json 已部署且可访问）';
+    });
+}
 </script>
+</div>
 </body>
 </html>
