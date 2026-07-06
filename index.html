@@ -51,7 +51,7 @@
   <header class="mb-5">
     <h1 class="text-xl sm:text-2xl font-bold text-slate-900 flex items-center gap-2">
       <span class="inline-block w-2 h-6 bg-indigo-600 rounded"></span>
-      产品渠道动销与利润罗盘系统 <span class="text-xs font-normal text-slate-400">v1.4-readonly</span>
+      产品渠道动销与利润罗盘系统 <span class="text-xs font-normal text-slate-400">v1.5-readonly</span>
     </h1>
     <p class="text-sm text-slate-500 mt-1">库销比 · 滚动周转 · 效期报损预警(随日期动态倒扣) · 智能促销边界 · 渠道利润看板</p>
     <div id="updateInfo" class="mt-2 text-xs text-amber-700 font-medium bg-amber-50 rounded-lg px-3 py-1.5 inline-block">正在加载数据...</div>
@@ -124,7 +124,7 @@
           <tr class="bg-slate-50 text-slate-500 text-left">
             <th class="p-2">产品</th><th class="p-2">SKU</th><th class="p-2">品类</th>
             <th class="p-2 text-right">成本</th><th class="p-2 text-right">控价</th><th class="p-2 text-right">到手价</th>
-            <th class="p-2 text-right">单件利润</th><th class="p-2 text-right">利润率</th>
+            <th class="p-2 text-right">单件利润</th><th class="p-2 text-right">利润率</th><th class="p-2 text-right">累计利润</th>
             <th class="p-2 text-right">日均销</th><th class="p-2 text-right">期末库存</th>
             <th class="p-2 text-right">库销比</th><th class="p-2 text-right">可售天数</th>
             <th class="p-2 text-right">剩余效期</th><th class="p-2 text-right">预计报损</th>
@@ -139,6 +139,7 @@
             <th class="p-1"><input id="flt_actual" oninput="renderOverview()" class="flt" placeholder="<80"></th>
             <th class="p-1"><input id="flt_profit" oninput="renderOverview()" class="flt" placeholder=">0"></th>
             <th class="p-1"><input id="flt_margin" oninput="renderOverview()" class="flt" placeholder=">15"></th>
+            <th class="p-1"><input id="flt_ytdProfit" oninput="renderOverview()" class="flt" placeholder=">0"></th>
             <th class="p-1"><input id="flt_daily" oninput="renderOverview()" class="flt" placeholder=">10"></th>
             <th class="p-1"><input id="flt_endInv" oninput="renderOverview()" class="flt" placeholder="0-500"></th>
             <th class="p-1"><input id="flt_isr" oninput="renderOverview()" class="flt" placeholder=">3"></th>
@@ -356,12 +357,12 @@ function matchNum(v,expr){
 function getOverviewFilters(){
   const g=id=>{const el=document.getElementById(id);return el?el.value.trim():'';};
   return {name:g('flt_name'),sku:g('flt_sku'),cat:g('flt_cat'),cost:g('flt_cost'),price:g('flt_price'),
-    actual:g('flt_actual'),profit:g('flt_profit'),margin:g('flt_margin'),daily:g('flt_daily'),
+    actual:g('flt_actual'),profit:g('flt_profit'),margin:g('flt_margin'),ytdProfit:g('flt_ytdProfit'),daily:g('flt_daily'),
     endInv:g('flt_endInv'),isr:g('flt_isr'),sellDays:g('flt_sellDays'),shelf:g('flt_shelf'),loss:g('flt_loss'),
     turnover:g('flt_turnover'),status:g('flt_status')};
 }
 function clearOverviewFilters(){
-  ['flt_name','flt_sku','flt_cat','flt_cost','flt_price','flt_actual','flt_profit','flt_margin','flt_daily','flt_endInv','flt_isr','flt_sellDays','flt_shelf','flt_loss','flt_turnover','flt_status']
+  ['flt_name','flt_sku','flt_cat','flt_cost','flt_price','flt_actual','flt_profit','flt_margin','flt_ytdProfit','flt_daily','flt_endInv','flt_isr','flt_sellDays','flt_shelf','flt_loss','flt_turnover','flt_status']
     .forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   renderOverview();
 }
@@ -369,7 +370,7 @@ function clearOverviewFilters(){
 function renderOverview(){
   const tb=document.getElementById('overviewBody'); tb.innerHTML='';
   const ovc=document.getElementById('ovCount');
-  const COLS=16;
+  const COLS=17;
   if(!products.length){tb.innerHTML=`<tr><td colspan="${COLS}" class="p-6 text-center text-slate-400">暂无数据，请检查 data.json 是否已正确部署</td></tr>`;if(ovc)ovc.textContent='';return;}
   const f=getOverviewFilters();
   let shown=0;
@@ -379,7 +380,7 @@ function renderOverview(){
     const pass =
       textMatch(p.name,f.name)&&textMatch(p.sku,f.sku)&&textMatch(p.cat,f.cat)&&
       matchNum(p.cost,f.cost)&&matchNum(p.price,f.price)&&matchNum(m.actual,f.actual)&&
-      matchNum(m.unitProfit,f.profit)&&matchNum(m.margin*100,f.margin)&&matchNum(m.daily,f.daily)&&
+      matchNum(m.unitProfit,f.profit)&&matchNum(m.margin*100,f.margin)&&matchNum(m.ytdProfit,f.ytdProfit)&&matchNum(m.daily,f.daily)&&
       matchNum(p.endInv,f.endInv)&&matchNum(m.isr,f.isr)&&matchNum(m.sellDays,f.sellDays)&&
       matchNum(m.shelfLife,f.shelf)&&matchNum(m.expiryLoss,f.loss)&&
       matchNum(m.turnover,f.turnover)&&textMatch(statusText,f.status);
@@ -394,6 +395,7 @@ function renderOverview(){
       <td class="p-2 text-right font-medium">${fmt(m.actual,2)}</td>
       <td class="p-2 text-right ${m.unitProfit<0?'text-rose-600':'text-emerald-600'}">${fmt(m.unitProfit,2)}</td>
       <td class="p-2 text-right ${m.margin<0?'text-rose-600':''}">${(m.margin*100).toFixed(1)}%</td>
+      <td class="p-2 text-right ${m.ytdProfit<0?'text-rose-600':'text-emerald-600'}">¥${fmt(m.ytdProfit)}</td>
       <td class="p-2 text-right">${fmt(m.daily,1)}</td><td class="p-2 text-right">${fmt(p.endInv)}</td>
       <td class="p-2 text-right font-semibold">${fmt(m.isr,2)}</td>
       <td class="p-2 text-right">${isFinite(m.sellDays)?fmt(m.sellDays)+'天':'∞'}</td>
