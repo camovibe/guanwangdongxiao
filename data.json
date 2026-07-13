@@ -7,14 +7,14 @@
       "cost": 34.81,
       "price": 139,
       "actualPrice": "66.34",
-      "weekSales": 172,
-      "endInv": 15520,
+      "weekSales": 136,
+      "endInv": 15383,
       "beginInv": 29890,
-      "ytdSales": 30166,
-      "date": "2026/7/6",
+      "ytdSales": 30302,
+      "date": "2026/7/13",
       "feeTax": "17",
       "feeOther": "23",
-      "shelfLife": "269"
+      "shelfLife": "262"
     },
     {
       "name": "GNC健安喜Vitapak®男士每日营养包进阶款\\30包*1盒\\490020",
@@ -23,14 +23,14 @@
       "cost": 107.2,
       "price": 399,
       "actualPrice": "218.39",
-      "weekSales": 172,
-      "endInv": 2014,
+      "weekSales": 84,
+      "endInv": 1941,
       "beginInv": 3457,
-      "ytdSales": 5172,
-      "date": "2026/7/6",
+      "ytdSales": 5256,
+      "date": "2026/7/13",
       "feeTax": "17",
       "feeOther": "23",
-      "shelfLife": "179"
+      "shelfLife": "172"
     },
     {
       "name": "GNC健安喜Vitapak男性30+每日营养包",
@@ -39,14 +39,14 @@
       "cost": 52.6,
       "price": 139,
       "actualPrice": "126.75",
-      "weekSales": 38,
-      "endInv": 973,
+      "weekSales": 41,
+      "endInv": 938,
       "beginInv": 1993,
-      "ytdSales": 2419,
-      "date": "2026/7/6",
+      "ytdSales": 2460,
+      "date": "2026/7/13",
       "feeTax": "17",
       "feeOther": "23",
-      "shelfLife": "238"
+      "shelfLife": "231"
     },
     {
       "name": "GNC健安喜Vitapak男性40+每日营养包",
@@ -55,14 +55,14 @@
       "cost": 62.14,
       "price": 229,
       "actualPrice": "202.97",
-      "weekSales": 99,
-      "endInv": 1274,
+      "weekSales": 91,
+      "endInv": 1183,
       "beginInv": 3798,
-      "ytdSales": 5660,
-      "date": "2026/7/6",
+      "ytdSales": 5751,
+      "date": "2026/7/13",
       "feeTax": "17",
       "feeOther": "23",
-      "shelfLife": "179"
+      "shelfLife": "172"
     },
     {
       "name": "GNC健安喜Vitapak女性50+每日营养包",
@@ -71,14 +71,14 @@
       "cost": 61.86,
       "price": 259,
       "actualPrice": "198.28",
-      "weekSales": 130,
-      "endInv": 875,
+      "weekSales": 87,
+      "endInv": 797,
       "beginInv": 2932,
-      "ytdSales": 5402,
-      "date": "2026/7/6",
+      "ytdSales": 5489,
+      "date": "2026/7/13",
       "feeTax": "17",
       "feeOther": "23",
-      "shelfLife": "210"
+      "shelfLife": "203"
     },
     {
       "name": "GNC健安喜Vitapak男性50+每日营养包",
@@ -87,14 +87,14 @@
       "cost": 63.14,
       "price": 259,
       "actualPrice": "207.69",
-      "weekSales": 91,
-      "endInv": 844,
+      "weekSales": 53,
+      "endInv": 791,
       "beginInv": 1592,
-      "ytdSales": 4648,
-      "date": "2026/7/6",
+      "ytdSales": 4701,
+      "date": "2026/7/13",
       "feeTax": "17",
       "feeOther": "23",
-      "shelfLife": "299"
+      "shelfLife": "292"
     },
     {
       "name": "健安喜维生素C缓释片（1000毫克180片）",
@@ -103,14 +103,14 @@
       "cost": 40.24,
       "price": 79,
       "actualPrice": "87.35",
-      "weekSales": 103,
-      "endInv": 998,
+      "weekSales": 93,
+      "endInv": 905,
       "beginInv": 1505,
-      "ytdSales": 2493,
-      "date": "2026/7/6",
+      "ytdSales": 2586,
+      "date": "2026/7/13",
       "feeTax": "17",
       "feeOther": "23",
-      "shelfLife": "391"
+      "shelfLife": "384"
     },
     {
       "name": "GNC健安喜叶黄素胶囊20毫克60粒",
@@ -119,14 +119,14 @@
       "cost": 12.82,
       "price": 33,
       "actualPrice": "41.57",
-      "weekSales": 113,
-      "endInv": 372,
+      "weekSales": 44,
+      "endInv": 328,
       "beginInv": 3518,
-      "ytdSales": 3583,
-      "date": "2026/7/6",
+      "ytdSales": 3627,
+      "date": "2026/7/13",
       "feeTax": "17",
       "feeOther": "23",
-      "shelfLife": "360"
+      "shelfLife": "353"
     },
     {
       "name": "GNC健安喜Vitapak女性30+每日营养包",
@@ -135,14 +135,14 @@
       "cost": 48.44,
       "price": 139,
       "actualPrice": "116",
-      "weekSales": 47,
-      "endInv": 1525,
+      "weekSales": 23,
+      "endInv": 1507,
       "beginInv": 1633,
-      "ytdSales": 4369,
-      "date": "2026/7/6",
+      "ytdSales": 4392,
+      "date": "2026/7/13",
       "feeTax": "17",
       "feeOther": "23",
-      "shelfLife": "238"
+      "shelfLife": "231"
     },
     {
       "name": "GNC健安喜泛醇200mg软胶囊（200mg 30粒 ）",
@@ -151,14 +151,14 @@
       "cost": 89.11,
       "price": 289,
       "actualPrice": "140.74",
-      "weekSales": 75,
-      "endInv": 1637,
+      "weekSales": 32,
+      "endInv": 1605,
       "beginInv": 2344,
-      "ytdSales": 721,
-      "date": "2026/7/6",
+      "ytdSales": 753,
+      "date": "2026/7/13",
       "feeTax": "17",
       "feeOther": "23",
-      "shelfLife": "635"
+      "shelfLife": "628"
     },
     {
       "name": "GNC健安喜七合一加钙优骨力氨糖软骨素运动关节片160片/瓶",
@@ -167,14 +167,14 @@
       "cost": 53.61,
       "price": 109,
       "actualPrice": "82.06",
-      "weekSales": 47,
-      "endInv": 967,
+      "weekSales": 48,
+      "endInv": 918,
       "beginInv": 3060,
-      "ytdSales": 2713,
-      "date": "2026/7/6",
+      "ytdSales": 2761,
+      "date": "2026/7/13",
       "feeTax": "17",
       "feeOther": "23",
-      "shelfLife": "665"
+      "shelfLife": "658"
     },
     {
       "name": "GNC姜黄奶蓟精华120粒",
@@ -183,14 +183,14 @@
       "cost": 38.87,
       "price": 169,
       "actualPrice": "114.29",
-      "weekSales": 68,
-      "endInv": 752,
+      "weekSales": 44,
+      "endInv": 706,
       "beginInv": 1249,
-      "ytdSales": 1950,
-      "date": "2026/7/6",
+      "ytdSales": 1994,
+      "date": "2026/7/13",
       "feeTax": "17",
       "feeOther": "23",
-      "shelfLife": "696"
+      "shelfLife": "689"
     },
     {
       "name": "健安喜Vitapak®男性40+每日营养包升级版\\30包*1盒\\490077",
@@ -199,14 +199,14 @@
       "cost": 66.36,
       "price": 279,
       "actualPrice": "187.72",
-      "weekSales": 77,
-      "endInv": 1183,
+      "weekSales": 43,
+      "endInv": 1141,
       "beginInv": 1002,
-      "ytdSales": 2091,
-      "date": "2026/7/6",
+      "ytdSales": 2134,
+      "date": "2026/7/13",
       "feeTax": "17",
       "feeOther": "23",
-      "shelfLife": "179"
+      "shelfLife": "172"
     },
     {
       "name": "健安喜辅酶Q10软胶囊200MG\\150粒*1瓶\\490062",
@@ -215,14 +215,14 @@
       "cost": 64.34,
       "price": 269,
       "actualPrice": "153.55",
-      "weekSales": 37,
-      "endInv": 1014,
+      "weekSales": 56,
+      "endInv": 959,
       "beginInv": 1078,
-      "ytdSales": 2500,
-      "date": "2026/7/6",
+      "ytdSales": 2556,
+      "date": "2026/7/13",
       "feeTax": "17",
       "feeOther": "23",
-      "shelfLife": "726"
+      "shelfLife": "719"
     },
     {
       "name": "健安喜Vitapak®女性40+每日营养包升级版\\30包*1盒\\490080",
@@ -231,14 +231,14 @@
       "cost": 66.1,
       "price": 279,
       "actualPrice": "180.03",
-      "weekSales": 56,
-      "endInv": 1608,
+      "weekSales": 73,
+      "endInv": 1532,
       "beginInv": 1070,
-      "ytdSales": 1750,
-      "date": "2026/7/6",
+      "ytdSales": 1823,
+      "date": "2026/7/13",
       "feeTax": "17",
       "feeOther": "23",
-      "shelfLife": "210"
+      "shelfLife": "203"
     },
     {
       "name": "健安喜男士多种维生素矿物质缓释片\\120粒*1瓶",
@@ -247,14 +247,14 @@
       "cost": 32.84,
       "price": 129,
       "actualPrice": "107.19",
-      "weekSales": 127,
-      "endInv": 0,
+      "weekSales": 21,
+      "endInv": 565,
       "beginInv": 975,
-      "ytdSales": 2493,
-      "date": "2026/7/6",
+      "ytdSales": 2514,
+      "date": "2026/7/13",
       "feeTax": "17",
       "feeOther": "23",
-      "shelfLife": "330"
+      "shelfLife": "323"
     },
     {
       "name": "健安喜优骨力葡萄糖氨软骨素120粒\\120粒*1瓶",
@@ -263,14 +263,14 @@
       "cost": 57.77,
       "price": 189,
       "actualPrice": "134.05",
-      "weekSales": 58,
-      "endInv": 855,
+      "weekSales": 9,
+      "endInv": 846,
       "beginInv": 462,
-      "ytdSales": 1139,
-      "date": "2026/7/6",
+      "ytdSales": 1148,
+      "date": "2026/7/13",
       "feeTax": "17",
       "feeOther": "23",
-      "shelfLife": "635"
+      "shelfLife": "628"
     },
     {
       "name": "GNC健安喜复合辅酶胶囊14粒/盒",
@@ -279,14 +279,14 @@
       "cost": 11.32,
       "price": 69,
       "actualPrice": "35.46",
-      "weekSales": 21,
-      "endInv": 532,
+      "weekSales": 11,
+      "endInv": 521,
       "beginInv": 1130,
-      "ytdSales": 628,
-      "date": "2026/7/6",
+      "ytdSales": 639,
+      "date": "2026/7/13",
       "feeTax": "17",
       "feeOther": "23",
-      "shelfLife": "452"
+      "shelfLife": "445"
     },
     {
       "name": "GNC健安喜Vitapak女性40+每日营养包",
@@ -295,14 +295,14 @@
       "cost": 62.33,
       "price": 229,
       "actualPrice": "186.79",
-      "weekSales": 63,
-      "endInv": 917,
+      "weekSales": 31,
+      "endInv": 882,
       "beginInv": 5051,
-      "ytdSales": 4080,
-      "date": "2026/7/6",
+      "ytdSales": 4111,
+      "date": "2026/7/13",
       "feeTax": "17",
       "feeOther": "23",
-      "shelfLife": "179"
+      "shelfLife": "172"
     },
     {
       "name": "健安喜女士营养包进阶款\\30包*1盒",
@@ -311,14 +311,14 @@
       "cost": 108.21,
       "price": 399,
       "actualPrice": "198.37",
-      "weekSales": 51,
-      "endInv": 970,
+      "weekSales": 211,
+      "endInv": 768,
       "beginInv": 1263,
-      "ytdSales": 3429,
-      "date": "2026/7/6",
+      "ytdSales": 3640,
+      "date": "2026/7/13",
       "feeTax": "17",
       "feeOther": "23",
-      "shelfLife": "179"
+      "shelfLife": "172"
     },
     {
       "name": "GNC健安喜辅酶Q10软胶囊100mg120粒/瓶",
@@ -327,14 +327,14 @@
       "cost": 41.03,
       "price": 129,
       "actualPrice": "100.12",
-      "weekSales": 41,
-      "endInv": 618,
+      "weekSales": 40,
+      "endInv": 579,
       "beginInv": 724,
-      "ytdSales": 1672,
-      "date": "2026/7/6",
+      "ytdSales": 1712,
+      "date": "2026/7/13",
       "feeTax": "17",
       "feeOther": "23",
-      "shelfLife": "849"
+      "shelfLife": "842"
     },
     {
       "name": "健安喜Vitapak®男性30+每日营养包升级版\\30包*1盒\\490076",
@@ -343,14 +343,14 @@
       "cost": 58.44,
       "price": 219,
       "actualPrice": "142.49",
-      "weekSales": 50,
-      "endInv": 745,
+      "weekSales": 26,
+      "endInv": 721,
       "beginInv": 387,
-      "ytdSales": 691,
-      "date": "2026/7/6",
+      "ytdSales": 717,
+      "date": "2026/7/13",
       "feeTax": "17",
       "feeOther": "23",
-      "shelfLife": "360"
+      "shelfLife": "353"
     },
     {
       "name": "GNC健安喜泛醇100mg软胶囊  （100mg 30粒 ）",
@@ -359,14 +359,14 @@
       "cost": 55.18,
       "price": 149,
       "actualPrice": "121.48",
-      "weekSales": 45,
-      "endInv": 137,
+      "weekSales": 34,
+      "endInv": 188,
       "beginInv": 1276,
-      "ytdSales": 1772,
-      "date": "2026/7/6",
+      "ytdSales": 1806,
+      "date": "2026/7/13",
       "feeTax": "17",
       "feeOther": "23",
-      "shelfLife": "635"
+      "shelfLife": "628"
     },
     {
       "name": "健安喜女士多种维生素矿物质缓释片\\120粒*1瓶",
@@ -375,14 +375,14 @@
       "cost": 34.25,
       "price": 129,
       "actualPrice": "123.29",
-      "weekSales": 41,
-      "endInv": 1576,
+      "weekSales": 60,
+      "endInv": 1520,
       "beginInv": 583,
-      "ytdSales": 1734,
-      "date": "2026/7/6",
+      "ytdSales": 1794,
+      "date": "2026/7/13",
       "feeTax": "17",
       "feeOther": "23",
-      "shelfLife": "299"
+      "shelfLife": "292"
     },
     {
       "name": "GNC健安喜辅酶Q10软胶囊200mg60粒/瓶",
@@ -391,14 +391,14 @@
       "cost": 35.49,
       "price": 129,
       "actualPrice": "101.13",
-      "weekSales": 32,
-      "endInv": 124,
+      "weekSales": 24,
+      "endInv": 99,
       "beginInv": 1115,
-      "ytdSales": 1478,
-      "date": "2026/7/6",
+      "ytdSales": 1502,
+      "date": "2026/7/13",
       "feeTax": "17",
       "feeOther": "23",
-      "shelfLife": "726"
+      "shelfLife": "719"
     },
     {
       "name": "GNC健安喜柠檬酸钙片1000mg180片",
@@ -407,14 +407,14 @@
       "cost": 20.11,
       "price": 49,
       "actualPrice": "47.43",
-      "weekSales": 35,
-      "endInv": 370,
+      "weekSales": 21,
+      "endInv": 350,
       "beginInv": 1366,
-      "ytdSales": 1004,
-      "date": "2026/7/6",
+      "ytdSales": 1025,
+      "date": "2026/7/13",
       "feeTax": "17",
       "feeOther": "23",
-      "shelfLife": "696"
+      "shelfLife": "689"
     },
     {
       "name": "健安喜Vitapak®女性30+每日营养包升级版\\30包*1盒\\490079",
@@ -423,14 +423,14 @@
       "cost": 55.7,
       "price": 219,
       "actualPrice": "137.59",
-      "weekSales": 54,
-      "endInv": 526,
+      "weekSales": 13,
+      "endInv": 513,
       "beginInv": 629,
-      "ytdSales": 866,
-      "date": "2026/7/6",
+      "ytdSales": 879,
+      "date": "2026/7/13",
       "feeTax": "17",
       "feeOther": "23",
-      "shelfLife": "422"
+      "shelfLife": "415"
     },
     {
       "name": "GNC健安喜高含量钙片1000mg 180片",
@@ -439,14 +439,14 @@
       "cost": 17.16,
       "price": 49,
       "actualPrice": "37.19",
-      "weekSales": 34,
-      "endInv": 937,
+      "weekSales": 44,
+      "endInv": 891,
       "beginInv": 827,
-      "ytdSales": 1463,
-      "date": "2026/7/6",
+      "ytdSales": 1507,
+      "date": "2026/7/13",
       "feeTax": "17",
       "feeOther": "23",
-      "shelfLife": "544"
+      "shelfLife": "537"
     },
     {
       "name": "健安喜EPA1200 高纯度鱼油\\60粒*1盒\\490046",
@@ -455,14 +455,14 @@
       "cost": 67.39,
       "price": 329,
       "actualPrice": "150.4",
-      "weekSales": 44,
-      "endInv": 874,
+      "weekSales": 73,
+      "endInv": 813,
       "beginInv": 1543,
-      "ytdSales": 2480,
-      "date": "2026/7/6",
+      "ytdSales": 2553,
+      "date": "2026/7/13",
       "feeTax": "17",
       "feeOther": "23",
-      "shelfLife": "422"
+      "shelfLife": "415"
     },
     {
       "name": "健安喜双层缓释维生素B\\60粒*1瓶",
@@ -471,14 +471,14 @@
       "cost": 19.95,
       "price": 79,
       "actualPrice": "68.5",
-      "weekSales": 39,
-      "endInv": 581,
+      "weekSales": 21,
+      "endInv": 559,
       "beginInv": 640,
-      "ytdSales": 1509,
-      "date": "2026/7/6",
+      "ytdSales": 1530,
+      "date": "2026/7/13",
       "feeTax": "17",
       "feeOther": "23",
-      "shelfLife": "238"
+      "shelfLife": "231"
     },
     {
       "name": "健安喜儿童液体钙镁锌（包装升级款）\\30条*1盒\\490052",
@@ -487,14 +487,14 @@
       "cost": 31.55,
       "price": 149,
       "actualPrice": "89.86",
-      "weekSales": 30,
-      "endInv": 1229,
+      "weekSales": 7,
+      "endInv": 1222,
       "beginInv": 2612,
-      "ytdSales": 1388,
-      "date": "2026/7/6",
+      "ytdSales": 1395,
+      "date": "2026/7/13",
       "feeTax": "17",
       "feeOther": "23",
-      "shelfLife": "148"
+      "shelfLife": "141"
     },
     {
       "name": "GNC健安喜辅酶Q10软胶囊100MG*60粒/瓶",
@@ -503,14 +503,14 @@
       "cost": 22.23,
       "price": 69,
       "actualPrice": "70.24",
-      "weekSales": 27,
-      "endInv": 385,
+      "weekSales": 19,
+      "endInv": 367,
       "beginInv": 1319,
-      "ytdSales": 859,
-      "date": "2026/7/6",
+      "ytdSales": 878,
+      "date": "2026/7/13",
       "feeTax": "17",
       "feeOther": "23",
-      "shelfLife": "604"
+      "shelfLife": "597"
     },
     {
       "name": "健安喜维生素D维生素K柠檬酸钙\\120粒*1瓶",
@@ -519,14 +519,14 @@
       "cost": 13.13,
       "price": 49,
       "actualPrice": "70.79",
-      "weekSales": 30,
-      "endInv": 237,
+      "weekSales": 10,
+      "endInv": 228,
       "beginInv": 622,
-      "ytdSales": 513,
-      "date": "2026/7/6",
+      "ytdSales": 523,
+      "date": "2026/7/13",
       "feeTax": "17",
       "feeOther": "23",
-      "shelfLife": "210"
+      "shelfLife": "203"
     },
     {
       "name": "健安喜Vitapak®儿童每日营养包升级款\\30包*1盒",
@@ -535,14 +535,14 @@
       "cost": 61.33,
       "price": 179,
       "actualPrice": "129.53",
-      "weekSales": 19,
-      "endInv": 408,
+      "weekSales": 13,
+      "endInv": 395,
       "beginInv": 557,
-      "ytdSales": 1266,
-      "date": "2026/7/6",
+      "ytdSales": 1279,
+      "date": "2026/7/13",
       "feeTax": "17",
       "feeOther": "23",
-      "shelfLife": "238"
+      "shelfLife": "231"
     },
     {
       "name": "健安喜Vitapak®女性50+每日营养包升级版\\30包*1盒\\490081",
@@ -551,14 +551,14 @@
       "cost": 62.44,
       "price": 279,
       "actualPrice": "152.13",
-      "weekSales": 31,
-      "endInv": 85,
+      "weekSales": 42,
+      "endInv": 43,
       "beginInv": 297,
-      "ytdSales": 509,
-      "date": "2026/7/6",
+      "ytdSales": 551,
+      "date": "2026/7/13",
       "feeTax": "17",
       "feeOther": "23",
-      "shelfLife": "425"
+      "shelfLife": "411"
     },
     {
       "name": "健安喜尿酸控制胶囊\\120粒*1瓶",
@@ -567,14 +567,14 @@
       "cost": 38.56,
       "price": 199,
       "actualPrice": "96.03",
-      "weekSales": 19,
-      "endInv": 567,
+      "weekSales": 7,
+      "endInv": 561,
       "beginInv": 1086,
-      "ytdSales": 425,
-      "date": "2026/7/6",
+      "ytdSales": 432,
+      "date": "2026/7/13",
       "feeTax": "17",
       "feeOther": "23",
-      "shelfLife": "57"
+      "shelfLife": "50"
     },
     {
       "name": "GNC健安喜葡萄籽精华300mg100粒",
@@ -583,14 +583,14 @@
       "cost": 26.45,
       "price": 85,
       "actualPrice": "70.92",
-      "weekSales": 13,
-      "endInv": 376,
+      "weekSales": 14,
+      "endInv": 362,
       "beginInv": 368,
-      "ytdSales": 772,
-      "date": "2026/7/6",
+      "ytdSales": 786,
+      "date": "2026/7/13",
       "feeTax": "17",
       "feeOther": "23",
-      "shelfLife": "483"
+      "shelfLife": "476"
     },
     {
       "name": "健安喜高钙液体钙镁锌\\20条*1盒\\490060",
@@ -599,14 +599,14 @@
       "cost": 18.96,
       "price": 109,
       "actualPrice": "85",
-      "weekSales": 27,
-      "endInv": 292,
+      "weekSales": 6,
+      "endInv": 286,
       "beginInv": 496,
-      "ytdSales": 536,
-      "date": "2026/7/6",
+      "ytdSales": 542,
+      "date": "2026/7/13",
       "feeTax": "17",
       "feeOther": "23",
-      "shelfLife": "118"
+      "shelfLife": "111"
     },
     {
       "name": "健安喜多重眼脑养护鱼油\\60粒*1盒\\453523",
@@ -615,14 +615,14 @@
       "cost": 42.39,
       "price": 269,
       "actualPrice": "105.97",
-      "weekSales": 18,
-      "endInv": 351,
+      "weekSales": 5,
+      "endInv": 346,
       "beginInv": 386,
-      "ytdSales": 336,
-      "date": "2026/7/6",
+      "ytdSales": 341,
+      "date": "2026/7/13",
       "feeTax": "17",
       "feeOther": "23",
-      "shelfLife": "360"
+      "shelfLife": "353"
     },
     {
       "name": "健安喜柠檬酸钙维生素D维生素K复合迷你钙\\360粒/瓶\\490026",
@@ -631,14 +631,14 @@
       "cost": 33.15,
       "price": 159,
       "actualPrice": "94.32",
-      "weekSales": 22,
-      "endInv": 616,
+      "weekSales": 17,
+      "endInv": 599,
       "beginInv": 1018,
-      "ytdSales": 970,
-      "date": "2026/7/6",
+      "ytdSales": 987,
+      "date": "2026/7/13",
       "feeTax": "17",
       "feeOther": "23",
-      "shelfLife": "210"
+      "shelfLife": "203"
     },
     {
       "name": "健安喜维生素E软胶囊180mg",
@@ -647,14 +647,14 @@
       "cost": 20.98,
       "price": 49,
       "actualPrice": "40.57",
-      "weekSales": 22,
-      "endInv": 791,
+      "weekSales": 20,
+      "endInv": 769,
       "beginInv": 439,
-      "ytdSales": 626,
-      "date": "2026/7/6",
+      "ytdSales": 646,
+      "date": "2026/7/13",
       "feeTax": "17",
       "feeOther": "23",
-      "shelfLife": "665"
+      "shelfLife": "658"
     },
     {
       "name": "GNC健安喜三倍卵磷脂软胶囊 180粒",
@@ -663,14 +663,14 @@
       "cost": 30.1,
       "price": 79,
       "actualPrice": "69.89",
-      "weekSales": 14,
-      "endInv": 1213,
+      "weekSales": 13,
+      "endInv": 1199,
       "beginInv": 1903,
-      "ytdSales": 691,
-      "date": "2026/7/6",
+      "ytdSales": 704,
+      "date": "2026/7/13",
       "feeTax": "17",
       "feeOther": "23",
-      "shelfLife": "452"
+      "shelfLife": "445"
     },
     {
       "name": "GNC健安喜三倍卵磷脂软胶囊 360粒",
@@ -679,14 +679,14 @@
       "cost": 56,
       "price": 159,
       "actualPrice": "122.44",
-      "weekSales": 19,
-      "endInv": 553,
+      "weekSales": 32,
+      "endInv": 527,
       "beginInv": 1326,
-      "ytdSales": 773,
-      "date": "2026/7/6",
+      "ytdSales": 805,
+      "date": "2026/7/13",
       "feeTax": "17",
       "feeOther": "23",
-      "shelfLife": "238"
+      "shelfLife": "231"
     },
     {
       "name": "健安喜EPA1200 高纯度鱼油（派样装）\\6粒*1盒\\490068",
@@ -695,14 +695,14 @@
       "cost": 13,
       "price": 49.9,
       "actualPrice": "-",
-      "weekSales": 19,
-      "endInv": 316,
+      "weekSales": 14,
+      "endInv": 304,
       "beginInv": 0,
-      "ytdSales": 1964,
-      "date": "2026/7/6",
+      "ytdSales": 1978,
+      "date": "2026/7/13",
       "feeTax": "17",
       "feeOther": "23",
-      "shelfLife": "422"
+      "shelfLife": "415"
     },
     {
       "name": "GNC健安喜非转基因浓缩大豆异黄酮90粒/瓶",
@@ -711,14 +711,14 @@
       "cost": 22.67,
       "price": 109,
       "actualPrice": "67.38",
-      "weekSales": 14,
-      "endInv": 275,
+      "weekSales": 24,
+      "endInv": 251,
       "beginInv": 143,
-      "ytdSales": 542,
-      "date": "2026/7/6",
+      "ytdSales": 566,
+      "date": "2026/7/13",
       "feeTax": "17",
       "feeOther": "23",
-      "shelfLife": "879"
+      "shelfLife": "872"
     },
     {
       "name": "GNC健安喜三倍浓缩加强型鱼油软胶囊（240粒小粒装）",
@@ -727,14 +727,14 @@
       "cost": 88.64,
       "price": 169,
       "actualPrice": "146.09",
-      "weekSales": 14,
-      "endInv": 657,
+      "weekSales": 16,
+      "endInv": 636,
       "beginInv": 956,
-      "ytdSales": 1196,
-      "date": "2026/7/6",
+      "ytdSales": 1212,
+      "date": "2026/7/13",
       "feeTax": "17",
       "feeOther": "23",
-      "shelfLife": "788"
+      "shelfLife": "781"
     },
     {
       "name": "健安喜Vitapak®男性50+每日营养包升级版\\30包*1盒\\490078",
@@ -743,14 +743,14 @@
       "cost": 64.23,
       "price": 279,
       "actualPrice": "195.36",
-      "weekSales": 35,
-      "endInv": 735,
+      "weekSales": 24,
+      "endInv": 712,
       "beginInv": 355,
-      "ytdSales": 832,
-      "date": "2026/7/6",
+      "ytdSales": 856,
+      "date": "2026/7/13",
       "feeTax": "17",
       "feeOther": "23",
-      "shelfLife": "360"
+      "shelfLife": "353"
     },
     {
       "name": "健安喜95%高纯度鱼油软胶囊\\180粒*1瓶\\490094",
@@ -759,14 +759,14 @@
       "cost": 104.79,
       "price": 339,
       "actualPrice": "151.31",
-      "weekSales": 8,
-      "endInv": 156,
+      "weekSales": 12,
+      "endInv": 145,
       "beginInv": 470,
-      "ytdSales": 524,
-      "date": "2026/7/6",
+      "ytdSales": 536,
+      "date": "2026/7/13",
       "feeTax": "17",
       "feeOther": "23",
-      "shelfLife": "849"
+      "shelfLife": "842"
     },
     {
       "name": "GNC健安喜四倍鱼油迷你软胶囊  （800mg 120粒）",
@@ -775,14 +775,14 @@
       "cost": 72.64,
       "price": 159,
       "actualPrice": "133.07",
-      "weekSales": 20,
-      "endInv": 569,
+      "weekSales": 14,
+      "endInv": 556,
       "beginInv": 1092,
-      "ytdSales": 526,
-      "date": "2026/7/6",
+      "ytdSales": 540,
+      "date": "2026/7/13",
       "feeTax": "17",
       "feeOther": "23",
-      "shelfLife": "635"
+      "shelfLife": "628"
     },
     {
       "name": "健安喜褪黑素片3毫克\\120片*1瓶",
@@ -791,14 +791,14 @@
       "cost": 9.09,
       "price": 39,
       "actualPrice": "25.28",
-      "weekSales": 22,
-      "endInv": 406,
+      "weekSales": 19,
+      "endInv": 391,
       "beginInv": 979,
-      "ytdSales": 1181,
-      "date": "2026/7/6",
+      "ytdSales": 1200,
+      "date": "2026/7/13",
       "feeTax": "17",
       "feeOther": "23",
-      "shelfLife": "360"
+      "shelfLife": "353"
     },
     {
       "name": "GNC健安喜儿童液体钙镁锌30袋",
@@ -807,14 +807,14 @@
       "cost": 32.08,
       "price": 99,
       "actualPrice": "37.1",
-      "weekSales": 18,
-      "endInv": 1267,
+      "weekSales": 9,
+      "endInv": 1259,
       "beginInv": 73,
-      "ytdSales": 3035,
-      "date": "2026/7/6",
+      "ytdSales": 3044,
+      "date": "2026/7/13",
       "feeTax": "17",
       "feeOther": "23",
-      "shelfLife": "57"
+      "shelfLife": "50"
     },
     {
       "name": "GNC健安喜硒元素200微克90片/瓶",
@@ -823,14 +823,14 @@
       "cost": 12.95,
       "price": 59,
       "actualPrice": "47.08",
-      "weekSales": 8,
-      "endInv": 951,
+      "weekSales": 13,
+      "endInv": 933,
       "beginInv": 609,
-      "ytdSales": 1106,
-      "date": "2026/7/6",
+      "ytdSales": 1119,
+      "date": "2026/7/13",
       "feeTax": "17",
       "feeOther": "23",
-      "shelfLife": "757"
+      "shelfLife": "750"
     },
     {
       "name": "健安喜胃肠双联益生菌\\60粒*1盒",
@@ -839,14 +839,14 @@
       "cost": 102.82,
       "price": 279,
       "actualPrice": "191",
-      "weekSales": 22,
-      "endInv": 419,
+      "weekSales": 16,
+      "endInv": 403,
       "beginInv": 0,
-      "ytdSales": 886,
-      "date": "2026/7/6",
+      "ytdSales": 902,
+      "date": "2026/7/13",
       "feeTax": "17",
       "feeOther": "23",
-      "shelfLife": "269"
+      "shelfLife": "262"
     },
     {
       "name": "健安喜女性私处健康益生菌\\60粒*1瓶\\490010",
@@ -855,14 +855,14 @@
       "cost": 50.38,
       "price": 129,
       "actualPrice": "38.66",
-      "weekSales": 19,
-      "endInv": 228,
+      "weekSales": 13,
+      "endInv": 213,
       "beginInv": 13192,
-      "ytdSales": 172,
-      "date": "2026/7/6",
+      "ytdSales": 185,
+      "date": "2026/7/13",
       "feeTax": "17",
       "feeOther": "23",
-      "shelfLife": "360"
+      "shelfLife": "353"
     },
     {
       "name": "健安喜七合一加钙优骨力氨糖软骨素运动关节片\\120粒*1瓶",
@@ -871,14 +871,14 @@
       "cost": 42.76,
       "price": 99,
       "actualPrice": "75.79",
-      "weekSales": 6,
-      "endInv": 380,
+      "weekSales": 11,
+      "endInv": 370,
       "beginInv": 381,
-      "ytdSales": 406,
-      "date": "2026/7/6",
+      "ytdSales": 417,
+      "date": "2026/7/13",
       "feeTax": "17",
       "feeOther": "23",
-      "shelfLife": "665"
+      "shelfLife": "658"
     },
     {
       "name": "GNC健安喜四倍鱼油迷你软胶囊 800mg 240粒",
@@ -887,14 +887,14 @@
       "cost": 141.67,
       "price": 279,
       "actualPrice": "217.29",
-      "weekSales": 24,
-      "endInv": 695,
+      "weekSales": 23,
+      "endInv": 672,
       "beginInv": 1026,
-      "ytdSales": 1083,
-      "date": "2026/7/6",
+      "ytdSales": 1106,
+      "date": "2026/7/13",
       "feeTax": "17",
       "feeOther": "23",
-      "shelfLife": "788"
+      "shelfLife": "781"
     },
     {
       "name": "GNC健安喜三倍鱼油迷你软胶囊（120粒）",
@@ -903,14 +903,14 @@
       "cost": 46.02,
       "price": 89,
       "actualPrice": "91.68",
-      "weekSales": 5,
-      "endInv": 297,
+      "weekSales": 11,
+      "endInv": 287,
       "beginInv": 397,
-      "ytdSales": 473,
-      "date": "2026/7/6",
+      "ytdSales": 484,
+      "date": "2026/7/13",
       "feeTax": "17",
       "feeOther": "23",
-      "shelfLife": "513"
+      "shelfLife": "506"
     },
     {
       "name": "健安喜多重抗衰鱼油\\60粒*1盒",
@@ -919,14 +919,14 @@
       "cost": 63.29,
       "price": 0,
       "actualPrice": "213.23",
-      "weekSales": 2,
-      "endInv": 103,
+      "weekSales": 4,
+      "endInv": 99,
       "beginInv": 88,
-      "ytdSales": 254,
-      "date": "2026/7/6",
+      "ytdSales": 258,
+      "date": "2026/7/13",
       "feeTax": "17",
       "feeOther": "23",
-      "shelfLife": "422"
+      "shelfLife": "415"
     },
     {
       "name": "健安喜透明质酸护眼软胶囊\\60粒*1盒\\490085",
@@ -935,14 +935,14 @@
       "cost": 29.28,
       "price": 179,
       "actualPrice": "70.02",
-      "weekSales": 8,
-      "endInv": 216,
+      "weekSales": 4,
+      "endInv": 212,
       "beginInv": 0,
-      "ytdSales": 390,
-      "date": "2026/7/6",
+      "ytdSales": 394,
+      "date": "2026/7/13",
       "feeTax": "17",
       "feeOther": "23",
-      "shelfLife": "513"
+      "shelfLife": "506"
     },
     {
       "name": "GNC健安喜奶蓟精华片 650mg 120粒",
@@ -951,14 +951,14 @@
       "cost": 40.18,
       "price": 119,
       "actualPrice": "94.84",
-      "weekSales": 8,
-      "endInv": 439,
+      "weekSales": 13,
+      "endInv": 424,
       "beginInv": 356,
-      "ytdSales": 616,
-      "date": "2026/7/6",
+      "ytdSales": 629,
+      "date": "2026/7/13",
       "feeTax": "17",
       "feeOther": "23",
-      "shelfLife": "726"
+      "shelfLife": "719"
     },
     {
       "name": "健安喜Vitapak@男性20+每日营养包\\30包/盒\\490027",
@@ -967,14 +967,14 @@
       "cost": 45.87,
       "price": 139,
       "actualPrice": "106.88",
-      "weekSales": 6,
-      "endInv": 198,
+      "weekSales": 5,
+      "endInv": 193,
       "beginInv": 231,
-      "ytdSales": 206,
-      "date": "2026/7/6",
+      "ytdSales": 211,
+      "date": "2026/7/13",
       "feeTax": "17",
       "feeOther": "23",
-      "shelfLife": "179"
+      "shelfLife": "172"
     },
     {
       "name": "GNC健安喜辅酶Q10软胶囊400mg60粒/瓶",
@@ -984,13 +984,13 @@
       "price": 199,
       "actualPrice": "149.51",
       "weekSales": 22,
-      "endInv": 122,
+      "endInv": 100,
       "beginInv": 695,
-      "ytdSales": 387,
-      "date": "2026/7/6",
+      "ytdSales": 409,
+      "date": "2026/7/13",
       "feeTax": "17",
       "feeOther": "23",
-      "shelfLife": "483"
+      "shelfLife": "476"
     },
     {
       "name": "健安喜儿童液体钙镁锌（包装升级款试用装） 3袋",
@@ -999,14 +999,14 @@
       "cost": 4.89,
       "price": 29.9,
       "actualPrice": "0.35",
-      "weekSales": 6,
+      "weekSales": 3,
       "endInv": 133,
       "beginInv": 852,
-      "ytdSales": 720,
-      "date": "2026/7/6",
+      "ytdSales": 723,
+      "date": "2026/7/13",
       "feeTax": "17",
       "feeOther": "23",
-      "shelfLife": "87"
+      "shelfLife": "80"
     },
     {
       "name": "健安喜维C莓果免疫粉\\30条*1盒\\490089",
@@ -1015,14 +1015,14 @@
       "cost": 19.88,
       "price": 129,
       "actualPrice": "32.52",
-      "weekSales": 6,
-      "endInv": 394,
+      "weekSales": 1,
+      "endInv": 393,
       "beginInv": 0,
-      "ytdSales": 208,
-      "date": "2026/7/6",
+      "ytdSales": 209,
+      "date": "2026/7/13",
       "feeTax": "17",
       "feeOther": "23",
-      "shelfLife": "530"
+      "shelfLife": "523"
     },
     {
       "name": "健安喜深海鱼油胶囊\\400粒/1瓶\\490029",
@@ -1031,14 +1031,14 @@
       "cost": 98.44,
       "price": 199,
       "actualPrice": "147.21",
-      "weekSales": 8,
-      "endInv": 389,
+      "weekSales": 5,
+      "endInv": 386,
       "beginInv": 788,
-      "ytdSales": 577,
-      "date": "2026/7/6",
+      "ytdSales": 582,
+      "date": "2026/7/13",
       "feeTax": "17",
       "feeOther": "23",
-      "shelfLife": "452"
+      "shelfLife": "445"
     },
     {
       "name": "健安喜麦角硫因美白银耀瓶",
@@ -1047,14 +1047,14 @@
       "cost": 32.38,
       "price": 0,
       "actualPrice": "-",
-      "weekSales": 2,
+      "weekSales": 0,
       "endInv": 34,
       "beginInv": 0,
       "ytdSales": 19,
-      "date": "2026/7/6",
+      "date": "2026/7/13",
       "feeTax": "17",
       "feeOther": "23",
-      "shelfLife": "547"
+      "shelfLife": "433"
     },
     {
       "name": "GNC健安喜清肺排毒胶囊\\60粒*1瓶\\490019",
@@ -1063,14 +1063,14 @@
       "cost": 60.05,
       "price": 199,
       "actualPrice": "102.86",
-      "weekSales": 10,
-      "endInv": 110,
+      "weekSales": 5,
+      "endInv": 105,
       "beginInv": 979,
-      "ytdSales": 247,
-      "date": "2026/7/6",
+      "ytdSales": 252,
+      "date": "2026/7/13",
       "feeTax": "17",
       "feeOther": "23",
-      "shelfLife": "238"
+      "shelfLife": "231"
     },
     {
       "name": "健安喜活性叶酸片800mcg\\100片*1瓶\\490025",
@@ -1079,14 +1079,14 @@
       "cost": 24.02,
       "price": 148,
       "actualPrice": "112.62",
-      "weekSales": 3,
-      "endInv": 197,
+      "weekSales": 6,
+      "endInv": 190,
       "beginInv": 118,
-      "ytdSales": 249,
-      "date": "2026/7/6",
+      "ytdSales": 255,
+      "date": "2026/7/13",
       "feeTax": "17",
       "feeOther": "23",
-      "shelfLife": "210"
+      "shelfLife": "203"
     },
     {
       "name": "健安喜Vitapak@女性20+每日营养包\\30包/盒\\490028",
@@ -1095,14 +1095,14 @@
       "cost": 50.2,
       "price": 139,
       "actualPrice": "95.76",
-      "weekSales": 7,
-      "endInv": 116,
+      "weekSales": 2,
+      "endInv": 114,
       "beginInv": 111,
-      "ytdSales": 305,
-      "date": "2026/7/6",
+      "ytdSales": 307,
+      "date": "2026/7/13",
       "feeTax": "17",
       "feeOther": "23",
-      "shelfLife": "179"
+      "shelfLife": "172"
     },
     {
       "name": "健安喜麦角硫因抗衰晶萃瓶",
@@ -1111,14 +1111,14 @@
       "cost": 19.29,
       "price": 0,
       "actualPrice": "-",
-      "weekSales": 3,
-      "endInv": 4,
+      "weekSales": 1,
+      "endInv": 3,
       "beginInv": 0,
-      "ytdSales": 24,
-      "date": "2026/7/6",
+      "ytdSales": 25,
+      "date": "2026/7/13",
       "feeTax": "17",
       "feeOther": "23",
-      "shelfLife": "547"
+      "shelfLife": "433"
     },
     {
       "name": "健安喜Vitapak儿童每日营养包升级款（体验装）",
@@ -1127,14 +1127,14 @@
       "cost": 8.06,
       "price": 39.9,
       "actualPrice": "0.04",
-      "weekSales": 2,
-      "endInv": 316,
+      "weekSales": 4,
+      "endInv": 313,
       "beginInv": 853,
-      "ytdSales": 539,
-      "date": "2026/7/6",
+      "ytdSales": 543,
+      "date": "2026/7/13",
       "feeTax": "17",
       "feeOther": "23",
-      "shelfLife": "238"
+      "shelfLife": "231"
     },
     {
       "name": "健安喜深海鱼油胶囊\\120粒*1瓶\\490038",
@@ -1144,13 +1144,13 @@
       "price": 79,
       "actualPrice": "72.36",
       "weekSales": 1,
-      "endInv": 189,
+      "endInv": 188,
       "beginInv": 305,
-      "ytdSales": 120,
-      "date": "2026/7/6",
+      "ytdSales": 121,
+      "date": "2026/7/13",
       "feeTax": "17",
       "feeOther": "23",
-      "shelfLife": "604"
+      "shelfLife": "597"
     },
     {
       "name": "健安喜N-乙酰葡萄糖氨复合饮品\\10包*1盒\\490036",
@@ -1159,14 +1159,14 @@
       "cost": 10.44,
       "price": 129,
       "actualPrice": "27.99",
-      "weekSales": 1,
-      "endInv": 4,
+      "weekSales": 0,
+      "endInv": 3,
       "beginInv": 17649,
       "ytdSales": 1697,
-      "date": "2026/7/6",
+      "date": "2026/7/13",
       "feeTax": "17",
       "feeOther": "23",
-      "shelfLife": "87"
+      "shelfLife": "80"
     },
     {
       "name": "GNC健安喜番茄红素软胶囊60粒",
@@ -1179,10 +1179,10 @@
       "endInv": 1,
       "beginInv": 632,
       "ytdSales": 623,
-      "date": "2026/7/6",
+      "date": "2026/7/13",
       "feeTax": "17",
       "feeOther": "23",
-      "shelfLife": "604"
+      "shelfLife": "597"
     },
     {
       "name": "健安喜97%高纯度鱼油软胶囊（派样装）\\12粒*1盒\\490037",
@@ -1192,13 +1192,13 @@
       "price": 39.9,
       "actualPrice": "0.77",
       "weekSales": 0,
-      "endInv": 46,
+      "endInv": 50,
       "beginInv": 17,
       "ytdSales": 1794,
-      "date": "2026/7/6",
+      "date": "2026/7/13",
       "feeTax": "17",
       "feeOther": "23",
-      "shelfLife": "269"
+      "shelfLife": "262"
     },
     {
       "name": "健安喜维生素C缓释片1000毫克\\30粒*1瓶\\490044",
@@ -1207,14 +1207,14 @@
       "cost": 10.46,
       "price": 33,
       "actualPrice": "0.02",
-      "weekSales": 1,
-      "endInv": 829,
+      "weekSales": 0,
+      "endInv": 830,
       "beginInv": 0,
       "ytdSales": 1209,
-      "date": "2026/7/6",
+      "date": "2026/7/13",
       "feeTax": "17",
       "feeOther": "23",
-      "shelfLife": "452"
+      "shelfLife": "445"
     },
     {
       "name": "杰士邦xGNC男性雄风片\\60粒*1盒\\490093",
@@ -1227,10 +1227,10 @@
       "endInv": 197,
       "beginInv": 0,
       "ytdSales": 3,
-      "date": "2026/7/6",
+      "date": "2026/7/13",
       "feeTax": "17",
       "feeOther": "23",
-      "shelfLife": "483"
+      "shelfLife": "476"
     },
     {
       "name": "健安喜维生素D3胶囊 5000IU\\180粒*1瓶\\490058",
@@ -1243,10 +1243,10 @@
       "endInv": 174,
       "beginInv": 0,
       "ytdSales": 26,
-      "date": "2026/7/6",
+      "date": "2026/7/13",
       "feeTax": "17",
       "feeOther": "23",
-      "shelfLife": "486"
+      "shelfLife": "472"
     },
     {
       "name": "健安喜麦角硫因护巢红氧瓶",
@@ -1255,14 +1255,14 @@
       "cost": 25.49,
       "price": 0,
       "actualPrice": "-",
-      "weekSales": 0,
-      "endInv": 44,
+      "weekSales": 2,
+      "endInv": 42,
       "beginInv": 0,
-      "ytdSales": 9,
-      "date": "2026/7/6",
+      "ytdSales": 11,
+      "date": "2026/7/13",
       "feeTax": "17",
       "feeOther": "23",
-      "shelfLife": "547"
+      "shelfLife": "433"
     },
     {
       "name": "健安喜泛醇200mg软胶囊\\60粒*1盒\\490063",
@@ -1275,10 +1275,10 @@
       "endInv": 3,
       "beginInv": 1184,
       "ytdSales": 1178,
-      "date": "2026/7/6",
+      "date": "2026/7/13",
       "feeTax": "17",
       "feeOther": "23",
-      "shelfLife": "665"
+      "shelfLife": "658"
     },
     {
       "name": "健安喜多重眼脑养护鱼油（派样装）\\6粒*1盒\\490067",
@@ -1288,13 +1288,13 @@
       "price": 0,
       "actualPrice": "0.52",
       "weekSales": 0,
-      "endInv": 2,
+      "endInv": 3,
       "beginInv": 614,
       "ytdSales": 634,
-      "date": "2026/7/6",
+      "date": "2026/7/13",
       "feeTax": "17",
       "feeOther": "23",
-      "shelfLife": "360"
+      "shelfLife": "353"
     },
     {
       "name": "健安喜心脑血管健康三合一\\90粒*1盒\\490021",
@@ -1307,10 +1307,10 @@
       "endInv": 0,
       "beginInv": 155,
       "ytdSales": 169,
-      "date": "2026/7/6",
+      "date": "2026/7/13",
       "feeTax": "17",
       "feeOther": "23",
-      "shelfLife": "26"
+      "shelfLife": "19"
     }
   ],
   "settings": {
@@ -1326,5 +1326,5 @@
     "shelfWarnDays": 90,
     "shelfCoverSafe": 1.5
   },
-  "updatedAt": "2026-07-06T07:21:50.679Z"
+  "updatedAt": "2026-07-13T06:02:11.676Z"
 }
