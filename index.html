@@ -357,7 +357,6 @@ const fmt=(v,d=0)=> (v==null||!isFinite(v))?'∞':Number(v).toLocaleString('zh-C
 function render(){
   const countEl = document.getElementById('countLabel');
   if(countEl) countEl.textContent = products.length;
-  document.getElementById('countLabel').textContent = products.length;
   try{ renderOverview(); }catch(e){ console.error('renderOverview 失败:',e); }
   try{ renderInputList(); }catch(e){ console.error('renderInputList 失败:',e); }
   try{ renderDashboard(); }catch(e){ console.error('renderDashboard 失败:',e); }
@@ -993,13 +992,16 @@ async function loadDashboardData(){
       if(d.settings) settings = {...settings, ...d.settings};
       const updatedAt = d.updatedAt || '未知';
       if(el) el.textContent = '数据更新时间：' + updatedAt + ' · 来源：' + url.split('?')[0];
-      render();
-      switchTab('dashboard');
+      // 渲染错误单独捕获，避免被当成"取数失败"误触发下一个候选源
+      try{
+        render();
+        switchTab('dashboard');
+      }catch(re){
+        console.error('渲染失败:', re);
+        if(el) el.textContent += '（⚠️ 数据已加载但渲染异常：' + re.message + '）';
+      }
       return;
     }catch(e){
       lastErr = url.split('?')[0] + ' → ' + e.message;
     }
   }
-  if(el) el.textContent = '数据加载失败（最后错误：' + lastErr + '）。请新开标签页直接访问该 URL 看具体状态码排查。';
-}
-</script></div></body></html>
