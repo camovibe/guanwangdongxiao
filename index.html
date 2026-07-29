@@ -67,8 +67,6 @@
     <button data-tab="dashboard" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium bg-white shadow-sm hover:bg-indigo-50 transition">渠道看板</button>
     <button data-tab="overview" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium bg-white shadow-sm hover:bg-indigo-50 transition">数据总览</button>
     <button data-tab="alerts" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium bg-white shadow-sm hover:bg-indigo-50 transition">预警与营销建议</button>
-    <button data-tab="input" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium bg-white shadow-sm hover:bg-indigo-50 transition">数据录入</button>
-    <button data-tab="settings" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium bg-white shadow-sm hover:bg-indigo-50 transition">参数设置</button>
   </nav>
 
   <!-- ============ 渠道看板 ============ -->
@@ -172,128 +170,6 @@
   <!-- ============ 预警与建议 ============ -->
   <section id="tab-alerts" class="tab-panel hidden">
     <div id="alertsContainer" class="grid grid-cols-1 gap-4"></div>
-  </section>
-
-  <!-- ============ 数据录入 ============ -->
-  <section id="tab-input" class="tab-panel hidden">
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-      <!-- 手动 -->
-      <div class="bg-white rounded-xl shadow-sm p-4">
-        <h3 class="text-sm font-semibold mb-3" id="formTitle">手动添加 / 编辑产品</h3>
-        <div class="grid grid-cols-2 gap-3 text-sm">
-          <label class="col-span-2">产品名称<input id="f_name" class="inp" placeholder="如：便携榨汁杯"></label>
-          <label>SKU编码<input id="f_sku" class="inp" placeholder="SKU001"></label>
-          <label>品类<input id="f_cat" class="inp" placeholder="小家电"></label>
-          <label>成本(元)<input id="f_cost" type="number" class="inp" placeholder="35"></label>
-          <label>控价(元)<input id="f_price" type="number" class="inp" placeholder="89"></label>
-          <label class="col-span-2">实际支付到手价(元)<input id="f_actprice" type="number" class="inp" placeholder="留空则等于控价"></label>
-          <label>最近一周销售件数<input id="f_week" type="number" class="inp" placeholder="420"></label>
-          <label>最新期末库存<input id="f_endinv" type="number" class="inp" placeholder="1200"></label>
-          <label>年初(1/1)期初库存<input id="f_begininv" type="number" class="inp" placeholder="800"></label>
-          <label>业务年累计销售件数<input id="f_ytd" type="number" class="inp" placeholder="9600"></label>
-          <label class="col-span-2 bg-amber-50 rounded-lg p-2 -mx-1">剩余效期天数（截至"数据日期"当天的剩余天数，系统会按今天自动倒扣；留空=不做效期分析）<input id="f_shelf" type="number" class="inp" placeholder="如 90，留空=不做效期分析"></label>
-          <label>数据日期<input id="f_date" type="date" class="inp"></label>
-          <label>税运仓储比例%(选填)<input id="f_ftax" type="number" class="inp" placeholder="留空用默认"></label>
-          <label class="col-span-2">其他费用比例%(选填)<input id="f_fother" type="number" class="inp" placeholder="留空用默认"></label>
-        </div>
-        <div class="flex gap-2 mt-4">
-          <button onclick="saveProduct()" class="flex-1 py-2 bg-indigo-600 text-white rounded-lg text-sm hover:bg-indigo-700">保存产品</button>
-          <button onclick="resetForm()" class="px-4 py-2 bg-slate-200 rounded-lg text-sm hover:bg-slate-300">清空</button>
-        </div>
-        <p class="text-xs text-slate-400 mt-2">提示：SKU相同的记录将被<strong>覆盖更新</strong>。剩余效期以"数据日期"为起点，系统按当天日期自动倒扣，因此建议务必填写数据日期；填空数据日期则效期不做倒扣（退回静态）。</p>
-        <button onclick="exportDataJson()" class="mt-4 w-full py-2 bg-amber-600 text-white rounded-lg text-sm hover:bg-amber-700">导出并同步到团队看板</button>
-      </div>
-      <!-- 批量 -->
-      <div class="bg-white rounded-xl shadow-sm p-4">
-        <h3 class="text-sm font-semibold mb-3">批量导入</h3>
-        <div class="border-2 border-dashed border-slate-200 rounded-lg p-6 text-center">
-          <p class="text-sm text-slate-500 mb-3">上传 CSV 表格批量导入（相同SKU自动覆盖）</p>
-          <input type="file" id="csvFile" accept=".csv" class="hidden" onchange="importCSV(event)">
-          <button onclick="document.getElementById('csvFile').click()" class="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm hover:bg-indigo-700">选择CSV文件</button>
-        </div>
-        <div class="mt-4 flex flex-col gap-2">
-          <button onclick="downloadTemplate()" class="w-full py-2 border border-indigo-300 text-indigo-600 rounded-lg text-sm hover:bg-indigo-50">下载标准投喂模板(CSV)</button>
-          <button onclick="loadSample()" class="w-full py-2 border border-slate-300 text-slate-600 rounded-lg text-sm hover:bg-slate-50">载入示例数据</button>
-          <button onclick="clearAll()" class="w-full py-2 border border-rose-300 text-rose-600 rounded-lg text-sm hover:bg-rose-50">清空全部数据</button>
-        </div>
-        <div class="mt-4 bg-slate-50 rounded-lg p-3 text-xs text-slate-500 leading-relaxed">
-          <strong>模板列顺序（末列为效期）：</strong><br>
-          产品名称, SKU编码, 品类, 成本, 控价, 实际支付到手价, 最近一周销售件数, 最新期末库存, 年初期初库存, 业务年累计销售件数, 数据日期, 税运仓储比例%, 其他费用比例%, <span class="text-amber-600 font-medium">剩余效期天数</span><br>
-          （到手价、税费两列留空套用默认；<strong>剩余效期天数</strong>留空则该产品不做效期分析；效期以"数据日期"为起点按今天自动倒扣，请确保数据日期准确）
-        </div>
-      </div>
-      <!-- GitHub 同步配置 -->
-      <div class="bg-white rounded-xl shadow-sm p-4">
-        <h3 class="text-sm font-semibold mb-3 flex items-center gap-2">
-          <svg class="w-4 h-4 text-slate-500" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
-          团队看板同步配置
-        </h3>
-        <div class="space-y-2 text-sm">
-          <label class="block text-xs text-slate-400">GitHub Token（需有 repo 写入权限）</label>
-          <input id="gh_token" type="password" class="inp" placeholder="ghp_xxxxxxxxxxxx">
-          <div class="flex gap-2">
-            <button onclick="saveGhToken()" class="px-3 py-1.5 bg-slate-800 text-white rounded-lg text-xs hover:bg-slate-700">保存 Token</button>
-            <button onclick="clearGhToken()" class="px-3 py-1.5 border border-slate-300 text-slate-600 rounded-lg text-xs hover:bg-slate-50">清除</button>
-          </div>
-          <p id="gh_status" class="text-xs text-slate-400"></p>
-          <p class="text-xs text-slate-400">配置后，点击「导出并同步到团队看板」将自动推送到 GitHub，团队看板约 1–2 分钟后刷新即可看到最新数据。</p>
-        </div>
-      </div>
-    </div>
-    <!-- 已录入列表 -->
-    <div class="bg-white rounded-xl shadow-sm p-4 mt-4 overflow-x-auto scrollbar-thin">
-      <h3 class="text-sm font-semibold mb-3">已录入产品（<span id="countLabel">0</span>）<span class="text-xs font-normal text-slate-400 ml-2">剩余效期列显示：今天推算值（录入值）</span></h3>
-      <table class="w-full text-xs sm:text-sm">
-        <thead><tr class="bg-slate-50 text-slate-500 text-left">
-          <th class="p-2">#</th><th class="p-2">产品</th><th class="p-2">SKU</th><th class="p-2">品类</th>
-          <th class="p-2 text-right">成本</th><th class="p-2 text-right">控价</th><th class="p-2 text-right">到手价</th>
-          <th class="p-2 text-right">周销</th><th class="p-2 text-right">库存</th><th class="p-2 text-right">剩余效期</th><th class="p-2">数据日期</th><th class="p-2">操作</th>
-        </tr></thead>
-        <tbody id="inputBody"></tbody>
-      </table>
-    </div>
-  </section>
-
-  <!-- ============ 参数设置 ============ -->
-  <section id="tab-settings" class="tab-panel hidden">
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-      <div class="bg-white rounded-xl shadow-sm p-4">
-        <h3 class="text-sm font-semibold mb-3">渠道费用与利润目标</h3>
-        <div class="grid grid-cols-1 gap-3 text-sm">
-          <label class="flex justify-between items-center">默认税运仓储费用比例(%)<input id="s_ftax" type="number" class="inp w-28"></label>
-          <label class="flex justify-between items-center">默认其他费用比例(%)<input id="s_fother" type="number" class="inp w-28"></label>
-          <label class="flex justify-between items-center">目标利润率(%)<input id="s_target" type="number" class="inp w-28"></label>
-        </div>
-      </div>
-      <div class="bg-white rounded-xl shadow-sm p-4">
-        <h3 class="text-sm font-semibold mb-3">库销比预警阈值 <span class="text-xs text-slate-400">(越大=库存越多)</span></h3>
-        <div class="grid grid-cols-1 gap-3 text-sm">
-          <label class="flex justify-between items-center">低于此值→断货风险<input id="s_isr_low" type="number" step="0.1" class="inp w-28"></label>
-          <label class="flex justify-between items-center">健康区间上限<input id="s_isr_healthy" type="number" step="0.1" class="inp w-28"></label>
-          <label class="flex justify-between items-center">高于此值→积压严重<input id="s_isr_high" type="number" step="0.1" class="inp w-28"></label>
-        </div>
-      </div>
-      <div class="bg-white rounded-xl shadow-sm p-4">
-        <h3 class="text-sm font-semibold mb-3">滚动周转率预警阈值 <span class="text-xs text-slate-400">(越大=周转越快)</span></h3>
-        <div class="grid grid-cols-1 gap-3 text-sm">
-          <label class="flex justify-between items-center">低于此值→滞销<input id="s_to_slow" type="number" step="0.1" class="inp w-28"></label>
-          <label class="flex justify-between items-center">健康区间下限<input id="s_to_healthy" type="number" step="0.1" class="inp w-28"></label>
-          <label class="flex justify-between items-center">高于此值→优秀<input id="s_to_good" type="number" step="0.1" class="inp w-28"></label>
-        </div>
-      </div>
-      <div class="bg-white rounded-xl shadow-sm p-4">
-        <h3 class="text-sm font-semibold mb-3">效期预警阈值 <span class="text-xs text-slate-400">(仅对填了剩余效期的产品生效)</span></h3>
-        <div class="grid grid-cols-1 gap-3 text-sm">
-          <label class="flex justify-between items-center">剩余效期低于此天数→临期<input id="s_shelf_warn" type="number" class="inp w-28"></label>
-          <label class="flex justify-between items-center">效期覆盖安全系数(剩余效期÷可售天数)<input id="s_shelf_cover" type="number" step="0.1" class="inp w-28"></label>
-        </div>
-        <p class="text-xs text-slate-400 mt-2">覆盖系数&lt;1 判为「效期报损风险」(到期卖不完)；≥1 但低于安全系数判为「效期偏紧」。剩余效期为按今天动态推算后的值。</p>
-      </div>
-      <div class="bg-white rounded-xl shadow-sm p-4 flex flex-col justify-between lg:col-span-2">
-        <p class="text-xs text-slate-500 leading-relaxed">阈值改动后点击保存将实时重算所有产品的预警等级、营销建议、促销边界与效期报损测算。目标利润率同时用于反推「目标利润底价」。效期天数每次打开/重算都会按当天日期自动倒扣，无需手动更新。</p>
-        <button onclick="saveSettings()" class="mt-4 py-2 bg-indigo-600 text-white rounded-lg text-sm hover:bg-indigo-700">保存参数并重算</button>
-      </div>
-    </div>
   </section>
 
 </div>
