@@ -1,8 +1,1113 @@
-<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>产品渠道动销与利润罗盘系统 - 只读看板</title><script src="https://cdn.tailwindcss.com"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script><style>body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;}.tab-active{background:#4f46e5 !important;color:#fff !important;}.scrollbar-thin::-webkit-scrollbar{height:8px;width:8px;}.scrollbar-thin::-webkit-scrollbar-thumb{background:#c7d2fe;border-radius:4px;}table td,table th{white-space:nowrap;}.inp{border:1px solid #e2e8f0;border-radius:8px;padding:6px 10px;width:100%;outline:none;}.inp:focus{border-color:#6366f1;}label{display:block;color:#475569;font-size:12px;}label input{margin-top:4px;}.flt{width:100%;min-width:60px;border:1px solid #e2e8f0;border-radius:6px;padding:2px 6px;font-size:12px;outline:none;}.flt:focus{border-color:#6366f1;}.alert-card{scroll-margin-top:80px;}#backTop{transition:opacity .3s,transform .3s,visibility .3s;}#backTop.hidden-btn{opacity:0;visibility:hidden;transform:translateY(12px);pointer-events:none;}</style><style>#password-screen{position:fixed;inset:0;z-index:9999;background:linear-gradient(135deg,#1e1b4b,#312e81);display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;}#password-screen .card{background:rgba(255,255,255,0.05);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:40px;max-width:380px;width:90%;text-align:center;box-shadow:0 25px 50px -12px rgba(0,0,0,0.25);}#password-screen h2{font-size:20px;font-weight:700;margin-bottom:8px;}#password-screen p{font-size:13px;color:#a5b4fc;margin-bottom:24px;line-height:1.6;}#password-screen input{width:100%;padding:12px 16px;border-radius:10px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.08);color:#fff;font-size:15px;outline:none;margin-bottom:16px;transition:border-color .2s;}#password-screen input:focus{border-color:#818cf8;}#password-screen input::placeholder{color:#818cf8;}#password-screen button{width:100%;padding:12px;border-radius:10px;border:none;background:#4f46e5;color:#fff;font-size:15px;font-weight:600;cursor:pointer;transition:background .2s;}#password-screen button:hover{background:#4338ca;}#password-screen .error{color:#f87171;font-size:13px;margin-top:12px;min-height:20px;}#password-screen .hint{color:#818cf8;font-size:11px;margin-top:16px;}#main-content{display:none;}</style></head><body class="bg-slate-100 text-slate-800"><div id="password-screen"><div class="card"><h2>🔐 产品渠道动销与利润罗盘</h2><p>本页面含成本、利润等敏感经营数据，请输入密码后访问。</p><input type="password" id="pwdInput" placeholder="输入密码" onkeydown="if(event.key=='Enter')checkPwd()"><button onclick="checkPwd()">进入看板</button><div class="error" id="pwdError"></div><div class="hint">⚠️ 本页面为简易密码保护，懂技术的人仍可能绕过。如需更高安全级别，请使用 Cloudflare Access 等服务端鉴权方案。</div></div></div><div id="main-content"><div class="max-w-screen-2xl mx-auto p-3 sm:p-6"><!-- 头部 --><header class="mb-5"><h1 class="text-xl sm:text-2xl font-bold text-slate-900 flex items-center gap-2"><span class="inline-block w-2 h-6 bg-indigo-600 rounded"></span>
-产品渠道动销与利润罗盘系统 <span class="text-xs font-normal text-slate-400">v1.7.2-readonly</span></h1><p class="text-sm text-slate-500 mt-1">库销比 · 滚动周转 · 效期报损预警(随日期动态倒扣) · 智能促销边界 · 渠道利润看板</p><p id="updateInfo" class="text-xs text-indigo-500 mt-1"></p></header><!-- Tab 导航 --><nav class="flex flex-wrap gap-2 mb-5"><button data-tab="dashboard" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium bg-white shadow-sm hover:bg-indigo-50 transition">渠道看板</button><button data-tab="overview" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium bg-white shadow-sm hover:bg-indigo-50 transition">数据总览</button><button data-tab="alerts" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium bg-white shadow-sm hover:bg-indigo-50 transition">预警与营销建议</button><button data-tab="input" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium bg-white shadow-sm hover:bg-indigo-50 transition">数据录入</button><button data-tab="settings" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium bg-white shadow-sm hover:bg-indigo-50 transition">参数设置</button></nav><!-- ============ 渠道看板 ============ --><section id="tab-dashboard" class="tab-panel"><div class="grid grid-cols-2 lg:grid-cols-5 gap-3 mb-5"><div class="bg-white rounded-xl shadow-sm p-4"><div class="text-xs text-slate-400">累计GMV（到手价×累计销量）</div><div id="kpi-gmv" class="text-lg sm:text-2xl font-bold text-slate-900 mt-1">-</div></div><div class="bg-white rounded-xl shadow-sm p-4"><div class="text-xs text-slate-400">累计利润</div><div id="kpi-profit" class="text-lg sm:text-2xl font-bold text-emerald-600 mt-1">-</div></div><div class="bg-white rounded-xl shadow-sm p-4"><div class="text-xs text-slate-400">加权利润率</div><div id="kpi-margin" class="text-lg sm:text-2xl font-bold text-indigo-600 mt-1">-</div></div><div id="card-alert" onclick="showAlertList()" class="bg-white rounded-xl shadow-sm p-4 cursor-pointer hover:ring-2 hover:ring-rose-200 transition select-none"><div class="text-xs text-slate-400 flex items-center justify-between">预警产品数 <span class="text-indigo-500">清单 ›</span></div><div id="kpi-alert" class="text-lg sm:text-2xl font-bold text-rose-600 mt-1">-</div></div><div id="card-expiry" onclick="showExpiryList()" class="bg-white rounded-xl shadow-sm p-4 cursor-pointer hover:ring-2 hover:ring-amber-200 transition select-none"><div class="text-xs text-slate-400 flex items-center justify-between">预计效期报损 <span class="text-indigo-500">清单 ›</span></div><div id="kpi-expiry" class="text-lg sm:text-2xl font-bold text-amber-600 mt-1">-</div></div></div><div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4"><div class="bg-white rounded-xl shadow-sm p-4"><h3 class="text-sm font-semibold mb-3">各品类 累计GMV 与 累计利润</h3><canvas id="chartCategory" height="140"></canvas></div><div class="bg-white rounded-xl shadow-sm p-4"><div class="flex justify-between items-center mb-1"><h3 class="text-sm font-semibold">库存健康度分布</h3><button onclick="showAlertList()" class="text-xs text-indigo-600 hover:underline">预警清单 ›</button></div><p class="text-xs text-slate-400 mb-2">点击饼图任一分区，可查看该状态的产品清单</p><canvas id="chartHealth" height="140" class="cursor-pointer"></canvas></div></div><div class="bg-white rounded-xl shadow-sm p-4"><h3 class="text-sm font-semibold mb-3">各产品 库销比（柱）与 滚动周转率（点）</h3><canvas id="chartMix" height="120"></canvas></div><div class="bg-white rounded-xl shadow-sm p-4"><h3 class="text-sm font-semibold mb-3">SKU 利润健康度气泡图</h3><p class="text-xs text-slate-400 mb-2">X=期末库存（≤3100 件每 100 一格；3100 以上每 10000 一格且格距与 100 格等长）· Y=到手价（每 10 元一格，不压缩，象限等比放大、可横向滚动）· 外圈大小=综合周销 · <span class="text-slate-500 font-medium">实心内核=最近一周周销</span>（内核越小=近期动销越弱于均值；出现虚线外环=最近周销已超过综合周销）· 颜色=利润健康度（红=亏损/保本边缘；<span class="text-slate-500 font-medium">库存&lt;20 件视为无库存，置灰</span>）· 点击查看单品建议</p><div class="overflow-x-auto scrollbar-thin"><div id="bubbleWrap" style="min-width:640px;height:380px;position:relative;"><canvas id="chartBubble"></canvas></div></div></div></section><!-- ============ 数据总览 ============ --><section id="tab-overview" class="tab-panel hidden"><div class="bg-white rounded-xl shadow-sm p-4 overflow-x-auto scrollbar-thin"><div class="flex justify-between items-center mb-2 flex-wrap gap-2"><h3 class="text-sm font-semibold">全部产品指标（剩余效期已按今天动态倒扣）<span id="ovCount" class="text-xs font-normal text-slate-400 ml-2"></span></h3><div class="flex gap-2"><button onclick="clearOverviewFilters()" class="px-3 py-1.5 text-xs bg-slate-200 rounded-lg hover:bg-slate-300">清空筛选</button><button onclick="exportData()" class="px-3 py-1.5 text-xs bg-emerald-600 text-white rounded-lg hover:bg-emerald-700">导出当前数据CSV</button><button onclick="exportDataJson()" class="px-3 py-1.5 text-xs bg-amber-600 text-white rounded-lg hover:bg-amber-700">导出 data.json</button></div></div><p class="text-xs text-slate-400 mb-3">筛选提示：数值列支持 <code>&gt;3</code>、<code>&lt;1</code>、<code>&gt;=2</code>、<code>1-3</code>（区间）等写法；文本 / 状态列按关键字模糊匹配（如状态输入「积压」「断货」「滞销」「报损」「临期」）。<strong>剩余效期</strong>列显示的是按今天推算后的真实剩余天数。</p><table class="w-full text-xs sm:text-sm border-collapse"><thead><tr class="bg-slate-50 text-slate-500 text-left"><th class="p-2">#</th><th class="p-2">产品</th><th class="p-2">SKU</th><th class="p-2">品类</th><th class="p-2 text-right">成本</th><th class="p-2 text-right">控价</th><th class="p-2 text-right">到手价</th><th class="p-2 text-right">单件利润</th><th class="p-2 text-right">利润率</th><th class="p-2 text-right">保本极限底价</th><th class="p-2 text-right">累计利润</th><th class="p-2 text-right">日均销</th><th class="p-2 text-right">期末库存</th><th class="p-2 text-right">库销比</th><th class="p-2 text-right">可售天数</th><th class="p-2 text-right">剩余效期</th><th class="p-2 text-right">预计报损</th><th class="p-2 text-right">滚动周转</th><th class="p-2">状态</th></tr><tr class="bg-white border-b"><th class="p-1"></th><th class="p-1"><input id="flt_name" oninput="renderOverview()" class="flt" placeholder="产品名"></th><th class="p-1"><input id="flt_sku" oninput="renderOverview()" class="flt" placeholder="SKU"></th><th class="p-1"><input id="flt_cat" oninput="renderOverview()" class="flt" placeholder="品类"></th><th class="p-1"><input id="flt_cost" oninput="renderOverview()" class="flt" placeholder=">10"></th><th class="p-1"><input id="flt_price" oninput="renderOverview()" class="flt" placeholder=">50"></th><th class="p-1"><input id="flt_actual" oninput="renderOverview()" class="flt" placeholder="<80"></th><th class="p-1"><input id="flt_profit" oninput="renderOverview()" class="flt" placeholder=">0"></th><th class="p-1"><input id="flt_margin" oninput="renderOverview()" class="flt" placeholder=">15"></th><th class="p-1"><input id="flt_breakeven" oninput="renderOverview()" class="flt" placeholder="<50"></th><th class="p-1"><input id="flt_ytdProfit" oninput="renderOverview()" class="flt" placeholder=">0"></th><th class="p-1"><input id="flt_daily" oninput="renderOverview()" class="flt" placeholder=">10"></th><th class="p-1"><input id="flt_endInv" oninput="renderOverview()" class="flt" placeholder="0-500"></th><th class="p-1"><input id="flt_isr" oninput="renderOverview()" class="flt" placeholder=">3"></th><th class="p-1"><input id="flt_sellDays" oninput="renderOverview()" class="flt" placeholder="<15"></th><th class="p-1"><input id="flt_shelf" oninput="renderOverview()" class="flt" placeholder="<30"></th><th class="p-1"><input id="flt_loss" oninput="renderOverview()" class="flt" placeholder=">0"></th><th class="p-1"><input id="flt_turnover" oninput="renderOverview()" class="flt" placeholder="<1"></th><th class="p-1"><input id="flt_status" oninput="renderOverview()" class="flt" placeholder="如 报损/临期"></th></tr></thead><tbody id="overviewBody"></tbody></table></div></section><!-- ============ 预警与建议 ============ --><section id="tab-alerts" class="tab-panel hidden"><div id="alertsContainer" class="grid grid-cols-1 gap-4"></div></section><!-- ============ 数据录入 ============ --><section id="tab-input" class="tab-panel hidden"><div class="grid grid-cols-1 lg:grid-cols-2 gap-4"><!-- 手动 --><div class="bg-white rounded-xl shadow-sm p-4"><h3 class="text-sm font-semibold mb-3" id="formTitle">手动添加 / 编辑产品</h3><div class="grid grid-cols-2 gap-3 text-sm"><label class="col-span-2">产品名称<input id="f_name" class="inp" placeholder="如：便携榨汁杯"></label><label>SKU编码<input id="f_sku" class="inp" placeholder="SKU001"></label><label>品类<input id="f_cat" class="inp" placeholder="小家电"></label><label>成本(元)<input id="f_cost" type="number" class="inp" placeholder="35"></label><label>控价(元)<input id="f_price" type="number" class="inp" placeholder="89"></label><label class="col-span-2">实际支付到手价(元)<input id="f_actprice" type="number" class="inp" placeholder="留空则等于控价"></label><label>最近一周销售件数<input id="f_week" type="number" class="inp" placeholder="420"></label><label>最新期末库存<input id="f_endinv" type="number" class="inp" placeholder="1200"></label><label>年初(1/1)期初库存<input id="f_begininv" type="number" class="inp" placeholder="800"></label><label>业务年累计销售件数<input id="f_ytd" type="number" class="inp" placeholder="9600"></label><label class="col-span-2 bg-amber-50 rounded-lg p-2 -mx-1">剩余效期天数（截至"数据日期"当天的剩余天数，系统会按今天自动倒扣；留空=不做效期分析）<input id="f_shelf" type="number" class="inp" placeholder="如 90，留空=不做效期分析"></label><label>数据日期<input id="f_date" type="date" class="inp"></label><label>税运仓储比例%(选填)<input id="f_ftax" type="number" class="inp" placeholder="留空用默认"></label><label class="col-span-2">其他费用比例%(选填)<input id="f_fother" type="number" class="inp" placeholder="留空用默认"></label></div><div class="flex gap-2 mt-4"><button onclick="saveProduct()" class="flex-1 py-2 bg-indigo-600 text-white rounded-lg text-sm hover:bg-indigo-700">保存产品</button><button onclick="resetForm()" class="px-4 py-2 bg-slate-200 rounded-lg text-sm hover:bg-slate-300">清空</button></div><p class="text-xs text-slate-400 mt-2">提示：SKU相同的记录将被<strong>覆盖更新</strong>。剩余效期以"数据日期"为起点，系统按当天日期自动倒扣，因此建议务必填写数据日期；填空数据日期则效期不做倒扣（退回静态）。</p><button onclick="exportDataJson()" class="mt-4 w-full py-2 bg-amber-600 text-white rounded-lg text-sm hover:bg-amber-700">导出并同步到团队看板</button></div><!-- 批量 --><div class="bg-white rounded-xl shadow-sm p-4"><h3 class="text-sm font-semibold mb-3">批量导入</h3><div class="border-2 border-dashed border-slate-200 rounded-lg p-6 text-center"><p class="text-sm text-slate-500 mb-3">上传 CSV 表格批量导入（相同SKU自动覆盖）</p><input type="file" id="csvFile" accept=".csv" class="hidden" onchange="importCSV(event)"><button onclick="document.getElementById('csvFile').click()" class="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm hover:bg-indigo-700">选择CSV文件</button></div><div class="mt-4 flex flex-col gap-2"><button onclick="downloadTemplate()" class="w-full py-2 border border-indigo-300 text-indigo-600 rounded-lg text-sm hover:bg-indigo-50">下载标准投喂模板(CSV)</button><button onclick="loadSample()" class="w-full py-2 border border-slate-300 text-slate-600 rounded-lg text-sm hover:bg-slate-50">载入示例数据</button><button onclick="clearAll()" class="w-full py-2 border border-rose-300 text-rose-600 rounded-lg text-sm hover:bg-rose-50">清空全部数据</button></div><div class="mt-4 bg-slate-50 rounded-lg p-3 text-xs text-slate-500 leading-relaxed"><strong>模板列顺序（末列为效期）：</strong><br>
-产品名称, SKU编码, 品类, 成本, 控价, 实际支付到手价, 最近一周销售件数, 最新期末库存, 年初期初库存, 业务年累计销售件数, 数据日期, 税运仓储比例%, 其他费用比例%, <span class="text-amber-600 font-medium">剩余效期天数</span><br>
-（到手价、税费两列留空套用默认；<strong>剩余效期天数</strong>留空则该产品不做效期分析；效期以"数据日期"为起点按今天自动倒扣，请确保数据日期准确）
-</div></div><!-- GitHub 同步配置 --><div class="bg-white rounded-xl shadow-sm p-4"><h3 class="text-sm font-semibold mb-3 flex items-center gap-2"><svg class="w-4 h-4 text-slate-500" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
-团队看板同步配置
-</h3><div class="space-y-2 text-sm"><label class="block text-xs text-slate-400">GitHub Token（需有 repo 写入权限）</label><input id="gh_token" type="password" class="inp" placeholder="ghp_xxxxxxxxxxxx"><div class="flex gap-2"><button onclick="saveGhToken()" class="px-3 py-1.5 bg-slate-800 text-white rounded-lg text-xs hover:bg-slate-700">保存 Token</button><button onclick="clearGhToken()" class="px-3 py-1.5 border border-slate-300 text-slate-600 rounded-lg text-xs hover:bg-slate-50">清除</button></div><p id="gh_status" class="text-xs text-slate-400"></p><p class="text-xs text-slate-400">配置后，点击「导出并同步到团队看板」将自动推送到 GitHub，团队看板约 1–2 分钟后刷新即可看到最新数据。</p></div></div></div><!-- 已录入列表 --><div class="bg-white rounded-xl shadow-sm p-4 mt-4 overflow-x-auto scrollbar-thin"><h3 class="text-sm font-semibold mb-3">已录入产品（<span id="countLabel">0</span>）<span class="text-xs font-normal text-slate-400 ml-2">剩余效期列显示：今天推算值（录入值）</span></h3><table class="w-full text-xs sm:text-sm"><thead><tr class="bg-slate-50 text-slate-500 text-left"><th class="p-2">#</th><th class="p-2">产品</th><th class="p-2">SKU</th><th class="p-2">品类</th><th class="p-2 text-right">成本</th><th class="p-2 text-right">控价</th><th class="p-2 text-right">到手价</th><th class="p-2 text-right">周销</th><th class="p-2 text-right">库存</th><th class="p-2 text-right">剩余效期</th><th class="p-2">数据日期</th><th class="p-2">操作</th></tr></thead><tbody id="inputBody"></tbody></table></div></section><!-- ============ 参数设置 ============ --><section id="tab-settings" class="tab-panel hidden"><div class="grid grid-cols-1 lg:grid-cols-2 gap-4"><div class="bg-white rounded-xl shadow-sm p-4"><h3 class="text-sm font-semibold mb-3">渠道费用与利润目标</h3><div class="grid grid-cols-1 gap-3 text-sm"><label class="flex justify-between items-center">默认税运仓储费用比例(%)<input id="s_ftax" type="number" class="inp w-28"></label><label class="flex justify-between items-center">默认其他费用比例(%)<input id="s_fother" type="number" class="inp w-28"></label><label class="flex justify-between items-center">目标利润率(%)<input id="s_target" type="number" class="inp w-28"></label></div></div><div class="bg-white rounded-xl shadow-sm p-4"><h3 class="text-sm font-semibold mb-3">库销比预警阈值 <span class="text-xs text-slate-400">(越大=库存越多)</span></h3><div class="grid grid-cols-1 gap-3 text-sm"><label class="flex justify-between items-center">低于此值→断货风险<input id="s_isr_low" type="number" step="0.1" class="inp w-28"></label><label class="flex justify-between items-center">健康区间上限<input id="s_isr_healthy" type="number" step="0.1" class="inp w-28"></label><label class="flex justify-between items-center">高于此值→积压严重<input id="s_isr_high" type="number" step="0.1" class="inp w-28"></label></div></div><div class="bg-white rounded-xl shadow-sm p-4"><h3 class="text-sm font-semibold mb-3">滚动周转率预警阈值 <span class="text-xs text-slate-400">(越大=周转越快)</span></h3><div class="grid grid-cols-1 gap-3 text-sm"><label class="flex justify-between items-center">低于此值→滞销<input id="s_to_slow" type="number" step="0.1" class="inp w-28"></label><label class="flex justify-between items-center">健康区间下限<input id="s_to_healthy" type="number" step="0.1" class="inp w-28"></label><label class="flex justify-between items-center">高于此值→优秀<input id="s_to_good" type="number" step="0.1" class="inp w-28"></label></div></div><div class="bg-white rounded-xl shadow-sm p-4"><h3 class="text-sm font-semibold mb-3">效期预警阈值 <span class="text-xs text-slate-400">(仅对填了剩余效期的产品生效)</span></h3><div class="grid grid-cols-1 gap-3 text-sm"><label class="flex justify-between items-center">剩余效期低于此天数→临期<input id="s_shelf_warn" type="number" class="inp w-28"></label><label class="flex justify-between items-center">效期覆盖安全系数(剩余效期÷可售天数)<input id="s_shelf_cover" type="number" step="0.1" class="inp w-28"></label></div><p class="text-xs text-slate-400 mt-2">覆盖系数&lt;1 判为「效期报损风险」(到期卖不完)；≥1 但低于安全系数判为「效期偏紧」。剩余效期为按今天动态推算后的值。</p></div><div class="bg-white rounded-xl shadow-sm p-4 flex flex-col justify-between lg:col-span-2"><p class="text-xs text-slate-500 leading-relaxed">阈值改动后点击保存将实时重算所有产品的预警等级、营销建议、促销边界与效期报损测算。目标利润率同时用于反推「目标利润底价」。效期天数每次打开/重算都会按当天日期自动倒扣，无需手动更新。</p><button onclick="saveSettings()" class="mt-4 py-2 bg-indigo-600 text-white rounded-lg text-sm hover:bg-indigo-700">保存参数并重算</button></div></div></section></div><!-- 产品清单弹窗 --><div id="listModal" class="fixed inset-0 z-50 hidden"><div class="absolute inset-0 bg-black/40" onclick="closeListModal()"></div><div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-white rounded-xl shadow-xl w-11/12 max-w-2xl flex flex-col" style="max-height:80vh;"><div class="flex justify-between items-center p-4 border-b"><h3 id="listModalTitle" class="font-semibold text-sm"></h3><button onclick="closeListModal()" class="text-slate-400 hover:text-slate-700 text-2xl leading-none">&times;</button></div><div id="listModalBody" class="p-3 overflow-y-auto scrollbar-thin"></div><div class="p-3 border-t text-xs text-slate-400 text-center">点击任一产品，将跳转到「预警与营销建议」并定位该单品</div></div></div><!-- 回到顶部浮动按钮 --><button id="backTop" onclick="goTop()" title="回到顶部"
-class="hidden-btn fixed bottom-6 right-6 z-40 w-12 h-12 rounded-full bg-indigo-600 text-white shadow-lg hover:bg-indigo-700 flex items-center justify-center"><svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7"/></svg></button><!-- Toast --><div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-sm px-4 py-2 rounded-lg shadow-lg opacity-0 pointer-events-none transition-opacity z-50"></div><script>let  products=[];let  settings={feeTax:8,feeOther:3,targetMargin:15,isrLow:0.5,isrHealthy:2,isrHigh:3,toSlow:1,toHealthy:3,toGood:6,shelfWarnDays:30,shelfCoverSafe:1.5};let  charts={};let  currentHealthLabels=[];function  persist(){try {localStorage.setItem('channelTool',JSON.stringify({products,settings}));}catch (e){}}function  restore(){try {const  d=JSON.parse(localStorage.getItem('channelTool'));if (d){if (Array.isArray(d.products))products=d.products;if (d.settings&&typeof  d.settings==='object')settings={...settings,...d.settings};}}catch (e){}const  token=localStorage.getItem('gh_token');if (token){const  el=document.getElementById('gh_token');if (el)el.value=token;const  st=document.getElementById('gh_status');if (st)st.textContent='Token 已配置，导出时将自动同步到团队看板';}}function  daysElapsed(dateStr){if (!dateStr)return  0;const  d0=new  Date(dateStr+'T00:00:00');if (isNaN(d0.getTime()))return  0;const  today=new  Date();today.setHours(0,0,0,0);return  Math.max(0,Math.round((today-d0)/86400000));}function  compute(p){const  feeTax=(p.feeTax!==''&&p.feeTax!=null&&!isNaN(p.feeTax))?Number(p.feeTax):settings.feeTax;const  feeOther=(p.feeOther!==''&&p.feeOther!=null&&!isNaN(p.feeOther))?Number(p.feeOther):settings.feeOther;const  totalFee=(feeTax+feeOther)/100;const  actual=(p.actualPrice!=null&&p.actualPrice!==''&&!isNaN(p.actualPrice)&&Number(p.actualPrice)>0)?Number(p.actualPrice):p.price;const  daily=p.weekSales/7;const  monthSales=daily*30;const  isr=monthSales>0 ? p.endInv/monthSales:(p.endInv>0?Infinity:0);const  sellDays=daily>0 ? p.endInv/daily:(p.endInv>0?Infinity:0);const  avgInv=(Number(p.beginInv)+Number(p.endInv))/2;const  turnover=avgInv>0 ? p.ytdSales/avgInv:null;const  unitProfit=actual*(1-totalFee)-p.cost;const  margin=actual>0 ? unitProfit/actual:0;const  breakeven=p.cost/(1-totalFee);const  denom=1-totalFee-settings.targetMargin/100;const  targetFloor=denom>0 ? p.cost/denom:null;const  ytdGMV=actual*p.ytdSales,ytdProfit=unitProfit*p.ytdSales;const  dayOfYear=p.date ? Math.ceil((new  Date(p.date)-new  Date(new  Date(p.date).getFullYear(),0,0))/86400000):null;const  avgDailySales=(dayOfYear&&dayOfYear>0)? p.ytdSales/dayOfYear:0;const  avgWeekSales=avgDailySales*7;const  shelfLifeRaw=(p.shelfLife!=null&&p.shelfLife!==''&&!isNaN(p.shelfLife)&&Number(p.shelfLife)>0)?Number(p.shelfLife):null;const  shelfElapsed=shelfLifeRaw!=null ? daysElapsed(p.date):0;let  shelfLife=null,shelfCover=null,expiryQty=null,expiryLoss=null,needDaily=null;if (shelfLifeRaw!=null){shelfLife=Math.max(0,shelfLifeRaw-shelfElapsed);if (shelfLife<=0){expiryQty=p.endInv;expiryLoss=p.endInv*p.cost;needDaily=Infinity;shelfCover=p.endInv>0 ? 0:Infinity;}else {const  sellableByExpiry=daily*shelfLife;expiryQty=Math.max(0,p.endInv-sellableByExpiry);expiryLoss=expiryQty*p.cost;needDaily=p.endInv/shelfLife;if (p.endInv<=0)shelfCover=Infinity;else  if (daily<=0)shelfCover=0;else  shelfCover=shelfLife/(p.endInv/daily);}}return {feeTax,feeOther,totalFee,actual,daily,isr,sellDays,turnover,unitProfit,margin,breakeven,targetFloor,ytdGMV,ytdProfit,shelfLife,shelfLifeRaw,shelfElapsed,shelfCover,expiryQty,expiryLoss,needDaily,avgDailySales,avgWeekSales};}function  invStatus(isr){if (isr===Infinity)return {t:'积压(无动销)',c:'rose',lv:3};if (isr<settings.isrLow)return {t:'断货风险',c:'amber',lv:2};if (isr<=settings.isrHealthy)return {t:'健康',c:'emerald',lv:0};if (isr<=settings.isrHigh)return {t:'库存偏高',c:'yellow',lv:1};return {t:'积压严重',c:'rose',lv:3};}function  turnStatus(to){if (to===null)return {t:'无数据',c:'slate',lv:0};if (to<settings.toSlow)return {t:'滞销',c:'rose',lv:3};if (to<settings.toHealthy)return {t:'周转偏慢',c:'yellow',lv:1};if (to<=settings.toGood)return {t:'周转健康',c:'emerald',lv:0};return {t:'周转优秀',c:'indigo',lv:0};}function  shelfStatus(m){if (m.shelfLife==null)return {t:'—',c:'slate',lv:0,none:true};if (m.shelfLife<=0)return {t:'已过效期',c:'rose',lv:3};if (m.shelfCover<1)return {t:'效期报损风险',c:'rose',lv:3};if (m.shelfLife<settings.shelfWarnDays)return {t:'临期需关注',c:'amber',lv:2};if (m.shelfCover<settings.shelfCoverSafe)return {t:'效期偏紧',c:'yellow',lv:1};return {t:'效期安全',c:'emerald',lv:0};}function  advise(p,m){const  inv=invStatus(m.isr),turn=turnStatus(m.turnover),shelf=shelfStatus(m);const  level=Math.max(inv.lv,turn.lv,shelf.lv);const  tags=[inv,turn];if (!shelf.none)tags.push(shelf);let  advice=[];const  disc=(fp)=>(p.price>0&&fp!=null)?(fp/p.price*10).toFixed(1)+'折':'—';const  fmtP=(v)=>v==null?'—':'¥'+v.toFixed(2);if (!shelf.none){if (m.shelfLife<=0){advice.push(`🔴 该批次<b>已超出效期</b>（数据日期至今已过 ${m.shelfElapsed}天，超过录入的 ${m.shelfLifeRaw}天效期），当前库存<b>${fmt(p.endInv)}</b>件基本全部面临报废，潜在报损<b>¥${fmt(m.expiryLoss)}</b>（成本口径）。请立即核实实物批次并做<strong>下架/报损/退供处理</strong>，同步核减库存并更新数据。`);}else  if (m.shelfCover<1){const  ratio=m.daily>0 ?(m.needDaily/m.daily).toFixed(1):'∞';advice.push(`🔴 剩余效期仅<b>${m.shelfLife}</b>天，按当前日均 ${m.daily.toFixed(1)}件，到期预计卖不完约<b>${Math.round(m.expiryQty)}</b>件，潜在报损<b>¥${fmt(m.expiryLoss)}</b>（成本口径）。需把日均动销拉到<b>${m.needDaily.toFixed(1)}</b>件/天（约当前 ${ratio}倍）才能到期前清完。建议<strong>立即临期清仓</strong>：因报损=全额亏损，清仓价可<strong>击穿保本价 ${fmtP(m.breakeven)}</strong>，只要能回收部分成本即优于报废；优先叠加渠道调拨、买赠、临期专区、直播秒杀。`);}else  if (shelf.lv===2){advice.push(`🟠 剩余效期 ${m.shelfLife}天，虽按当前动销可在到期前售罄（效期覆盖系数 ${m.shelfCover.toFixed(2)}），但时间窗偏紧。建议<strong>提前排一轮温和促销</strong>（目标底价 ${fmtP(m.targetFloor)}约 ${disc(m.targetFloor)}）预留缓冲，避免临近到期被迫深度砍价。`);}else  if (shelf.lv===1){advice.push(`🟡 效期覆盖系数 ${m.shelfCover.toFixed(2)}（安全线 ${settings.shelfCoverSafe}）略偏紧。保持动销监控，若两周内周转下滑再启动促销。`);}}if (inv.lv===2&&inv.t==='断货风险'){advice.push(`⚠️ 可售天数约 ${isFinite(m.sellDays)?Math.round(m.sellDays)+'天':'—'}，库存紧张。建议<strong>优先补货</strong>，暂缓一切促销以免加速断货；若为爆品可小幅提价平衡供需。`);}if (inv.lv===3||(inv.lv===1)){if (m.margin>=settings.targetMargin/100){advice.push(`📦 库存${inv.t}，但利润率${(m.margin*100).toFixed(1)}%有空间。<strong>建议促销去化</strong>：保住目标利润(${settings.targetMargin}%)的最低到手价 ${fmtP(m.targetFloor)}（约${disc(m.targetFloor)}）；需快速清仓的极限保本价 ${fmtP(m.breakeven)}（约${disc(m.breakeven)}）。`);}else  if (m.margin>0){advice.push(`📦 库存${inv.t}且利润偏薄(${(m.margin*100).toFixed(1)}%)。促销空间有限，最低仅可至保本价 ${fmtP(m.breakeven)}（约${disc(m.breakeven)}）。建议<strong>捆绑搭售、满赠引流</strong>而非直接降价，并收紧补货。`);}else {advice.push(`🔴 库存${inv.t}且当前已亏损。建议<strong>清仓止损</strong>或渠道调拨，停止补货，重新评估该SKU定位。`);}}if (turn.lv>=1&&inv.lv<=0){advice.push(`🐢 库存表面健康但滚动周转${turn.t}(${m.turnover?m.turnover.toFixed(2):'—'})，存在慢动销风险。建议加强内容曝光/关联推荐，观察2周动销变化再决定是否促销。`);}if (level===0&&advice.length===0){advice.push(`✅ 库销、周转${shelf.none?'':'与效期'}均健康，利润率${(m.margin*100).toFixed(1)}%。<strong>维持现有节奏</strong>，可按目标利润底价 ${fmtP(m.targetFloor)}作为大促时的价格护栏。`);}return {level,tags,advice,shelf,inv,turn};}const  badge=(c,t)=>`<span class ="inline-block px-2 py-0.5 rounded text-xs bg-${c}-100 text-${c}-700">${t}</span>`;const  fmt=(v,d=0)=>(v==null||!isFinite(v))?'∞':Number(v).toLocaleString('zh-CN',{maximumFractionDigits:d});function  render(){document.getElementById('countLabel').textContent=products.length;try {renderOverview();}catch (e){console.error('renderOverview 失败:',e);}try {renderInputList();}catch (e){console.error('renderInputList 失败:',e);}try {renderDashboard();}catch (e){console.error('renderDashboard 失败:',e);}try {renderAlerts();}catch (e){console.error('renderAlerts 失败:',e);}persist();}function  textMatch(field,expr){if (!expr)return  true;return  String(field).toLowerCase().includes(expr.toLowerCase());}function  matchNum(v,expr){if (!expr)return  true;const  val=(v===Infinity)?1e15:(v==null?NaN:Number(v));const  e=expr.replace(/\s/g,'');let  m;if (m=e.match(/^(-?\d*\.?\d+)-(-?\d*\.?\d+)$/))return !isNaN(val)&&val>=+m[1]&&val<=+m[2];if (m=e.match(/^(>=|<=|>|<|=)(-?\d*\.?\d+)$/)){if (isNaN(val))return  false;const  n=+m[2];switch (m[1]){case '>':return  val>n;case '<':return  val<n;case '>=':return  val>=n;case '<=':return  val<=n;default:return  Math.abs(val-n)<1e-6;}}if (m=e.match(/^(-?\d*\.?\d+)$/))return (!isNaN(val)&&Math.abs(val-+m[1])<1e-6)||String(v).includes(e);return  true;}function  getOverviewFilters(){const  g=id=>{const  el=document.getElementById(id);return  el?el.value.trim():'';};return {name:g('flt_name'),sku:g('flt_sku'),cat:g('flt_cat'),cost:g('flt_cost'),price:g('flt_price'),actual:g('flt_actual'),profit:g('flt_profit'),margin:g('flt_margin'),breakeven:g('flt_breakeven'),ytdProfit:g('flt_ytdProfit'),daily:g('flt_daily'),endInv:g('flt_endInv'),isr:g('flt_isr'),sellDays:g('flt_sellDays'),shelf:g('flt_shelf'),loss:g('flt_loss'),turnover:g('flt_turnover'),status:g('flt_status')};}function  clearOverviewFilters(){['flt_name','flt_sku','flt_cat','flt_cost','flt_price','flt_actual','flt_profit','flt_margin','flt_breakeven','flt_ytdProfit','flt_daily','flt_endInv','flt_isr','flt_sellDays','flt_shelf','flt_loss','flt_turnover','flt_status'] .forEach(id=>{const  el=document.getElementById(id);if (el)el.value='';});renderOverview();}function  renderOverview(){const  tb=document.getElementById('overviewBody');tb.innerHTML='';const  ovc=document.getElementById('ovCount');const  COLS=19;if (!products.length){tb.innerHTML=`<tr><td colspan="${COLS}" class ="p-6 text-center text-slate-400">暂无数据，请到「数据录入」添加或载入示例</td></tr>`;if (ovc)ovc.textContent='';return ;}const  f=getOverviewFilters();let  shown=0;products.forEach(p=>{const  m=compute(p);const  inv=invStatus(m.isr),turn=turnStatus(m.turnover),shelf=shelfStatus(m);const  statusText=inv.t+' '+turn.t+' '+(shelf.none?'':shelf.t);const  pass=textMatch(p.name,f.name)&&textMatch(p.sku,f.sku)&&textMatch(p.cat,f.cat)&&matchNum(p.cost,f.cost)&&matchNum(p.price,f.price)&&matchNum(m.actual,f.actual)&&matchNum(m.unitProfit,f.profit)&&matchNum(m.margin*100,f.margin)&&matchNum(m.breakeven,f.breakeven)&&matchNum(m.ytdProfit,f.ytdProfit)&&matchNum(m.daily,f.daily)&&matchNum(p.endInv,f.endInv)&&matchNum(m.isr,f.isr)&&matchNum(m.sellDays,f.sellDays)&&matchNum(m.shelfLife,f.shelf)&&matchNum(m.expiryLoss,f.loss)&&matchNum(m.turnover,f.turnover)&&textMatch(statusText,f.status);if (!pass)return ;shown++;const  idx=shown;const  shelfCell=m.shelfLife==null ? '<span class ="text-slate-300">—</span>':`<span class ="${shelf.lv>=2?'text-rose-600 font-semibold':''}" title="录入${m.shelfLifeRaw}天/已过${m.shelfElapsed}天">${m.shelfLife}天</span>`;const  lossCell=(m.expiryLoss&&m.expiryLoss>0)? `<span class ="text-amber-600 font-medium">¥${fmt(m.expiryLoss)}</span>`:'<span class ="text-slate-300">—</span>';tb.innerHTML+=`<tr class ="border-t hover:bg-slate-50 cursor-pointer" onclick="gotoAlert('${p.sku}')"><td class ="p-2 text-center text-slate-400">${idx}</td><td class ="p-2 font-medium">${p.name}</td><td class ="p-2 text-slate-400">${p.sku}</td><td class ="p-2">${p.cat}</td><td class ="p-2 text-right">${fmt(p.cost,2)}</td><td class ="p-2 text-right">${fmt(p.price,2)}</td><td class ="p-2 text-right font-medium">${fmt(m.actual,2)}</td><td class ="p-2 text-right ${m.unitProfit<0?'text-rose-600':'text-emerald-600'}">${fmt(m.unitProfit,2)}</td><td class ="p-2 text-right ${m.margin<0?'text-rose-600':''}">${(m.margin*100).toFixed(1)}%</td><td class ="p-2 text-right text-rose-600 font-semibold">¥${fmt(m.breakeven,2)}</td><td class ="p-2 text-right ${m.ytdProfit<0?'text-rose-600':'text-emerald-600'}">¥${fmt(m.ytdProfit)}</td><td class ="p-2 text-right">${fmt(m.daily,1)}</td><td class ="p-2 text-right">${fmt(p.endInv)}</td><td class ="p-2 text-right font-semibold">${fmt(m.isr,2)}</td><td class ="p-2 text-right">${isFinite(m.sellDays)?fmt(m.sellDays)+'天':'∞'}</td><td class ="p-2 text-right">${shelfCell}</td><td class ="p-2 text-right">${lossCell}</td><td class ="p-2 text-right font-semibold">${m.turnover?m.turnover.toFixed(2):'—'}</td><td class ="p-2">${badge(inv.c,inv.t)}${badge(turn.c,turn.t)}${shelf.none?'':' '+badge(shelf.c,shelf.t)}</td></tr>`;});if (shown===0)tb.innerHTML=`<tr><td colspan="${COLS}" class ="p-6 text-center text-slate-400">无符合筛选条件的产品</td></tr>`;if (ovc)ovc.textContent=`显示 ${shown}/${products.length}条`+(shown<products.length?'（已筛选）':'');}function  renderInputList(){const  tb=document.getElementById('inputBody');tb.innerHTML='';if (!products.length){tb.innerHTML='<tr><td colspan="12" class ="p-4 text-center text-slate-400">暂无数据</td></tr>';return ;}products.forEach((p,i)=>{const  idx=i+1;const  m=compute(p);const  shelfTxt=m.shelfLife!=null ? `${m.shelfLife}天<span class ="text-slate-400">（录入${m.shelfLifeRaw}）</span>`:'—';tb.innerHTML+=`<tr class ="border-t"><td class ="p-2 text-center text-slate-400">${idx}</td><td class ="p-2 font-medium">${p.name}</td><td class ="p-2 text-slate-400">${p.sku}</td><td class ="p-2">${p.cat}</td><td class ="p-2 text-right">${fmt(p.cost,2)}</td><td class ="p-2 text-right">${fmt(p.price,2)}</td><td class ="p-2 text-right">${fmt(m.actual,2)}</td><td class ="p-2 text-right">${fmt(p.weekSales)}</td><td class ="p-2 text-right">${fmt(p.endInv)}</td><td class ="p-2 text-right ${m.shelfLife!=null&&m.shelfLife<=settings.shelfWarnDays?'text-rose-600 font-semibold':''}">${shelfTxt}</td><td class ="p-2 text-slate-500">${p.date||'—'}</td><td class ="p-2"><button onclick="editProduct('${p.sku}')" class ="text-indigo-600 hover:underline">编辑</button><button onclick="delProduct('${p.sku}')" class ="text-rose-600 hover:underline ml-2">删除</button></td></tr>`;});}function  renderDashboard(){let  gmv=0,profit=0,alerts=0,expiryLossTotal=0;const  catMap={};const  health={'健康':0,'库存偏高':0,'积压严重':0,'积压(无动销)':0,'断货风险':0};const  mixLabels=[],mixIsr=[],mixTo=[];products.forEach(p=>{const  m=compute(p);gmv+=m.ytdGMV;profit+=m.ytdProfit;const  inv=invStatus(m.isr),turn=turnStatus(m.turnover),shelf=shelfStatus(m);if (Math.max(inv.lv,turn.lv,shelf.lv)>=2)alerts++;if (m.expiryLoss)expiryLossTotal+=m.expiryLoss;if (health[inv.t]!==undefined)health[inv.t]++;catMap[p.cat]=catMap[p.cat]||{gmv:0,profit:0};catMap[p.cat].gmv+=m.ytdGMV;catMap[p.cat].profit+=m.ytdProfit;mixLabels.push(p.name);mixIsr.push(isFinite(m.isr)?+m.isr.toFixed(2):settings.isrHigh*1.5);mixTo.push(m.turnover?+m.turnover.toFixed(2):0);});document.getElementById('kpi-gmv').textContent='¥'+fmt(gmv);document.getElementById('kpi-profit').textContent='¥'+fmt(profit);document.getElementById('kpi-margin').textContent=gmv>0?(profit/gmv*100).toFixed(1)+'%':'—';document.getElementById('kpi-alert').textContent=alerts;document.getElementById('kpi-expiry').textContent='¥'+fmt(expiryLossTotal);const  cats=Object.keys(catMap);drawChart('chartCategory','bar',{labels:cats,datasets:[{label:'累计GMV',data:cats.map(c=>+catMap[c].gmv.toFixed(0)),backgroundColor:'#a5b4fc'},{label:'累计利润',data:cats.map(c=>+catMap[c].profit.toFixed(0)),backgroundColor:'#6366f1'}]});const  hLabels=Object.keys(health).filter(k=>health[k]>0);currentHealthLabels=hLabels;drawChart('chartHealth','doughnut',{labels:hLabels,datasets:[{data:hLabels.map(k=>health[k]),backgroundColor:['#34d399','#fbbf24','#f43f5e','#9f1239','#f59e0b']}]},{cutout:'55%',onClick:(evt,els)=>{if (els&&els.length){const  status=currentHealthLabels[els[0].index];openProductList('库存状态：'+status+'（点击查看单品建议）',getProductsByStatus(status));}else {showAlertList();}}});drawChart('chartMix','bar',{labels:mixLabels,datasets:[{label:'库销比',data:mixIsr,backgroundColor:'#a5b4fc'},{label:'滚动周转',data:mixTo,type:'line',borderColor:'#f43f5e',backgroundColor:'#f43f5e',pointRadius:4,yAxisID:'y1'}]},{scales:{y:{beginAtZero:true,title:{display:true,text:'库销比'}},y1:{beginAtZero:true,position:'right',title:{display:true,text:'滚动周转'},grid:{drawOnChartArea:false}}}});const  X_BREAK=3100,X_COMPRESS=100,OUT_OF_STOCK=20;const  tx=v=>v<=X_BREAK ? v:X_BREAK+(v-X_BREAK)/X_COMPRESS;const  bubbleData=products.map(p=>{const  m=compute(p);const  r=Math.min(25,Math.max(4,Math.sqrt(Math.max(0,m.avgWeekSales))*2));let  bc,fc;if (p.endInv<OUT_OF_STOCK){bc='#94a3b8';fc='rgba(148,163,184,0.22)';}else  if (m.actual<=m.breakeven){bc='#f43f5e';fc='rgba(244,63,94,0.35)';}else  if (m.actual<=m.breakeven*1.15){bc='#f59e0b';fc='rgba(245,158,11,0.35)';}else {bc='#10b981';fc='rgba(16,185,129,0.35)';}return {x:tx(p.endInv),inv:p.endInv,y:m.actual,r:r,sku:p.sku,name:p.name,m:m,weekSales:p.weekSales,bc:bc,fc:fc};});const  maxInvT=bubbleData.length ? Math.max(...bubbleData.map(d=>d.x)):100;const  maxActual=bubbleData.length ? Math.max(...bubbleData.map(d=>d.y)):100;const  yMax=Math.ceil(maxActual/10)*10+10;const  wrap=document.getElementById('bubbleWrap');if (wrap){wrap.style.minWidth=Math.max(720,Math.round(maxInvT/100*22)+80)+'px';wrap.style.height=Math.max(400,Math.round(yMax/10*16)+80)+'px';}const  salesComparePlugin={id:'salesCompare',afterDatasetsDraw(chart){const  meta=chart.getDatasetMeta(0);const  c=chart.ctx;meta.data.forEach((pt,i)=>{const  d=chart.data.datasets[0].data[i];const  rOut=pt.options.radius||d.r;const  rIn=Math.min(rOut,Math.sqrt(Math.max(0,d.weekSales))*2);c.save();c.beginPath();c.arc(pt.x,pt.y,Math.max(1.5,rIn),0,Math.PI*2);c.globalAlpha=0.85;c.fillStyle=d.bc;c.fill();if (d.weekSales>d.m.avgWeekSales){c.beginPath();c.arc(pt.x,pt.y,rOut+2.5,0,Math.PI*2);c.setLineDash([3,3]);c.lineWidth=1.5;c.globalAlpha=1;c.strokeStyle=d.bc;c.stroke();}c.restore();});}};drawChart('chartBubble','bubble',{datasets:[{label:'SKU',data:bubbleData,backgroundColor:bubbleData.map(d=>d.fc),borderColor:bubbleData.map(d=>d.bc),borderWidth:2}]},{maintainAspectRatio:false,scales:{x:{title:{display:true,text:'期末库存（件，3100 以上压缩等距）'},beginAtZero:true,afterBuildTicks(axis){const  ticks=[];for (let  v=0;v<=3000;v+=100)ticks.push({value:v});[10000,20000].forEach(v=>ticks.push({value:tx(v)}));axis.ticks=ticks;},ticks:{callback:function (v){return  v<=X_BREAK ? v:Math.round(X_BREAK+(v-X_BREAK)*X_COMPRESS).toLocaleString();}}},y:{title:{display:true,text:'到手价（元）'},beginAtZero:true,max:yMax,ticks:{stepSize:10}}},plugins:{tooltip:{callbacks:{label:function (ctx){const  d=ctx.raw;const  m=d.m;const  diff=m.avgWeekSales>0 ?((d.weekSales-m.avgWeekSales)/m.avgWeekSales*100).toFixed(1):0;const  trend=diff>=0 ? '↑+'+diff+'%':'↓'+diff+'%';return  [ d.name+'('+d.sku+')'+(d.inv<OUT_OF_STOCK ? '【无库存】':''),'到手价:¥'+m.actual.toFixed(2)+'|保本极限:¥'+m.breakeven.toFixed(2)+'|差距:¥'+(m.actual-m.breakeven).toFixed(2),'库存:'+d.inv+'件'+(d.inv<OUT_OF_STOCK ? '（<20件，按无库存处理）':'')+'|最近周销:'+d.weekSales+'|综合周销:'+m.avgWeekSales.toFixed(1)+' '+trend,'利润率:'+(m.margin*100).toFixed(1)+'%|库销比:'+(isFinite(m.isr)?m.isr.toFixed(2):'∞')];}}},legend:{display:false}},onClick:(evt,els)=>{if (els&&els.length){const  d=bubbleData[els[0].index];if (d)gotoAlert(d.sku);}}},[salesComparePlugin]);}function  drawChart(id,type,data,extra={},extraPlugins=[]){const  ctx=document.getElementById(id);if (!ctx)return ;if (charts[id])charts[id].destroy();const  opts={responsive:true,plugins:{legend:{labels:{boxWidth:12,font:{size:11}}}}};const  inlinePlugins=[].concat(extraPlugins);if (type==='doughnut'||type==='pie'){inlinePlugins.push({id:'pctLabels',afterDraw:function (chart){const  dataset=chart.data.datasets[0];const  meta=chart.getDatasetMeta(0);const  total=dataset.data.reduce((a,b)=>a+b,0);if (!total)return ;const  c=chart.ctx;c.save();c.font='bold 11px sans-serif';c.fillStyle='#475569';c.textAlign='center';c.textBaseline='middle';meta.data.forEach((arc,i)=>{const  v=dataset.data[i];if (!v)return ;const  pct=(v/total*100).toFixed(1)+'%';const  midA=(arc.startAngle+arc.endAngle)/2;const  midR=(arc.outerRadius+arc.innerRadius)/2;const  cx=arc.x+Math.cos(midA)*midR;const  cy=arc.y+Math.sin(midA)*midR;c.fillText(pct,cx,cy);});c.restore();}});}charts[id]=new  Chart(ctx,{type,data,options:{...opts,...extra},plugins:inlinePlugins});}function  renderAlerts(){const  c=document.getElementById('alertsContainer');c.innerHTML='';if (!products.length){c.innerHTML='<div class ="bg-white rounded-xl p-6 text-center text-slate-400">暂无数据</div>';return ;}const  scoredList=products.map(p=>{const  m=compute(p);const  a=advise(p,m);return {p,m,a};}).sort((x,y)=>y.a.level-x.a.level);const  levelBar={3:'border-rose-400',2:'border-amber-400',1:'border-yellow-300',0:'border-emerald-300'};scoredList.forEach(({p,m,a})=>{const  fmtP=(v)=>v==null?'—':'¥'+v.toFixed(2);const  disc=(fp)=>(p.price>0&&fp!=null)?(fp/p.price*10).toFixed(1)+'折':'—';const  shelfMetric=m.shelfLife!=null ? `<div>剩余效期<b class ="${a.shelf.lv>=2?'text-rose-600':'text-slate-800'}">${m.shelfLife}天</b><span class ="text-slate-400">(录入${m.shelfLifeRaw}/已过${m.shelfElapsed})</span></div>`:`<div>剩余效期<b class ="text-slate-300">—</b></div>`;c.innerHTML+=`<div id="alert-${p.sku}" class ="alert-card bg-white rounded-xl shadow-sm p-4 border-l-4 ${levelBar[a.level]}transition"><div class ="flex flex-wrap justify-between items-center gap-2 mb-2"><div class ="font-semibold">${p.name}<span class ="text-xs text-slate-400">${p.sku}· ${p.cat}</span></div><div class ="flex gap-1 flex-wrap">${a.tags.map(t=>badge(t.c,t.t)).join('')}</div></div><div class ="grid grid-cols-2 sm:grid-cols-6 gap-2 text-xs text-slate-500 mb-3"><div>库销比<b class ="text-slate-800">${fmt(m.isr,2)}</b></div><div>可售天数<b class ="text-slate-800">${isFinite(m.sellDays)?fmt(m.sellDays)+'天':'∞'}</b></div>${shelfMetric}<div>滚动周转<b class ="text-slate-800">${m.turnover?m.turnover.toFixed(2):'—'}</b></div><div>利润率<b class ="text-slate-800">${(m.margin*100).toFixed(1)}%</b></div><div>单件利润<b class ="text-slate-800">${fmt(m.unitProfit,2)}</b></div></div><div class ="space-y-1 text-sm text-slate-700 mb-3">${a.advice.map(x=>`<p>${x}</p>`).join('')}</div><div class ="bg-slate-50 rounded-lg p-3 text-xs grid grid-cols-1 sm:grid-cols-4 gap-2"><div>🏷 控价：<b>${fmtP(p.price)}</b></div><div>💰 当前到手价：<b>${fmtP(m.actual)}</b></div><div>🎯 目标利润底价：<b class ="text-indigo-600">${fmtP(m.targetFloor)}</b>（${disc(m.targetFloor)}）</div><div>🩸 保本极限底价：<b class ="text-rose-600">${fmtP(m.breakeven)}</b>（${disc(m.breakeven)}）</div></div>${(m.expiryLoss&&m.expiryLoss>0)?`<div class ="mt-2 text-xs bg-rose-50 text-rose-700 rounded-lg p-2">⏳ 效期测算：预计报损约<b>${Math.round(m.expiryQty)}</b>件/<b>¥${fmt(m.expiryLoss)}</b>${isFinite(m.needDaily)?`，清完所需日均<b>${m.needDaily.toFixed(1)}</b>件`:'（已过效期）'}</div>`:''}</div>`;});}function  scoreProduct(p){const  m=compute(p);const  inv=invStatus(m.isr);const  turn=turnStatus(m.turnover);const  shelf=shelfStatus(m);return {p,m,inv,turn,shelf,level:Math.max(inv.lv,turn.lv,shelf.lv)};}function  getWarningList(){return  products.map(scoreProduct).filter(x=>x.level>=2).sort((a,b)=>b.level-a.level);}function  getProductsByStatus(status){return  products.map(scoreProduct).filter(x=>x.inv.t===status).sort((a,b)=>b.level-a.level);}function  getExpiryRiskList(){return  products.map(scoreProduct).filter(x=>!x.shelf.none&&x.shelf.lv>=2).sort((a,b)=>(b.m.expiryLoss||0)-(a.m.expiryLoss||0));}function  showAlertList(){const  list=getWarningList();openProductList(`预警产品清单（共 ${list.length}个）`,list);}function  showExpiryList(){const  list=getExpiryRiskList();openProductList(`效期风险清单（临期/报损，共 ${list.length}个）`,list);}function  openProductList(title,list){document.getElementById('listModalTitle').textContent=title;const  body=document.getElementById('listModalBody');if (!list.length){body.innerHTML='<div class ="p-6 text-center text-slate-400">暂无符合条件的产品 🎉</div>';}else {body.innerHTML=list.map(({p,m,inv,turn,shelf})=>{const  shelfBadge=shelf.none?'':badge(shelf.c,shelf.t);const  lossLine=(m.expiryLoss&&m.expiryLoss>0)? ` · 预计报损¥${fmt(m.expiryLoss)}`:'';const  shelfLine=m.shelfLife!=null? ` · 效期${m.shelfLife}天`:'';return  `<button onclick="gotoAlert('${p.sku}')" class ="w-full text-left border rounded-lg p-3 mb-2 hover:bg-indigo-50 hover:border-indigo-300 transition flex justify-between items-center gap-3"><div class ="min-w-0"><div class ="font-medium text-sm truncate">${p.name}<span class ="text-xs text-slate-400">${p.sku}· ${p.cat}</span></div><div class ="text-xs text-slate-500 mt-1">库销比<b>${fmt(m.isr,2)}</b>· 可售 ${isFinite(m.sellDays)?fmt(m.sellDays)+'天':'∞'}${shelfLine}· 周转 ${m.turnover?m.turnover.toFixed(2):'—'}${lossLine}</div></div><div class ="flex flex-col items-end gap-1 shrink-0"><div class ="flex gap-1 flex-wrap justify-end">${badge(inv.c,inv.t)}${badge(turn.c,turn.t)}${shelfBadge}</div><span class ="text-xs text-indigo-500">查看建议 →</span></div></button>`;}).join('');}document.getElementById('listModal').classList.remove('hidden');}function  closeListModal(){document.getElementById('listModal').classList.add('hidden');}function  gotoAlert(sku){closeListModal();switchTab('alerts');setTimeout(()=>{const  el=document.getElementById('alert-'+sku);if (el){el.scrollIntoView({behavior:'smooth',block:'center'});el.classList.add('ring-2','ring-indigo-400','bg-indigo-50');setTimeout(()=>el.classList.remove('ring-2','ring-indigo-400','bg-indigo-50'),2600);}},120);}function  saveProduct(){const  g=id=>document.getElementById(id).value.trim();const  sku=g('f_sku'),name=g('f_name');if (!sku||!name){toast('产品名称与SKU编码必填');return ;}const  obj={name,sku,cat:g('f_cat')||'未分类',cost:+g('f_cost')||0,price:+g('f_price')||0,actualPrice:g('f_actprice'),weekSales:+g('f_week')||0,endInv:+g('f_endinv')||0,beginInv:+g('f_begininv')||0,ytdSales:+g('f_ytd')||0,shelfLife:g('f_shelf'),date:g('f_date'),feeTax:g('f_ftax'),feeOther:g('f_fother')};const  i=products.findIndex(x=>x.sku===sku);if (i>=0)products[i]=obj;else  products.push(obj);resetForm();render();toast('已保存');}function  editProduct(sku){const  p=products.find(x=>x.sku===sku);if (!p)return ;const  s=(id,v)=>document.getElementById(id).value=v??'';s('f_name',p.name);s('f_sku',p.sku);s('f_cat',p.cat);s('f_cost',p.cost);s('f_price',p.price);s('f_actprice',p.actualPrice);s('f_week',p.weekSales);s('f_endinv',p.endInv);s('f_begininv',p.beginInv);s('f_ytd',p.ytdSales);s('f_shelf',p.shelfLife);s('f_date',p.date);s('f_ftax',p.feeTax);s('f_fother',p.feeOther);document.getElementById('formTitle').textContent='编辑：'+p.name;switchTab('input');setScrollTop(0);}function  delProduct(sku){if (!confirm('确认删除该产品？'))return ;products=products.filter(x=>x.sku!==sku);render();toast('已删除');}function  resetForm(){['f_name','f_sku','f_cat','f_cost','f_price','f_actprice','f_week','f_endinv','f_begininv','f_ytd','f_shelf','f_date','f_ftax','f_fother'].forEach(id=>document.getElementById(id).value='');document.getElementById('formTitle').textContent='手动添加/编辑产品';}function  clearAll(){if (!products.length){toast('当前无数据');return ;}if (!confirm('确认清空全部 '+products.length+' 条产品数据？清空前会自动留一份本地备份。'))return ;try {localStorage.setItem('channelTool_backup',JSON.stringify({products,settings,backupAt:new  Date().toISOString()}));}catch (e){}products=[];render();toast('已清空（旧数据已备份到 channelTool_backup）');}function  loadSettingsForm(){document.getElementById('s_ftax').value=settings.feeTax;document.getElementById('s_fother').value=settings.feeOther;document.getElementById('s_target').value=settings.targetMargin;document.getElementById('s_isr_low').value=settings.isrLow;document.getElementById('s_isr_healthy').value=settings.isrHealthy;document.getElementById('s_isr_high').value=settings.isrHigh;document.getElementById('s_to_slow').value=settings.toSlow;document.getElementById('s_to_healthy').value=settings.toHealthy;document.getElementById('s_to_good').value=settings.toGood;document.getElementById('s_shelf_warn').value=settings.shelfWarnDays;document.getElementById('s_shelf_cover').value=settings.shelfCoverSafe;}function  saveSettings(){const  g=id=>+document.getElementById(id).value;settings.feeTax=g('s_ftax');settings.feeOther=g('s_fother');settings.targetMargin=g('s_target');settings.isrLow=g('s_isr_low');settings.isrHealthy=g('s_isr_healthy');settings.isrHigh=g('s_isr_high');settings.toSlow=g('s_to_slow');settings.toHealthy=g('s_to_healthy');settings.toGood=g('s_to_good');settings.shelfWarnDays=g('s_shelf_warn');settings.shelfCoverSafe=g('s_shelf_cover');render();toast('参数已保存，全部重算完成');}const  HEADERS=['产品名称','SKU编码','品类','成本','控价','实际支付到手价','最近一周销售件数','最新期末库存','年初期初库存','业务年累计销售件数','数据日期','税运仓储比例%','其他费用比例%','剩余效期天数'];function  downloadTemplate(){const  sample=['鲜食坚果礼盒','SKU007','食品','40','99','89','105','3000','2000','5200','2026-06-28','8','3','90'];const  csv='\ufeff'+HEADERS.join(',')+'\n'+sample.join(',')+'\n';downloadFile(csv,'渠道数据投喂模板.csv');}function  exportData(){let  rows=[HEADERS.join(',')];products.forEach(p=>rows.push([p.name,p.sku,p.cat,p.cost,p.price,p.actualPrice,p.weekSales,p.endInv,p.beginInv,p.ytdSales,p.date,p.feeTax,p.feeOther,p.shelfLife].join(',')));downloadFile('\ufeff'+rows.join('\n'),'渠道数据导出.csv');}function  downloadFile(content,name){const  blob=new  Blob([content],{type:'text/csv;charset=utf-8;'});const  a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();}const  GH_REPO='camovibe/guanwangdongxiao';const  GH_PATH='data.json';function  saveGhToken(){const  token=document.getElementById('gh_token').value.trim();if (!token){toast('请输入 Token');return ;}localStorage.setItem('gh_token',token);document.getElementById('gh_status').textContent='Token 已保存（本地存储，不会上传）';toast('Token 已保存');}function  clearGhToken(){localStorage.removeItem('gh_token');document.getElementById('gh_token').value='';document.getElementById('gh_status').textContent='Token 已清除';toast('Token 已清除');}async  function  pushToGitHub(token,content){const  apiBase=`https:toast('正在同步到团队看板...');try {let  sha=null;const  getRes=await  fetch(apiBase,{headers:{'Authorization':`Bearer ${token}`,'Accept':'application/vnd.github+json'}});if (getRes.ok){const  info=await  getRes.json();sha=info.sha;}const  body={message:`Update data.json via 产品渠道动销与利润罗盘系统 — ${new  Date().toLocaleString('zh-CN')}`,content:btoa(unescape(encodeURIComponent(content)))};if (sha)body.sha=sha;const  putRes=await  fetch(apiBase,{method:'PUT',headers:{'Authorization':`Bearer ${token}`,'Accept':'application/vnd.github+json','Content-Type':'application/json'},body:JSON.stringify(body)});if (putRes.ok){toast('✅ 已同步到团队看板！约 1–2 分钟后刷新可见');}else {const  err=await  putRes.json().catch (()=>null);toast('❌ 同步失败:'+(err?.message||putRes.statusText));}}catch (e){toast('❌ 同步失败:'+e.message);}}async  function  exportDataJson(){const  data={products,settings,updatedAt:new  Date().toISOString()};const  jsonStr=JSON.stringify(data,null,2);const  blob=new  Blob([jsonStr],{type:'application/json'});const  a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='data.json';a.click();const  token=localStorage.getItem('gh_token');if (token){await  pushToGitHub(token,jsonStr);}else {toast('已本地导出；未配置 GitHub Token，跳过自动同步');}}function  importCSV(e){const  file=e.target.files[0];if (!file)return ;const  reader=new  FileReader();reader.onload=ev=>{let  txt=ev.target.result.replace(/^\ufeff/,'');const  lines=txt.split(/\r?\n/).filter(l=>l.trim());let  added=0;for (let  i=1;i<lines.length;i++){const  c=lines[i].split(',');if (c.length<10||!c[1])continue;const  obj={name:c[0].trim(),sku:c[1].trim(),cat:(c[2]||'未分类').trim(),cost:+c[3]||0,price:+c[4]||0,actualPrice:(c[5]||'').trim(),weekSales:+c[6]||0,endInv:+c[7]||0,beginInv:+c[8]||0,ytdSales:+c[9]||0,date:(c[10]||'').trim(),feeTax:(c[11]||'').trim(),feeOther:(c[12]||'').trim(),shelfLife:(c[13]||'').trim()};const  idx=products.findIndex(x=>x.sku===obj.sku);if (idx>=0)products[idx]=obj;else  products.push(obj);added++;}render();toast('成功导入/更新 '+added+' 条');e.target.value='';};reader.readAsText(file,'UTF-8');}function  loadSample(){products=[{name:'便携榨汁杯',sku:'SKU001',cat:'小家电',cost:35,price:89,actualPrice:79,weekSales:420,endInv:1200,beginInv:800,ytdSales:9600,shelfLife:'',date:'2026-06-28',feeTax:'',feeOther:''},{name:'无线蓝牙耳机',sku:'SKU002',cat:'数码',cost:68,price:159,actualPrice:139,weekSales:95,endInv:2400,beginInv:1500,ytdSales:3100,shelfLife:'',date:'2026-06-28',feeTax:'',feeOther:''},{name:'儿童保温杯',sku:'SKU003',cat:'母婴',cost:22,price:59,actualPrice:49,weekSales:680,endInv:900,beginInv:1200,ytdSales:15800,shelfLife:'',date:'2026-06-28',feeTax:6,feeOther:2},{name:'折叠收纳箱',sku:'SKU004',cat:'家居',cost:45,price:79,actualPrice:69,weekSales:30,endInv:3200,beginInv:2800,ytdSales:1500,shelfLife:'',date:'2026-06-28',feeTax:'',feeOther:''},{name:'高端筋膜枪',sku:'SKU005',cat:'小家电',cost:210,price:299,actualPrice:279,weekSales:210,endInv:180,beginInv:600,ytdSales:8200,shelfLife:'',date:'2026-06-28',feeTax:10,feeOther:4},{name:'益生菌软糖',sku:'SKU006',cat:'保健食品',cost:25,price:79,actualPrice:69,weekSales:350,endInv:2000,beginInv:1800,ytdSales:11200,shelfLife:300,date:'2026-06-28',feeTax:'',feeOther:''},{name:'鲜食坚果礼盒',sku:'SKU007',cat:'食品',cost:40,price:99,actualPrice:89,weekSales:105,endInv:3000,beginInv:2000,ytdSales:5200,shelfLife:90,date:'2026-06-28',feeTax:'',feeOther:''}];render();toast('已载入示例数据（含效期示例）');}function  switchTab(name){document.querySelectorAll('.tab-panel').forEach(p=>p.classList.add('hidden'));document.getElementById('tab-'+name).classList.remove('hidden');document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('tab-active',b.dataset.tab===name));if (name==='dashboard')renderDashboard();goTop();}document.querySelectorAll('.tab-btn').forEach(b=>b.addEventListener('click',()=>switchTab(b.dataset.tab)));document.addEventListener('keydown',e=>{if (e.key==='Escape')closeListModal();});let  toastTimer;function  toast(msg){const  t=document.getElementById('toast');t.textContent=msg;t.style.opacity=1;clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.style.opacity=0,2000);}function  getScrollTop(){return  window.pageYOffset||document.documentElement.scrollTop||document.body.scrollTop||0;}function  setScrollTop(y){try {window.scrollTo(0,y);}catch (e){}if (document.documentElement)document.documentElement.scrollTop=y;if (document.body)document.body.scrollTop=y;}function  goTop(){const  startY=getScrollTop();if (startY<=0){setScrollTop(0);return ;}const  duration=400,start=performance.now();function  step(now){const  t=Math.min(1,(now-start)/duration);const  ease=1-Math.pow(1-t,3);setScrollTop(startY*(1-ease));if (t<1)requestAnimationFrame(step);}requestAnimationFrame(step);}(function (){const  btn=document.getElementById('backTop');const  onScroll=()=>{if (getScrollTop()>300)btn.classList.remove('hidden-btn');else  btn.classList.add('hidden-btn');};window.addEventListener('scroll',onScroll,{passive:true});document.addEventListener('scroll',onScroll,{passive:true,capture:true});onScroll();})();loadSettingsForm();const  DASHBOARD_PASSWORD="2026";function  checkPwd(){const  input=document.getElementById('pwdInput').value.trim();const  err=document.getElementById('pwdError');if (!input){err.textContent='请输入密码';return ;}if (input===DASHBOARD_PASSWORD){document.getElementById('password-screen').style.display='none';document.getElementById('main-content').style.display='block';loadDashboardData();}else {err.textContent='密码错误，请重试';}}function  loadDashboardData(){fetch('./data.json?t='+Date.now(),{cache:'no-store'}).then(r=>{if (!r.ok)throw new  Error('HTTP '+r.status);return  r.json();}).then(d=>{products=d.products||[];if (d.settings)settings={...settings,...d.settings};const  updatedAt=d.updatedAt||'未知';const  el=document.getElementById('updateInfo');if (el)el.textContent='数据更新时间：'+updatedAt+' · 本页面为只读看板，如需修改请联系管理员';render();switchTab('dashboard');}).catch (e=>{const  el=document.getElementById('updateInfo');if (el)el.textContent='数据加载失败：'+e.message+'（请确认 data.json 已部署且可访问）';});}</script></div></body></html>
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>产品渠道动销与利润罗盘系统 - 只读看板</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;}
+  .tab-active{background:#4f46e5 !important;color:#fff !important;}
+  .scrollbar-thin::-webkit-scrollbar{height:8px;width:8px;}
+  .scrollbar-thin::-webkit-scrollbar-thumb{background:#c7d2fe;border-radius:4px;}
+  table td,table th{white-space:nowrap;}
+  .inp{border:1px solid #e2e8f0;border-radius:8px;padding:6px 10px;width:100%;outline:none;}
+  .inp:focus{border-color:#6366f1;}
+  label{display:block;color:#475569;font-size:12px;}
+  label input{margin-top:4px;}
+  .flt{width:100%;min-width:60px;border:1px solid #e2e8f0;border-radius:6px;padding:2px 6px;font-size:12px;outline:none;}
+  .flt:focus{border-color:#6366f1;}
+  .alert-card{scroll-margin-top:80px;}
+  #backTop{transition:opacity .3s, transform .3s, visibility .3s;}
+  #backTop.hidden-btn{opacity:0;visibility:hidden;transform:translateY(12px);pointer-events:none;}
+</style>
+<style>
+  #password-screen{position:fixed;inset:0;z-index:9999;background:linear-gradient(135deg,#1e1b4b,#312e81);display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;}
+  #password-screen .card{background:rgba(255,255,255,0.05);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:40px;max-width:380px;width:90%;text-align:center;box-shadow:0 25px 50px -12px rgba(0,0,0,0.25);}
+  #password-screen h2{font-size:20px;font-weight:700;margin-bottom:8px;}
+  #password-screen p{font-size:13px;color:#a5b4fc;margin-bottom:24px;line-height:1.6;}
+  #password-screen input{width:100%;padding:12px 16px;border-radius:10px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.08);color:#fff;font-size:15px;outline:none;margin-bottom:16px;transition:border-color .2s;}
+  #password-screen input:focus{border-color:#818cf8;}
+  #password-screen input::placeholder{color:#818cf8;}
+  #password-screen button{width:100%;padding:12px;border-radius:10px;border:none;background:#4f46e5;color:#fff;font-size:15px;font-weight:600;cursor:pointer;transition:background .2s;}
+  #password-screen button:hover{background:#4338ca;}
+  #password-screen .error{color:#f87171;font-size:13px;margin-top:12px;min-height:20px;}
+  #password-screen .hint{color:#818cf8;font-size:11px;margin-top:16px;}
+  #main-content{display:none;}
+</style>
+</head>
+<body class="bg-slate-100 text-slate-800">
+<div id="password-screen">
+  <div class="card">
+    <h2>🔐 产品渠道动销与利润罗盘</h2>
+    <p>本页面含成本、利润等敏感经营数据，请输入密码后访问。</p>
+    <input type="password" id="pwdInput" placeholder="输入密码" onkeydown="if(event.key=='Enter')checkPwd()">
+    <button onclick="checkPwd()">进入看板</button>
+    <div class="error" id="pwdError"></div>
+    <div class="hint">⚠️ 本页面为简易密码保护，懂技术的人仍可能绕过。如需更高安全级别，请使用 Cloudflare Access 等服务端鉴权方案。</div>
+  </div>
+</div>
+<div id="main-content">
+
+<div class="max-w-screen-2xl mx-auto p-3 sm:p-6">
+
+  <!-- 头部 -->
+  <header class="mb-5">
+    <h1 class="text-xl sm:text-2xl font-bold text-slate-900 flex items-center gap-2">
+      <span class="inline-block w-2 h-6 bg-indigo-600 rounded"></span>
+      产品渠道动销与利润罗盘系统 <span class="text-xs font-normal text-slate-400">v1.7.2-readonly</span>
+    </h1>
+    <p class="text-sm text-slate-500 mt-1">库销比 · 滚动周转 · 效期报损预警(随日期动态倒扣) · 智能促销边界 · 渠道利润看板</p>
+    <p id="updateInfo" class="text-xs text-indigo-500 mt-1"></p>
+  </header>
+
+  <!-- Tab 导航 -->
+  <nav class="flex flex-wrap gap-2 mb-5">
+    <button data-tab="dashboard" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium bg-white shadow-sm hover:bg-indigo-50 transition">渠道看板</button>
+    <button data-tab="overview" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium bg-white shadow-sm hover:bg-indigo-50 transition">数据总览</button>
+    <button data-tab="alerts" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium bg-white shadow-sm hover:bg-indigo-50 transition">预警与营销建议</button>
+    <button data-tab="input" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium bg-white shadow-sm hover:bg-indigo-50 transition">数据录入</button>
+    <button data-tab="settings" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium bg-white shadow-sm hover:bg-indigo-50 transition">参数设置</button>
+  </nav>
+
+  <!-- ============ 渠道看板 ============ -->
+  <section id="tab-dashboard" class="tab-panel">
+    <div class="grid grid-cols-2 lg:grid-cols-5 gap-3 mb-5">
+      <div class="bg-white rounded-xl shadow-sm p-4">
+        <div class="text-xs text-slate-400">累计GMV（到手价×累计销量）</div>
+        <div id="kpi-gmv" class="text-lg sm:text-2xl font-bold text-slate-900 mt-1">-</div>
+      </div>
+      <div class="bg-white rounded-xl shadow-sm p-4">
+        <div class="text-xs text-slate-400">累计利润</div>
+        <div id="kpi-profit" class="text-lg sm:text-2xl font-bold text-emerald-600 mt-1">-</div>
+      </div>
+      <div class="bg-white rounded-xl shadow-sm p-4">
+        <div class="text-xs text-slate-400">加权利润率</div>
+        <div id="kpi-margin" class="text-lg sm:text-2xl font-bold text-indigo-600 mt-1">-</div>
+      </div>
+      <div id="card-alert" onclick="showAlertList()" class="bg-white rounded-xl shadow-sm p-4 cursor-pointer hover:ring-2 hover:ring-rose-200 transition select-none">
+        <div class="text-xs text-slate-400 flex items-center justify-between">预警产品数 <span class="text-indigo-500">清单 ›</span></div>
+        <div id="kpi-alert" class="text-lg sm:text-2xl font-bold text-rose-600 mt-1">-</div>
+      </div>
+      <div id="card-expiry" onclick="showExpiryList()" class="bg-white rounded-xl shadow-sm p-4 cursor-pointer hover:ring-2 hover:ring-amber-200 transition select-none">
+        <div class="text-xs text-slate-400 flex items-center justify-between">预计效期报损 <span class="text-indigo-500">清单 ›</span></div>
+        <div id="kpi-expiry" class="text-lg sm:text-2xl font-bold text-amber-600 mt-1">-</div>
+      </div>
+    </div>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
+      <div class="bg-white rounded-xl shadow-sm p-4">
+        <h3 class="text-sm font-semibold mb-3">各品类 累计GMV 与 累计利润</h3>
+        <canvas id="chartCategory" height="140"></canvas>
+      </div>
+      <div class="bg-white rounded-xl shadow-sm p-4">
+        <div class="flex justify-between items-center mb-1">
+          <h3 class="text-sm font-semibold">库存健康度分布</h3>
+          <button onclick="showAlertList()" class="text-xs text-indigo-600 hover:underline">预警清单 ›</button>
+        </div>
+        <p class="text-xs text-slate-400 mb-2">点击饼图任一分区，可查看该状态的产品清单</p>
+        <canvas id="chartHealth" height="140" class="cursor-pointer"></canvas>
+      </div>
+    </div>
+    <div class="bg-white rounded-xl shadow-sm p-4">
+      <h3 class="text-sm font-semibold mb-3">各产品 库销比（柱）与 滚动周转率（点）</h3>
+      <canvas id="chartMix" height="120"></canvas>
+    </div>
+    <div class="bg-white rounded-xl shadow-sm p-4">
+      <h3 class="text-sm font-semibold mb-3">SKU 利润健康度气泡图</h3>
+      <p class="text-xs text-slate-400 mb-2">X=期末库存（≤3100 件每 100 一格；3100 以上每 10000 一格且格距与 100 格等长）· Y=到手价（每 10 元一格，不压缩，象限等比放大、可横向滚动）· 外圈大小=综合周销 · <span class="text-slate-500 font-medium">实心内核=最近一周周销</span>（内核越小=近期动销越弱于均值；出现虚线外环=最近周销已超过综合周销）· 颜色=利润健康度（红=亏损/保本边缘；<span class="text-slate-500 font-medium">库存&lt;20 件视为无库存，置灰</span>）· 点击查看单品建议</p>
+      <div class="overflow-x-auto scrollbar-thin"><div id="bubbleWrap" style="min-width:640px;height:380px;position:relative;"><canvas id="chartBubble"></canvas></div></div>
+    </div>
+  </section>
+
+  <!-- ============ 数据总览 ============ -->
+  <section id="tab-overview" class="tab-panel hidden">
+    <div class="bg-white rounded-xl shadow-sm p-4 overflow-x-auto scrollbar-thin">
+      <div class="flex justify-between items-center mb-2 flex-wrap gap-2">
+        <h3 class="text-sm font-semibold">全部产品指标（剩余效期已按今天动态倒扣）<span id="ovCount" class="text-xs font-normal text-slate-400 ml-2"></span></h3>
+        <div class="flex gap-2">
+          <button onclick="clearOverviewFilters()" class="px-3 py-1.5 text-xs bg-slate-200 rounded-lg hover:bg-slate-300">清空筛选</button>
+          <button onclick="exportData()" class="px-3 py-1.5 text-xs bg-emerald-600 text-white rounded-lg hover:bg-emerald-700">导出当前数据CSV</button>
+          <button onclick="exportDataJson()" class="px-3 py-1.5 text-xs bg-amber-600 text-white rounded-lg hover:bg-amber-700">导出 data.json</button>
+        </div>
+      </div>
+      <p class="text-xs text-slate-400 mb-3">筛选提示：数值列支持 <code>&gt;3</code>、<code>&lt;1</code>、<code>&gt;=2</code>、<code>1-3</code>（区间）等写法；文本 / 状态列按关键字模糊匹配（如状态输入「积压」「断货」「滞销」「报损」「临期」）。<strong>剩余效期</strong>列显示的是按今天推算后的真实剩余天数。</p>
+      <table class="w-full text-xs sm:text-sm border-collapse">
+        <thead>
+          <tr class="bg-slate-50 text-slate-500 text-left">
+            <th class="p-2">#</th><th class="p-2">产品</th><th class="p-2">SKU</th><th class="p-2">品类</th>
+            <th class="p-2 text-right">成本</th><th class="p-2 text-right">控价</th><th class="p-2 text-right">到手价</th>
+            <th class="p-2 text-right">单件利润</th><th class="p-2 text-right">利润率</th><th class="p-2 text-right">保本极限底价</th><th class="p-2 text-right">累计利润</th>
+            <th class="p-2 text-right">日均销</th><th class="p-2 text-right">期末库存</th>
+            <th class="p-2 text-right">库销比</th><th class="p-2 text-right">可售天数</th>
+            <th class="p-2 text-right">剩余效期</th><th class="p-2 text-right">预计报损</th>
+            <th class="p-2 text-right">滚动周转</th><th class="p-2">状态</th>
+          </tr>
+          <tr class="bg-white border-b">
+            <th class="p-1"></th><th class="p-1"><input id="flt_name" oninput="renderOverview()" class="flt" placeholder="产品名"></th>
+            <th class="p-1"><input id="flt_sku" oninput="renderOverview()" class="flt" placeholder="SKU"></th>
+            <th class="p-1"><input id="flt_cat" oninput="renderOverview()" class="flt" placeholder="品类"></th>
+            <th class="p-1"><input id="flt_cost" oninput="renderOverview()" class="flt" placeholder=">10"></th>
+            <th class="p-1"><input id="flt_price" oninput="renderOverview()" class="flt" placeholder=">50"></th>
+            <th class="p-1"><input id="flt_actual" oninput="renderOverview()" class="flt" placeholder="<80"></th>
+            <th class="p-1"><input id="flt_profit" oninput="renderOverview()" class="flt" placeholder=">0"></th>
+            <th class="p-1"><input id="flt_margin" oninput="renderOverview()" class="flt" placeholder=">15"></th>
+            <th class="p-1"><input id="flt_breakeven" oninput="renderOverview()" class="flt" placeholder="<50"></th>
+            <th class="p-1"><input id="flt_ytdProfit" oninput="renderOverview()" class="flt" placeholder=">0"></th>
+            <th class="p-1"><input id="flt_daily" oninput="renderOverview()" class="flt" placeholder=">10"></th>
+            <th class="p-1"><input id="flt_endInv" oninput="renderOverview()" class="flt" placeholder="0-500"></th>
+            <th class="p-1"><input id="flt_isr" oninput="renderOverview()" class="flt" placeholder=">3"></th>
+            <th class="p-1"><input id="flt_sellDays" oninput="renderOverview()" class="flt" placeholder="<15"></th>
+            <th class="p-1"><input id="flt_shelf" oninput="renderOverview()" class="flt" placeholder="<30"></th>
+            <th class="p-1"><input id="flt_loss" oninput="renderOverview()" class="flt" placeholder=">0"></th>
+            <th class="p-1"><input id="flt_turnover" oninput="renderOverview()" class="flt" placeholder="<1"></th>
+            <th class="p-1"><input id="flt_status" oninput="renderOverview()" class="flt" placeholder="如 报损/临期"></th>
+          </tr>
+        </thead>
+        <tbody id="overviewBody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ============ 预警与建议 ============ -->
+  <section id="tab-alerts" class="tab-panel hidden">
+    <div id="alertsContainer" class="grid grid-cols-1 gap-4"></div>
+  </section>
+
+  <!-- ============ 数据录入 ============ -->
+  <section id="tab-input" class="tab-panel hidden">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <!-- 手动 -->
+      <div class="bg-white rounded-xl shadow-sm p-4">
+        <h3 class="text-sm font-semibold mb-3" id="formTitle">手动添加 / 编辑产品</h3>
+        <div class="grid grid-cols-2 gap-3 text-sm">
+          <label class="col-span-2">产品名称<input id="f_name" class="inp" placeholder="如：便携榨汁杯"></label>
+          <label>SKU编码<input id="f_sku" class="inp" placeholder="SKU001"></label>
+          <label>品类<input id="f_cat" class="inp" placeholder="小家电"></label>
+          <label>成本(元)<input id="f_cost" type="number" class="inp" placeholder="35"></label>
+          <label>控价(元)<input id="f_price" type="number" class="inp" placeholder="89"></label>
+          <label class="col-span-2">实际支付到手价(元)<input id="f_actprice" type="number" class="inp" placeholder="留空则等于控价"></label>
+          <label>最近一周销售件数<input id="f_week" type="number" class="inp" placeholder="420"></label>
+          <label>最新期末库存<input id="f_endinv" type="number" class="inp" placeholder="1200"></label>
+          <label>年初(1/1)期初库存<input id="f_begininv" type="number" class="inp" placeholder="800"></label>
+          <label>业务年累计销售件数<input id="f_ytd" type="number" class="inp" placeholder="9600"></label>
+          <label class="col-span-2 bg-amber-50 rounded-lg p-2 -mx-1">剩余效期天数（截至"数据日期"当天的剩余天数，系统会按今天自动倒扣；留空=不做效期分析）<input id="f_shelf" type="number" class="inp" placeholder="如 90，留空=不做效期分析"></label>
+          <label>数据日期<input id="f_date" type="date" class="inp"></label>
+          <label>税运仓储比例%(选填)<input id="f_ftax" type="number" class="inp" placeholder="留空用默认"></label>
+          <label class="col-span-2">其他费用比例%(选填)<input id="f_fother" type="number" class="inp" placeholder="留空用默认"></label>
+        </div>
+        <div class="flex gap-2 mt-4">
+          <button onclick="saveProduct()" class="flex-1 py-2 bg-indigo-600 text-white rounded-lg text-sm hover:bg-indigo-700">保存产品</button>
+          <button onclick="resetForm()" class="px-4 py-2 bg-slate-200 rounded-lg text-sm hover:bg-slate-300">清空</button>
+        </div>
+        <p class="text-xs text-slate-400 mt-2">提示：SKU相同的记录将被<strong>覆盖更新</strong>。剩余效期以"数据日期"为起点，系统按当天日期自动倒扣，因此建议务必填写数据日期；填空数据日期则效期不做倒扣（退回静态）。</p>
+        <button onclick="exportDataJson()" class="mt-4 w-full py-2 bg-amber-600 text-white rounded-lg text-sm hover:bg-amber-700">导出并同步到团队看板</button>
+      </div>
+      <!-- 批量 -->
+      <div class="bg-white rounded-xl shadow-sm p-4">
+        <h3 class="text-sm font-semibold mb-3">批量导入</h3>
+        <div class="border-2 border-dashed border-slate-200 rounded-lg p-6 text-center">
+          <p class="text-sm text-slate-500 mb-3">上传 CSV 表格批量导入（相同SKU自动覆盖）</p>
+          <input type="file" id="csvFile" accept=".csv" class="hidden" onchange="importCSV(event)">
+          <button onclick="document.getElementById('csvFile').click()" class="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm hover:bg-indigo-700">选择CSV文件</button>
+        </div>
+        <div class="mt-4 flex flex-col gap-2">
+          <button onclick="downloadTemplate()" class="w-full py-2 border border-indigo-300 text-indigo-600 rounded-lg text-sm hover:bg-indigo-50">下载标准投喂模板(CSV)</button>
+          <button onclick="loadSample()" class="w-full py-2 border border-slate-300 text-slate-600 rounded-lg text-sm hover:bg-slate-50">载入示例数据</button>
+          <button onclick="clearAll()" class="w-full py-2 border border-rose-300 text-rose-600 rounded-lg text-sm hover:bg-rose-50">清空全部数据</button>
+        </div>
+        <div class="mt-4 bg-slate-50 rounded-lg p-3 text-xs text-slate-500 leading-relaxed">
+          <strong>模板列顺序（末列为效期）：</strong><br>
+          产品名称, SKU编码, 品类, 成本, 控价, 实际支付到手价, 最近一周销售件数, 最新期末库存, 年初期初库存, 业务年累计销售件数, 数据日期, 税运仓储比例%, 其他费用比例%, <span class="text-amber-600 font-medium">剩余效期天数</span><br>
+          （到手价、税费两列留空套用默认；<strong>剩余效期天数</strong>留空则该产品不做效期分析；效期以"数据日期"为起点按今天自动倒扣，请确保数据日期准确）
+        </div>
+      </div>
+      <!-- GitHub 同步配置 -->
+      <div class="bg-white rounded-xl shadow-sm p-4">
+        <h3 class="text-sm font-semibold mb-3 flex items-center gap-2">
+          <svg class="w-4 h-4 text-slate-500" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+          团队看板同步配置
+        </h3>
+        <div class="space-y-2 text-sm">
+          <label class="block text-xs text-slate-400">GitHub Token（需有 repo 写入权限）</label>
+          <input id="gh_token" type="password" class="inp" placeholder="ghp_xxxxxxxxxxxx">
+          <div class="flex gap-2">
+            <button onclick="saveGhToken()" class="px-3 py-1.5 bg-slate-800 text-white rounded-lg text-xs hover:bg-slate-700">保存 Token</button>
+            <button onclick="clearGhToken()" class="px-3 py-1.5 border border-slate-300 text-slate-600 rounded-lg text-xs hover:bg-slate-50">清除</button>
+          </div>
+          <p id="gh_status" class="text-xs text-slate-400"></p>
+          <p class="text-xs text-slate-400">配置后，点击「导出并同步到团队看板」将自动推送到 GitHub，团队看板约 1–2 分钟后刷新即可看到最新数据。</p>
+        </div>
+      </div>
+    </div>
+    <!-- 已录入列表 -->
+    <div class="bg-white rounded-xl shadow-sm p-4 mt-4 overflow-x-auto scrollbar-thin">
+      <h3 class="text-sm font-semibold mb-3">已录入产品（<span id="countLabel">0</span>）<span class="text-xs font-normal text-slate-400 ml-2">剩余效期列显示：今天推算值（录入值）</span></h3>
+      <table class="w-full text-xs sm:text-sm">
+        <thead><tr class="bg-slate-50 text-slate-500 text-left">
+          <th class="p-2">#</th><th class="p-2">产品</th><th class="p-2">SKU</th><th class="p-2">品类</th>
+          <th class="p-2 text-right">成本</th><th class="p-2 text-right">控价</th><th class="p-2 text-right">到手价</th>
+          <th class="p-2 text-right">周销</th><th class="p-2 text-right">库存</th><th class="p-2 text-right">剩余效期</th><th class="p-2">数据日期</th><th class="p-2">操作</th>
+        </tr></thead>
+        <tbody id="inputBody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ============ 参数设置 ============ -->
+  <section id="tab-settings" class="tab-panel hidden">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div class="bg-white rounded-xl shadow-sm p-4">
+        <h3 class="text-sm font-semibold mb-3">渠道费用与利润目标</h3>
+        <div class="grid grid-cols-1 gap-3 text-sm">
+          <label class="flex justify-between items-center">默认税运仓储费用比例(%)<input id="s_ftax" type="number" class="inp w-28"></label>
+          <label class="flex justify-between items-center">默认其他费用比例(%)<input id="s_fother" type="number" class="inp w-28"></label>
+          <label class="flex justify-between items-center">目标利润率(%)<input id="s_target" type="number" class="inp w-28"></label>
+        </div>
+      </div>
+      <div class="bg-white rounded-xl shadow-sm p-4">
+        <h3 class="text-sm font-semibold mb-3">库销比预警阈值 <span class="text-xs text-slate-400">(越大=库存越多)</span></h3>
+        <div class="grid grid-cols-1 gap-3 text-sm">
+          <label class="flex justify-between items-center">低于此值→断货风险<input id="s_isr_low" type="number" step="0.1" class="inp w-28"></label>
+          <label class="flex justify-between items-center">健康区间上限<input id="s_isr_healthy" type="number" step="0.1" class="inp w-28"></label>
+          <label class="flex justify-between items-center">高于此值→积压严重<input id="s_isr_high" type="number" step="0.1" class="inp w-28"></label>
+        </div>
+      </div>
+      <div class="bg-white rounded-xl shadow-sm p-4">
+        <h3 class="text-sm font-semibold mb-3">滚动周转率预警阈值 <span class="text-xs text-slate-400">(越大=周转越快)</span></h3>
+        <div class="grid grid-cols-1 gap-3 text-sm">
+          <label class="flex justify-between items-center">低于此值→滞销<input id="s_to_slow" type="number" step="0.1" class="inp w-28"></label>
+          <label class="flex justify-between items-center">健康区间下限<input id="s_to_healthy" type="number" step="0.1" class="inp w-28"></label>
+          <label class="flex justify-between items-center">高于此值→优秀<input id="s_to_good" type="number" step="0.1" class="inp w-28"></label>
+        </div>
+      </div>
+      <div class="bg-white rounded-xl shadow-sm p-4">
+        <h3 class="text-sm font-semibold mb-3">效期预警阈值 <span class="text-xs text-slate-400">(仅对填了剩余效期的产品生效)</span></h3>
+        <div class="grid grid-cols-1 gap-3 text-sm">
+          <label class="flex justify-between items-center">剩余效期低于此天数→临期<input id="s_shelf_warn" type="number" class="inp w-28"></label>
+          <label class="flex justify-between items-center">效期覆盖安全系数(剩余效期÷可售天数)<input id="s_shelf_cover" type="number" step="0.1" class="inp w-28"></label>
+        </div>
+        <p class="text-xs text-slate-400 mt-2">覆盖系数&lt;1 判为「效期报损风险」(到期卖不完)；≥1 但低于安全系数判为「效期偏紧」。剩余效期为按今天动态推算后的值。</p>
+      </div>
+      <div class="bg-white rounded-xl shadow-sm p-4 flex flex-col justify-between lg:col-span-2">
+        <p class="text-xs text-slate-500 leading-relaxed">阈值改动后点击保存将实时重算所有产品的预警等级、营销建议、促销边界与效期报损测算。目标利润率同时用于反推「目标利润底价」。效期天数每次打开/重算都会按当天日期自动倒扣，无需手动更新。</p>
+        <button onclick="saveSettings()" class="mt-4 py-2 bg-indigo-600 text-white rounded-lg text-sm hover:bg-indigo-700">保存参数并重算</button>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<!-- 产品清单弹窗 -->
+<div id="listModal" class="fixed inset-0 z-50 hidden">
+  <div class="absolute inset-0 bg-black/40" onclick="closeListModal()"></div>
+  <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-white rounded-xl shadow-xl w-11/12 max-w-2xl flex flex-col" style="max-height:80vh;">
+    <div class="flex justify-between items-center p-4 border-b">
+      <h3 id="listModalTitle" class="font-semibold text-sm"></h3>
+      <button onclick="closeListModal()" class="text-slate-400 hover:text-slate-700 text-2xl leading-none">&times;</button>
+    </div>
+    <div id="listModalBody" class="p-3 overflow-y-auto scrollbar-thin"></div>
+    <div class="p-3 border-t text-xs text-slate-400 text-center">点击任一产品，将跳转到「预警与营销建议」并定位该单品</div>
+  </div>
+</div>
+
+<!-- 回到顶部浮动按钮 -->
+<button id="backTop" onclick="goTop()" title="回到顶部"
+  class="hidden-btn fixed bottom-6 right-6 z-40 w-12 h-12 rounded-full bg-indigo-600 text-white shadow-lg hover:bg-indigo-700 flex items-center justify-center">
+  <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+    <path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7"/>
+  </svg>
+</button>
+
+<!-- Toast -->
+<div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-sm px-4 py-2 rounded-lg shadow-lg opacity-0 pointer-events-none transition-opacity z-50"></div>
+
+<script>
+/* ================= 状态 ================= */
+let products = [];
+let settings = {
+  feeTax: 8, feeOther: 3, targetMargin: 15,
+  isrLow: 0.5, isrHealthy: 2, isrHigh: 3,
+  toSlow: 1, toHealthy: 3, toGood: 6,
+  shelfWarnDays: 30, shelfCoverSafe: 1.5
+};
+let charts = {};
+let currentHealthLabels = [];
+
+/* ============ 持久化(容错) ============ */
+function persist(){ try{ localStorage.setItem('channelTool', JSON.stringify({products,settings})); }catch(e){} }
+function restore(){
+  try{ const d=JSON.parse(localStorage.getItem('channelTool')); if(d){ if(Array.isArray(d.products)) products=d.products; if(d.settings&&typeof d.settings==='object') settings={...settings,...d.settings}; } }catch(e){}
+  const token = localStorage.getItem('gh_token');
+  if(token){
+    const el = document.getElementById('gh_token');
+    if(el) el.value = token;
+    const st = document.getElementById('gh_status');
+    if(st) st.textContent = 'Token 已配置，导出时将自动同步到团队看板';
+  }
+}
+
+/* ============ 日期辅助：计算数据日期到今天流逝的自然天数(不为负) ============ */
+function daysElapsed(dateStr){
+  if(!dateStr) return 0;
+  const d0 = new Date(dateStr + 'T00:00:00');
+  if(isNaN(d0.getTime())) return 0;
+  const today = new Date(); today.setHours(0,0,0,0);
+  return Math.max(0, Math.round((today - d0) / 86400000));
+}
+
+/* ============ 计算核心 ============ */
+function compute(p){
+  const feeTax = (p.feeTax!==''&&p.feeTax!=null&&!isNaN(p.feeTax))?Number(p.feeTax):settings.feeTax;
+  const feeOther = (p.feeOther!==''&&p.feeOther!=null&&!isNaN(p.feeOther))?Number(p.feeOther):settings.feeOther;
+  const totalFee = (feeTax+feeOther)/100;
+  const actual = (p.actualPrice!=null&&p.actualPrice!==''&&!isNaN(p.actualPrice)&&Number(p.actualPrice)>0)?Number(p.actualPrice):p.price;
+  const daily = p.weekSales/7;
+  const monthSales = daily*30;
+  const isr = monthSales>0 ? p.endInv/monthSales : (p.endInv>0?Infinity:0);
+  const sellDays = daily>0 ? p.endInv/daily : (p.endInv>0?Infinity:0);
+  const avgInv = (Number(p.beginInv)+Number(p.endInv))/2;
+  const turnover = avgInv>0 ? p.ytdSales/avgInv : null;
+  const unitProfit = actual*(1-totalFee)-p.cost;
+  const margin = actual>0 ? unitProfit/actual : 0;
+  const breakeven = p.cost/(1-totalFee);
+  const denom = 1-totalFee-settings.targetMargin/100;
+  const targetFloor = denom>0 ? p.cost/denom : null;
+  const ytdGMV = actual*p.ytdSales, ytdProfit = unitProfit*p.ytdSales;
+  /* ---- 综合平均周销（年累积销售 / 数据日期在今年的第几天 × 7） ---- */
+  const dayOfYear = p.date ? Math.ceil((new Date(p.date) - new Date(new Date(p.date).getFullYear(), 0, 0)) / 86400000) : null;
+  const avgDailySales = (dayOfYear && dayOfYear > 0) ? p.ytdSales / dayOfYear : 0;
+  const avgWeekSales = avgDailySales * 7;
+
+  /* ---- 效期测算(随当天日期动态推算) ---- */
+  const shelfLifeRaw = (p.shelfLife!=null&&p.shelfLife!==''&&!isNaN(p.shelfLife)&&Number(p.shelfLife)>0)?Number(p.shelfLife):null;
+  const shelfElapsed = shelfLifeRaw!=null ? daysElapsed(p.date) : 0;   // 数据日期至今已流逝天数
+  let shelfLife=null, shelfCover=null, expiryQty=null, expiryLoss=null, needDaily=null;
+  if(shelfLifeRaw!=null){
+    shelfLife = Math.max(0, shelfLifeRaw - shelfElapsed);              // 截至今天的真实剩余效期
+    if(shelfLife<=0){
+      // 已过效期:全部库存视为报损
+      expiryQty  = p.endInv;
+      expiryLoss = p.endInv*p.cost;
+      needDaily  = Infinity;
+      shelfCover = p.endInv>0 ? 0 : Infinity;
+    }else{
+      const sellableByExpiry = daily*shelfLife;         // 效期内按当前速度能卖出的量
+      expiryQty  = Math.max(0, p.endInv - sellableByExpiry); // 预计报损件数
+      expiryLoss = expiryQty*p.cost;                    // 预计报损金额(成本口径)
+      needDaily  = p.endInv/shelfLife;                  // 到期前清完所需日均
+      if(p.endInv<=0) shelfCover=Infinity;
+      else if(daily<=0) shelfCover=0;
+      else shelfCover = shelfLife/(p.endInv/daily);     // 剩余效期 ÷ 可售天数
+    }
+  }
+  return {feeTax,feeOther,totalFee,actual,daily,isr,sellDays,turnover,unitProfit,margin,breakeven,targetFloor,ytdGMV,ytdProfit,
+          shelfLife,shelfLifeRaw,shelfElapsed,shelfCover,expiryQty,expiryLoss,needDaily,
+          avgDailySales,avgWeekSales};
+}
+
+/* 状态判定 */
+function invStatus(isr){
+  if(isr===Infinity) return {t:'积压(无动销)',c:'rose',lv:3};
+  if(isr<settings.isrLow) return {t:'断货风险',c:'amber',lv:2};
+  if(isr<=settings.isrHealthy) return {t:'健康',c:'emerald',lv:0};
+  if(isr<=settings.isrHigh) return {t:'库存偏高',c:'yellow',lv:1};
+  return {t:'积压严重',c:'rose',lv:3};
+}
+function turnStatus(to){
+  if(to===null) return {t:'无数据',c:'slate',lv:0};
+  if(to<settings.toSlow) return {t:'滞销',c:'rose',lv:3};
+  if(to<settings.toHealthy) return {t:'周转偏慢',c:'yellow',lv:1};
+  if(to<=settings.toGood) return {t:'周转健康',c:'emerald',lv:0};
+  return {t:'周转优秀',c:'indigo',lv:0};
+}
+function shelfStatus(m){
+  if(m.shelfLife==null) return {t:'—',c:'slate',lv:0,none:true};
+  if(m.shelfLife<=0) return {t:'已过效期',c:'rose',lv:3};
+  if(m.shelfCover<1) return {t:'效期报损风险',c:'rose',lv:3};
+  if(m.shelfLife<settings.shelfWarnDays) return {t:'临期需关注',c:'amber',lv:2};
+  if(m.shelfCover<settings.shelfCoverSafe) return {t:'效期偏紧',c:'yellow',lv:1};
+  return {t:'效期安全',c:'emerald',lv:0};
+}
+
+/* 营销建议引擎 */
+function advise(p,m){
+  const inv=invStatus(m.isr), turn=turnStatus(m.turnover), shelf=shelfStatus(m);
+  const level = Math.max(inv.lv, turn.lv, shelf.lv);
+  const tags = [inv, turn]; if(!shelf.none) tags.push(shelf);
+  let advice = [];
+  const disc = (fp)=> (p.price>0&&fp!=null)?(fp/p.price*10).toFixed(1)+'折':'—';
+  const fmtP = (v)=> v==null?'—':'¥'+v.toFixed(2);
+
+  /* --- 效期优先(风险最高，放最前) --- */
+  if(!shelf.none){
+    if(m.shelfLife<=0){
+      advice.push(`🔴 该批次<b>已超出效期</b>（数据日期至今已过 ${m.shelfElapsed} 天，超过录入的 ${m.shelfLifeRaw} 天效期），当前库存 <b>${fmt(p.endInv)}</b> 件基本全部面临报废，潜在报损 <b>¥${fmt(m.expiryLoss)}</b>（成本口径）。请立即核实实物批次并做<strong>下架 / 报损 / 退供处理</strong>，同步核减库存并更新数据。`);
+    } else if(m.shelfCover<1){
+      const ratio = m.daily>0 ? (m.needDaily/m.daily).toFixed(1) : '∞';
+      advice.push(`🔴 剩余效期仅 <b>${m.shelfLife}</b> 天，按当前日均 ${m.daily.toFixed(1)} 件，到期预计卖不完约 <b>${Math.round(m.expiryQty)}</b> 件，潜在报损 <b>¥${fmt(m.expiryLoss)}</b>（成本口径）。需把日均动销拉到 <b>${m.needDaily.toFixed(1)}</b> 件/天（约当前 ${ratio} 倍）才能到期前清完。建议<strong>立即临期清仓</strong>：因报损=全额亏损，清仓价可<strong>击穿保本价 ${fmtP(m.breakeven)}</strong>，只要能回收部分成本即优于报废；优先叠加渠道调拨、买赠、临期专区、直播秒杀。`);
+    } else if(shelf.lv===2){
+      advice.push(`🟠 剩余效期 ${m.shelfLife} 天，虽按当前动销可在到期前售罄（效期覆盖系数 ${m.shelfCover.toFixed(2)}），但时间窗偏紧。建议<strong>提前排一轮温和促销</strong>（目标底价 ${fmtP(m.targetFloor)} 约 ${disc(m.targetFloor)}）预留缓冲，避免临近到期被迫深度砍价。`);
+    } else if(shelf.lv===1){
+      advice.push(`🟡 效期覆盖系数 ${m.shelfCover.toFixed(2)}（安全线 ${settings.shelfCoverSafe}）略偏紧。保持动销监控，若两周内周转下滑再启动促销。`);
+    }
+  }
+
+  if(inv.lv===2 && inv.t==='断货风险'){
+    advice.push(`⚠️ 可售天数约 ${isFinite(m.sellDays)?Math.round(m.sellDays)+'天':'—'}，库存紧张。建议<strong>优先补货</strong>，暂缓一切促销以免加速断货；若为爆品可小幅提价平衡供需。`);
+  }
+  if(inv.lv===3 || (inv.lv===1)){
+    if(m.margin>=settings.targetMargin/100){
+      advice.push(`📦 库存${inv.t}，但利润率${(m.margin*100).toFixed(1)}%有空间。<strong>建议促销去化</strong>：保住目标利润(${settings.targetMargin}%)的最低到手价 ${fmtP(m.targetFloor)}（约${disc(m.targetFloor)}）；需快速清仓的极限保本价 ${fmtP(m.breakeven)}（约${disc(m.breakeven)}）。`);
+    } else if(m.margin>0){
+      advice.push(`📦 库存${inv.t}且利润偏薄(${(m.margin*100).toFixed(1)}%)。促销空间有限，最低仅可至保本价 ${fmtP(m.breakeven)}（约${disc(m.breakeven)}）。建议<strong>捆绑搭售、满赠引流</strong>而非直接降价，并收紧补货。`);
+    } else {
+      advice.push(`🔴 库存${inv.t}且当前已亏损。建议<strong>清仓止损</strong>或渠道调拨，停止补货，重新评估该SKU定位。`);
+    }
+  }
+  if(turn.lv>=1 && inv.lv<=0){
+    advice.push(`🐢 库存表面健康但滚动周转${turn.t}(${m.turnover?m.turnover.toFixed(2):'—'})，存在慢动销风险。建议加强内容曝光/关联推荐，观察2周动销变化再决定是否促销。`);
+  }
+  if(level===0 && advice.length===0){
+    advice.push(`✅ 库销、周转${shelf.none?'':'与效期'}均健康，利润率${(m.margin*100).toFixed(1)}%。<strong>维持现有节奏</strong>，可按目标利润底价 ${fmtP(m.targetFloor)} 作为大促时的价格护栏。`);
+  }
+  return {level,tags,advice,shelf,inv,turn};
+}
+
+/* ============ 渲染 ============ */
+const badge=(c,t)=>`<span class="inline-block px-2 py-0.5 rounded text-xs bg-${c}-100 text-${c}-700">${t}</span>`;
+const fmt=(v,d=0)=> (v==null||!isFinite(v))?'∞':Number(v).toLocaleString('zh-CN',{maximumFractionDigits:d});
+
+function render(){
+  document.getElementById('countLabel').textContent = products.length;
+  try{ renderOverview(); }catch(e){ console.error('renderOverview 失败:',e); }
+  try{ renderInputList(); }catch(e){ console.error('renderInputList 失败:',e); }
+  try{ renderDashboard(); }catch(e){ console.error('renderDashboard 失败:',e); }
+  try{ renderAlerts(); }catch(e){ console.error('renderAlerts 失败:',e); }
+  persist();
+}
+
+/* ---------- 数据总览筛选 ---------- */
+function textMatch(field,expr){ if(!expr) return true; return String(field).toLowerCase().includes(expr.toLowerCase()); }
+function matchNum(v,expr){
+  if(!expr) return true;
+  const val = (v===Infinity)?1e15:(v==null?NaN:Number(v));
+  const e = expr.replace(/\s/g,'');
+  let m;
+  if(m=e.match(/^(-?\d*\.?\d+)-(-?\d*\.?\d+)$/)) return !isNaN(val)&&val>=+m[1]&&val<=+m[2];
+  if(m=e.match(/^(>=|<=|>|<|=)(-?\d*\.?\d+)$/)){
+    if(isNaN(val)) return false;
+    const n=+m[2];
+    switch(m[1]){case'>':return val>n;case'<':return val<n;case'>=':return val>=n;case'<=':return val<=n;default:return Math.abs(val-n)<1e-6;}
+  }
+  if(m=e.match(/^(-?\d*\.?\d+)$/)) return (!isNaN(val)&&Math.abs(val-+m[1])<1e-6) || String(v).includes(e);
+  return true;
+}
+function getOverviewFilters(){
+  const g=id=>{const el=document.getElementById(id);return el?el.value.trim():'';};
+  return {name:g('flt_name'),sku:g('flt_sku'),cat:g('flt_cat'),cost:g('flt_cost'),price:g('flt_price'),
+    actual:g('flt_actual'),profit:g('flt_profit'),margin:g('flt_margin'),breakeven:g('flt_breakeven'),ytdProfit:g('flt_ytdProfit'),daily:g('flt_daily'),
+    endInv:g('flt_endInv'),isr:g('flt_isr'),sellDays:g('flt_sellDays'),shelf:g('flt_shelf'),loss:g('flt_loss'),
+    turnover:g('flt_turnover'),status:g('flt_status')};
+}
+function clearOverviewFilters(){
+  ['flt_name','flt_sku','flt_cat','flt_cost','flt_price','flt_actual','flt_profit','flt_margin','flt_breakeven','flt_ytdProfit','flt_daily','flt_endInv','flt_isr','flt_sellDays','flt_shelf','flt_loss','flt_turnover','flt_status']
+    .forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  renderOverview();
+}
+
+function renderOverview(){
+  const tb=document.getElementById('overviewBody'); tb.innerHTML='';
+  const ovc=document.getElementById('ovCount');
+  const COLS=19;
+  if(!products.length){tb.innerHTML=`<tr><td colspan="${COLS}" class="p-6 text-center text-slate-400">暂无数据，请到「数据录入」添加或载入示例</td></tr>`;if(ovc)ovc.textContent='';return;}
+  const f=getOverviewFilters();
+  let shown=0;
+  products.forEach(p=>{
+    const m=compute(p); const inv=invStatus(m.isr), turn=turnStatus(m.turnover), shelf=shelfStatus(m);
+    const statusText=inv.t+' '+turn.t+' '+(shelf.none?'':shelf.t);
+    const pass =
+      textMatch(p.name,f.name)&&textMatch(p.sku,f.sku)&&textMatch(p.cat,f.cat)&&
+      matchNum(p.cost,f.cost)&&matchNum(p.price,f.price)&&matchNum(m.actual,f.actual)&&
+      matchNum(m.unitProfit,f.profit)&&matchNum(m.margin*100,f.margin)&&matchNum(m.breakeven,f.breakeven)&&matchNum(m.ytdProfit,f.ytdProfit)&&matchNum(m.daily,f.daily)&&
+      matchNum(p.endInv,f.endInv)&&matchNum(m.isr,f.isr)&&matchNum(m.sellDays,f.sellDays)&&
+      matchNum(m.shelfLife,f.shelf)&&matchNum(m.expiryLoss,f.loss)&&
+      matchNum(m.turnover,f.turnover)&&textMatch(statusText,f.status);
+    if(!pass) return;
+    shown++;
+    const idx = shown;
+    const shelfCell = m.shelfLife==null ? '<span class="text-slate-300">—</span>'
+      : `<span class="${shelf.lv>=2?'text-rose-600 font-semibold':''}" title="录入${m.shelfLifeRaw}天 / 已过${m.shelfElapsed}天">${m.shelfLife}天</span>`;
+    const lossCell = (m.expiryLoss&&m.expiryLoss>0) ? `<span class="text-amber-600 font-medium">¥${fmt(m.expiryLoss)}</span>` : '<span class="text-slate-300">—</span>';
+    tb.innerHTML+=`<tr class="border-t hover:bg-slate-50 cursor-pointer" onclick="gotoAlert('${p.sku}')">
+      <td class="p-2 text-center text-slate-400">${idx}</td><td class="p-2 font-medium">${p.name}</td><td class="p-2 text-slate-400">${p.sku}</td><td class="p-2">${p.cat}</td>
+      <td class="p-2 text-right">${fmt(p.cost,2)}</td><td class="p-2 text-right">${fmt(p.price,2)}</td>
+      <td class="p-2 text-right font-medium">${fmt(m.actual,2)}</td>
+      <td class="p-2 text-right ${m.unitProfit<0?'text-rose-600':'text-emerald-600'}">${fmt(m.unitProfit,2)}</td>
+      <td class="p-2 text-right ${m.margin<0?'text-rose-600':''}">${(m.margin*100).toFixed(1)}%</td>
+      <td class="p-2 text-right text-rose-600 font-semibold">¥${fmt(m.breakeven,2)}</td>
+      <td class="p-2 text-right ${m.ytdProfit<0?'text-rose-600':'text-emerald-600'}">¥${fmt(m.ytdProfit)}</td>
+      <td class="p-2 text-right">${fmt(m.daily,1)}</td><td class="p-2 text-right">${fmt(p.endInv)}</td>
+      <td class="p-2 text-right font-semibold">${fmt(m.isr,2)}</td>
+      <td class="p-2 text-right">${isFinite(m.sellDays)?fmt(m.sellDays)+'天':'∞'}</td>
+      <td class="p-2 text-right">${shelfCell}</td>
+      <td class="p-2 text-right">${lossCell}</td>
+      <td class="p-2 text-right font-semibold">${m.turnover?m.turnover.toFixed(2):'—'}</td>
+      <td class="p-2">${badge(inv.c,inv.t)} ${badge(turn.c,turn.t)}${shelf.none?'':' '+badge(shelf.c,shelf.t)}</td>
+    </tr>`;
+  });
+  if(shown===0) tb.innerHTML=`<tr><td colspan="${COLS}" class="p-6 text-center text-slate-400">无符合筛选条件的产品</td></tr>`;
+  if(ovc) ovc.textContent=`显示 ${shown} / ${products.length} 条` + (shown<products.length?'（已筛选）':'');
+}
+
+function renderInputList(){
+  const tb=document.getElementById('inputBody'); tb.innerHTML='';
+  if(!products.length){tb.innerHTML='<tr><td colspan="12" class="p-4 text-center text-slate-400">暂无数据</td></tr>';return;}
+  products.forEach((p,i)=>{
+    const idx=i+1;
+    const m=compute(p);
+    const shelfTxt = m.shelfLife!=null
+      ? `${m.shelfLife}天<span class="text-slate-400">（录入${m.shelfLifeRaw}）</span>`
+      : '—';
+    tb.innerHTML+=`<tr class="border-t">
+      <td class="p-2 text-center text-slate-400">${idx}</td><td class="p-2 font-medium">${p.name}</td><td class="p-2 text-slate-400">${p.sku}</td><td class="p-2">${p.cat}</td>
+      <td class="p-2 text-right">${fmt(p.cost,2)}</td><td class="p-2 text-right">${fmt(p.price,2)}</td>
+      <td class="p-2 text-right">${fmt(m.actual,2)}</td>
+      <td class="p-2 text-right">${fmt(p.weekSales)}</td><td class="p-2 text-right">${fmt(p.endInv)}</td>
+      <td class="p-2 text-right ${m.shelfLife!=null&&m.shelfLife<=settings.shelfWarnDays?'text-rose-600 font-semibold':''}">${shelfTxt}</td>
+      <td class="p-2 text-slate-500">${p.date||'—'}</td>
+      <td class="p-2"><button onclick="editProduct('${p.sku}')" class="text-indigo-600 hover:underline">编辑</button>
+      <button onclick="delProduct('${p.sku}')" class="text-rose-600 hover:underline ml-2">删除</button></td>
+    </tr>`;
+  });
+}
+
+function renderDashboard(){
+  let gmv=0,profit=0,alerts=0,expiryLossTotal=0;
+  const catMap={}; const health={'健康':0,'库存偏高':0,'积压严重':0,'积压(无动销)':0,'断货风险':0};
+  const mixLabels=[],mixIsr=[],mixTo=[];
+  products.forEach(p=>{
+    const m=compute(p); gmv+=m.ytdGMV; profit+=m.ytdProfit;
+    const inv=invStatus(m.isr),turn=turnStatus(m.turnover),shelf=shelfStatus(m);
+    if(Math.max(inv.lv,turn.lv,shelf.lv)>=2) alerts++;
+    if(m.expiryLoss) expiryLossTotal+=m.expiryLoss;
+    if(health[inv.t]!==undefined) health[inv.t]++;
+    catMap[p.cat]=catMap[p.cat]||{gmv:0,profit:0}; catMap[p.cat].gmv+=m.ytdGMV; catMap[p.cat].profit+=m.ytdProfit;
+    mixLabels.push(p.name); mixIsr.push(isFinite(m.isr)?+m.isr.toFixed(2):settings.isrHigh*1.5); mixTo.push(m.turnover?+m.turnover.toFixed(2):0);
+  });
+  document.getElementById('kpi-gmv').textContent='¥'+fmt(gmv);
+  document.getElementById('kpi-profit').textContent='¥'+fmt(profit);
+  document.getElementById('kpi-margin').textContent=gmv>0?(profit/gmv*100).toFixed(1)+'%':'—';
+  document.getElementById('kpi-alert').textContent=alerts;
+  document.getElementById('kpi-expiry').textContent='¥'+fmt(expiryLossTotal);
+
+  const cats=Object.keys(catMap);
+  drawChart('chartCategory','bar',{labels:cats,datasets:[
+    {label:'累计GMV',data:cats.map(c=>+catMap[c].gmv.toFixed(0)),backgroundColor:'#a5b4fc'},
+    {label:'累计利润',data:cats.map(c=>+catMap[c].profit.toFixed(0)),backgroundColor:'#6366f1'}
+  ]});
+
+  const hLabels=Object.keys(health).filter(k=>health[k]>0);
+  currentHealthLabels=hLabels;
+  drawChart('chartHealth','doughnut',{labels:hLabels,datasets:[{data:hLabels.map(k=>health[k]),
+    backgroundColor:['#34d399','#fbbf24','#f43f5e','#9f1239','#f59e0b']}]},{
+      cutout:'55%',
+      onClick:(evt,els)=>{
+        if(els&&els.length){
+          const status=currentHealthLabels[els[0].index];
+          openProductList('库存状态：'+status+'（点击查看单品建议）', getProductsByStatus(status));
+        } else {
+          showAlertList();
+        }
+      }
+  });
+
+  /* ---- 库销比 × 滚动周转 组合图 ---- */
+  drawChart('chartMix','bar',{labels:mixLabels,datasets:[
+    {label:'库销比',data:mixIsr,backgroundColor:'#a5b4fc'},
+    {label:'滚动周转',data:mixTo,type:'line',borderColor:'#f43f5e',backgroundColor:'#f43f5e',pointRadius:4,yAxisID:'y1'}
+  ]},{scales:{y:{beginAtZero:true,title:{display:true,text:'库销比'}},y1:{beginAtZero:true,position:'right',title:{display:true,text:'滚动周转'},grid:{drawOnChartArea:false}}}});
+
+  /* ---- SKU 利润健康度气泡图 ---- */
+  /* X=期末库存（件）：≤3100 每 100 一格；>3100 按 1/100 压缩，使 10000 步长与 100 步长格距一致，不牺牲布局空间 */
+  /* Y=到手价（元）：每 10 元一格，不压缩，象限按刻度等比放大（画布加宽加高），容器横向滚动 */
+  /* 库存 < 20 件视为无库存：气泡置灰，不参与利润健康度配色 */
+  const X_BREAK = 3100, X_COMPRESS = 100, OUT_OF_STOCK = 20;
+  const tx = v => v <= X_BREAK ? v : X_BREAK + (v - X_BREAK) / X_COMPRESS;
+  const bubbleData = products.map(p=>{
+    const m=compute(p);
+    const r = Math.min(25, Math.max(4, Math.sqrt(Math.max(0,m.avgWeekSales)) * 2));
+    let bc, fc;
+    if(p.endInv < OUT_OF_STOCK){ bc='#94a3b8'; fc='rgba(148,163,184,0.22)'; }
+    else if(m.actual <= m.breakeven){ bc='#f43f5e'; fc='rgba(244,63,94,0.35)'; }
+    else if(m.actual <= m.breakeven * 1.15){ bc='#f59e0b'; fc='rgba(245,158,11,0.35)'; }
+    else { bc='#10b981'; fc='rgba(16,185,129,0.35)'; }
+    return {x:tx(p.endInv), inv:p.endInv, y:m.actual, r:r, sku:p.sku, name:p.name, m:m, weekSales:p.weekSales, bc:bc, fc:fc};
+  });
+  /* 象限等比放大：宽度按库存刻度（每 100 格约 22px）、高度按价格刻度（每 10 元约 16px） */
+  const maxInvT = bubbleData.length ? Math.max(...bubbleData.map(d=>d.x)) : 100;
+  const maxActual = bubbleData.length ? Math.max(...bubbleData.map(d=>d.y)) : 100;
+  const yMax = Math.ceil(maxActual/10)*10 + 10;
+  const wrap = document.getElementById('bubbleWrap');
+  if(wrap){
+    wrap.style.minWidth = Math.max(720, Math.round(maxInvT/100*22)+80) + 'px';
+    wrap.style.height = Math.max(400, Math.round(yMax/10*16)+80) + 'px';
+  }
+  /* 内核实心圆=最近一周周销（与外圈同一比例尺，内核越小=近期动销越弱于综合均值）；最近周销>综合周销时加虚线外环提示动销走强 */
+  const salesComparePlugin = {id:'salesCompare', afterDatasetsDraw(chart){
+    const meta = chart.getDatasetMeta(0);
+    const c = chart.ctx;
+    meta.data.forEach((pt,i)=>{
+      const d = chart.data.datasets[0].data[i];
+      const rOut = pt.options.radius || d.r;
+      const rIn = Math.min(rOut, Math.sqrt(Math.max(0,d.weekSales)) * 2);
+      c.save();
+      c.beginPath(); c.arc(pt.x, pt.y, Math.max(1.5, rIn), 0, Math.PI*2);
+      c.globalAlpha = 0.85; c.fillStyle = d.bc; c.fill();
+      if(d.weekSales > d.m.avgWeekSales){
+        c.beginPath(); c.arc(pt.x, pt.y, rOut + 2.5, 0, Math.PI*2);
+        c.setLineDash([3,3]); c.lineWidth = 1.5; c.globalAlpha = 1; c.strokeStyle = d.bc; c.stroke();
+      }
+      c.restore();
+    });
+  }};
+  drawChart('chartBubble','bubble',{datasets:[{
+    label:'SKU',
+    data:bubbleData,
+    backgroundColor:bubbleData.map(d=>d.fc),
+    borderColor:bubbleData.map(d=>d.bc),
+    borderWidth:2
+  }]},{
+    maintainAspectRatio:false,
+    scales:{
+      x:{
+        title:{display:true,text:'期末库存（件，3100 以上压缩等距）'},beginAtZero:true,
+        afterBuildTicks(axis){
+          const ticks=[];
+          for(let v=0; v<=3000; v+=100) ticks.push({value:v});
+          [10000,20000].forEach(v=>ticks.push({value:tx(v)}));
+          axis.ticks = ticks;
+        },
+        ticks:{callback:function(v){ return v<=X_BREAK ? v : Math.round(X_BREAK+(v-X_BREAK)*X_COMPRESS).toLocaleString(); }}
+      },
+      y:{
+        title:{display:true,text:'到手价（元）'},beginAtZero:true,max:yMax,
+        ticks:{stepSize:10}
+      }
+    },
+    plugins:{
+      tooltip:{
+        callbacks:{
+          label:function(ctx){
+            const d=ctx.raw;
+            const m=d.m;
+            const diff = m.avgWeekSales>0 ? ((d.weekSales - m.avgWeekSales)/m.avgWeekSales*100).toFixed(1) : 0;
+            const trend = diff>=0 ? '↑+'+diff+'%' : '↓'+diff+'%';
+            return [
+              d.name + ' (' + d.sku + ')' + (d.inv < OUT_OF_STOCK ? '【无库存】' : ''),
+              '到手价: ¥' + m.actual.toFixed(2) + ' | 保本极限: ¥' + m.breakeven.toFixed(2) + ' | 差距: ¥' + (m.actual-m.breakeven).toFixed(2),
+              '库存: ' + d.inv + '件' + (d.inv < OUT_OF_STOCK ? '（<20件，按无库存处理）' : '') + ' | 最近周销: ' + d.weekSales + ' | 综合周销: ' + m.avgWeekSales.toFixed(1) + ' ' + trend,
+              '利润率: ' + (m.margin*100).toFixed(1) + '% | 库销比: ' + (isFinite(m.isr)?m.isr.toFixed(2):'∞')
+            ];
+          }
+        }
+      },
+      legend:{display:false}
+    },
+    onClick:(evt,els)=>{
+      if(els&&els.length){
+        const d=bubbleData[els[0].index];
+        if(d) gotoAlert(d.sku);
+      }
+    }
+  },[salesComparePlugin]);
+}
+
+function drawChart(id,type,data,extra={},extraPlugins=[]){
+  const ctx=document.getElementById(id); if(!ctx)return;
+  if(charts[id]) charts[id].destroy();
+  const opts={responsive:true,plugins:{legend:{labels:{boxWidth:12,font:{size:11}}}}};
+  const inlinePlugins=[].concat(extraPlugins);
+  /* doughnut 百分比标签（Chart.js 4 须以内联插件注册，options.plugins.afterDraw 不会被执行） */
+  if(type==='doughnut'||type==='pie'){
+    inlinePlugins.push({id:'pctLabels',afterDraw:function(chart){
+      const dataset=chart.data.datasets[0];
+      const meta=chart.getDatasetMeta(0);
+      const total=dataset.data.reduce((a,b)=>a+b,0);
+      if(!total) return;
+      const c=chart.ctx;
+      c.save();
+      c.font='bold 11px sans-serif';
+      c.fillStyle='#475569';
+      c.textAlign='center';
+      c.textBaseline='middle';
+      meta.data.forEach((arc,i)=>{
+        const v=dataset.data[i];
+        if(!v) return;
+        const pct=(v/total*100).toFixed(1)+'%';
+        const midA=(arc.startAngle+arc.endAngle)/2;
+        const midR=(arc.outerRadius+arc.innerRadius)/2;
+        const cx=arc.x+Math.cos(midA)*midR;
+        const cy=arc.y+Math.sin(midA)*midR;
+        c.fillText(pct,cx,cy);
+      });
+      c.restore();
+    }});
+  }
+  charts[id]=new Chart(ctx,{type,data,options:{...opts,...extra},plugins:inlinePlugins});
+}
+
+function renderAlerts(){
+  const c=document.getElementById('alertsContainer'); c.innerHTML='';
+  if(!products.length){c.innerHTML='<div class="bg-white rounded-xl p-6 text-center text-slate-400">暂无数据</div>';return;}
+  const scoredList=products.map(p=>{const m=compute(p);const a=advise(p,m);return {p,m,a};})
+    .sort((x,y)=>y.a.level-x.a.level);
+  const levelBar={3:'border-rose-400',2:'border-amber-400',1:'border-yellow-300',0:'border-emerald-300'};
+  scoredList.forEach(({p,m,a})=>{
+    const fmtP=(v)=> v==null?'—':'¥'+v.toFixed(2);
+    const disc=(fp)=> (p.price>0&&fp!=null)?(fp/p.price*10).toFixed(1)+'折':'—';
+    const shelfMetric = m.shelfLife!=null
+      ? `<div>剩余效期 <b class="${a.shelf.lv>=2?'text-rose-600':'text-slate-800'}">${m.shelfLife}天</b><span class="text-slate-400"> (录入${m.shelfLifeRaw}/已过${m.shelfElapsed})</span></div>`
+      : `<div>剩余效期 <b class="text-slate-300">—</b></div>`;
+    c.innerHTML+=`<div id="alert-${p.sku}" class="alert-card bg-white rounded-xl shadow-sm p-4 border-l-4 ${levelBar[a.level]} transition">
+      <div class="flex flex-wrap justify-between items-center gap-2 mb-2">
+        <div class="font-semibold">${p.name} <span class="text-xs text-slate-400">${p.sku} · ${p.cat}</span></div>
+        <div class="flex gap-1 flex-wrap">${a.tags.map(t=>badge(t.c,t.t)).join('')}</div>
+      </div>
+      <div class="grid grid-cols-2 sm:grid-cols-6 gap-2 text-xs text-slate-500 mb-3">
+        <div>库销比 <b class="text-slate-800">${fmt(m.isr,2)}</b></div>
+        <div>可售天数 <b class="text-slate-800">${isFinite(m.sellDays)?fmt(m.sellDays)+'天':'∞'}</b></div>
+        ${shelfMetric}
+        <div>滚动周转 <b class="text-slate-800">${m.turnover?m.turnover.toFixed(2):'—'}</b></div>
+        <div>利润率 <b class="text-slate-800">${(m.margin*100).toFixed(1)}%</b></div>
+        <div>单件利润 <b class="text-slate-800">${fmt(m.unitProfit,2)}</b></div>
+      </div>
+      <div class="space-y-1 text-sm text-slate-700 mb-3">${a.advice.map(x=>`<p>${x}</p>`).join('')}</div>
+      <div class="bg-slate-50 rounded-lg p-3 text-xs grid grid-cols-1 sm:grid-cols-4 gap-2">
+        <div>🏷 控价：<b>${fmtP(p.price)}</b></div>
+        <div>💰 当前到手价：<b>${fmtP(m.actual)}</b></div>
+        <div>🎯 目标利润底价：<b class="text-indigo-600">${fmtP(m.targetFloor)}</b>（${disc(m.targetFloor)}）</div>
+        <div>🩸 保本极限底价：<b class="text-rose-600">${fmtP(m.breakeven)}</b>（${disc(m.breakeven)}）</div>
+      </div>
+      ${(m.expiryLoss&&m.expiryLoss>0)?`<div class="mt-2 text-xs bg-rose-50 text-rose-700 rounded-lg p-2">⏳ 效期测算：预计报损约 <b>${Math.round(m.expiryQty)}</b> 件 / <b>¥${fmt(m.expiryLoss)}</b>${isFinite(m.needDaily)?`，清完所需日均 <b>${m.needDaily.toFixed(1)}</b> 件`:'（已过效期）'}</div>`:''}
+    </div>`;
+  });
+}
+
+/* ============ 清单弹窗 & 联动 ============ */
+function scoreProduct(p){const m=compute(p);const inv=invStatus(m.isr);const turn=turnStatus(m.turnover);const shelf=shelfStatus(m);return {p,m,inv,turn,shelf,level:Math.max(inv.lv,turn.lv,shelf.lv)};}
+function getWarningList(){ return products.map(scoreProduct).filter(x=>x.level>=2).sort((a,b)=>b.level-a.level); }
+function getProductsByStatus(status){ return products.map(scoreProduct).filter(x=>x.inv.t===status).sort((a,b)=>b.level-a.level); }
+function getExpiryRiskList(){ return products.map(scoreProduct).filter(x=>!x.shelf.none && x.shelf.lv>=2).sort((a,b)=>(b.m.expiryLoss||0)-(a.m.expiryLoss||0)); }
+
+function showAlertList(){ const list=getWarningList(); openProductList(`预警产品清单（共 ${list.length} 个）`, list); }
+function showExpiryList(){ const list=getExpiryRiskList(); openProductList(`效期风险清单（临期/报损，共 ${list.length} 个）`, list); }
+
+function openProductList(title,list){
+  document.getElementById('listModalTitle').textContent=title;
+  const body=document.getElementById('listModalBody');
+  if(!list.length){
+    body.innerHTML='<div class="p-6 text-center text-slate-400">暂无符合条件的产品 🎉</div>';
+  }else{
+    body.innerHTML=list.map(({p,m,inv,turn,shelf})=>{
+      const shelfBadge = shelf.none?'':badge(shelf.c,shelf.t);
+      const lossLine = (m.expiryLoss&&m.expiryLoss>0)? ` · 预计报损¥${fmt(m.expiryLoss)}`:'';
+      const shelfLine = m.shelfLife!=null? ` · 效期${m.shelfLife}天`:'';
+      return `<button onclick="gotoAlert('${p.sku}')" class="w-full text-left border rounded-lg p-3 mb-2 hover:bg-indigo-50 hover:border-indigo-300 transition flex justify-between items-center gap-3">
+        <div class="min-w-0">
+          <div class="font-medium text-sm truncate">${p.name} <span class="text-xs text-slate-400">${p.sku} · ${p.cat}</span></div>
+          <div class="text-xs text-slate-500 mt-1">库销比 <b>${fmt(m.isr,2)}</b> · 可售 ${isFinite(m.sellDays)?fmt(m.sellDays)+'天':'∞'}${shelfLine} · 周转 ${m.turnover?m.turnover.toFixed(2):'—'}${lossLine}</div>
+        </div>
+        <div class="flex flex-col items-end gap-1 shrink-0">
+          <div class="flex gap-1 flex-wrap justify-end">${badge(inv.c,inv.t)}${badge(turn.c,turn.t)}${shelfBadge}</div>
+          <span class="text-xs text-indigo-500">查看建议 →</span>
+        </div>
+      </button>`;
+    }).join('');
+  }
+  document.getElementById('listModal').classList.remove('hidden');
+}
+function closeListModal(){ document.getElementById('listModal').classList.add('hidden'); }
+function gotoAlert(sku){
+  closeListModal();
+  switchTab('alerts');
+  setTimeout(()=>{
+    const el=document.getElementById('alert-'+sku);
+    if(el){
+      el.scrollIntoView({behavior:'smooth',block:'center'});
+      el.classList.add('ring-2','ring-indigo-400','bg-indigo-50');
+      setTimeout(()=>el.classList.remove('ring-2','ring-indigo-400','bg-indigo-50'),2600);
+    }
+  },120);
+}
+
+/* ============ 增删改 ============ */
+function saveProduct(){
+  const g=id=>document.getElementById(id).value.trim();
+  const sku=g('f_sku'), name=g('f_name');
+  if(!sku||!name){toast('产品名称与SKU编码必填');return;}
+  const obj={name,sku,cat:g('f_cat')||'未分类',
+    cost:+g('f_cost')||0, price:+g('f_price')||0, actualPrice:g('f_actprice'),
+    weekSales:+g('f_week')||0, endInv:+g('f_endinv')||0,
+    beginInv:+g('f_begininv')||0, ytdSales:+g('f_ytd')||0,
+    shelfLife:g('f_shelf'),
+    date:g('f_date'), feeTax:g('f_ftax'), feeOther:g('f_fother')};
+  const i=products.findIndex(x=>x.sku===sku);
+  if(i>=0) products[i]=obj; else products.push(obj);
+  resetForm(); render(); toast('已保存');
+}
+function editProduct(sku){
+  const p=products.find(x=>x.sku===sku); if(!p)return;
+  const s=(id,v)=>document.getElementById(id).value=v??'';
+  s('f_name',p.name);s('f_sku',p.sku);s('f_cat',p.cat);s('f_cost',p.cost);s('f_price',p.price);
+  s('f_actprice',p.actualPrice);s('f_week',p.weekSales);s('f_endinv',p.endInv);
+  s('f_begininv',p.beginInv);s('f_ytd',p.ytdSales);s('f_shelf',p.shelfLife);
+  s('f_date',p.date);s('f_ftax',p.feeTax);s('f_fother',p.feeOther);
+  document.getElementById('formTitle').textContent='编辑：'+p.name;
+  switchTab('input'); setScrollTop(0);
+}
+function delProduct(sku){ if(!confirm('确认删除该产品？'))return; products=products.filter(x=>x.sku!==sku); render(); toast('已删除'); }
+function resetForm(){ ['f_name','f_sku','f_cat','f_cost','f_price','f_actprice','f_week','f_endinv','f_begininv','f_ytd','f_shelf','f_date','f_ftax','f_fother'].forEach(id=>document.getElementById(id).value=''); document.getElementById('formTitle').textContent='手动添加 / 编辑产品'; }
+function clearAll(){
+  if(!products.length){ toast('当前无数据'); return; }
+  if(!confirm('确认清空全部 '+products.length+' 条产品数据？清空前会自动留一份本地备份。')) return;
+  try{ localStorage.setItem('channelTool_backup', JSON.stringify({products,settings,backupAt:new Date().toISOString()})); }catch(e){}
+  products=[]; render(); toast('已清空（旧数据已备份到 channelTool_backup）');
+}
+
+/* ============ 设置 ============ */
+function loadSettingsForm(){
+  document.getElementById('s_ftax').value=settings.feeTax;
+  document.getElementById('s_fother').value=settings.feeOther;
+  document.getElementById('s_target').value=settings.targetMargin;
+  document.getElementById('s_isr_low').value=settings.isrLow;
+  document.getElementById('s_isr_healthy').value=settings.isrHealthy;
+  document.getElementById('s_isr_high').value=settings.isrHigh;
+  document.getElementById('s_to_slow').value=settings.toSlow;
+  document.getElementById('s_to_healthy').value=settings.toHealthy;
+  document.getElementById('s_to_good').value=settings.toGood;
+  document.getElementById('s_shelf_warn').value=settings.shelfWarnDays;
+  document.getElementById('s_shelf_cover').value=settings.shelfCoverSafe;
+}
+function saveSettings(){
+  const g=id=>+document.getElementById(id).value;
+  settings.feeTax=g('s_ftax'); settings.feeOther=g('s_fother'); settings.targetMargin=g('s_target');
+  settings.isrLow=g('s_isr_low'); settings.isrHealthy=g('s_isr_healthy'); settings.isrHigh=g('s_isr_high');
+  settings.toSlow=g('s_to_slow'); settings.toHealthy=g('s_to_healthy'); settings.toGood=g('s_to_good');
+  settings.shelfWarnDays=g('s_shelf_warn'); settings.shelfCoverSafe=g('s_shelf_cover');
+  render(); toast('参数已保存，全部重算完成');
+}
+
+/* ============ CSV ============ */
+const HEADERS=['产品名称','SKU编码','品类','成本','控价','实际支付到手价','最近一周销售件数','最新期末库存','年初期初库存','业务年累计销售件数','数据日期','税运仓储比例%','其他费用比例%','剩余效期天数'];
+function downloadTemplate(){
+  const sample=['鲜食坚果礼盒','SKU007','食品','40','99','89','105','3000','2000','5200','2026-06-28','8','3','90'];
+  const csv='\ufeff'+HEADERS.join(',')+'\n'+sample.join(',')+'\n';
+  downloadFile(csv,'渠道数据投喂模板.csv');
+}
+function exportData(){
+  let rows=[HEADERS.join(',')];
+  products.forEach(p=>rows.push([p.name,p.sku,p.cat,p.cost,p.price,p.actualPrice,p.weekSales,p.endInv,p.beginInv,p.ytdSales,p.date,p.feeTax,p.feeOther,p.shelfLife].join(',')));
+  downloadFile('\ufeff'+rows.join('\n'),'渠道数据导出.csv');
+}
+function downloadFile(content,name){
+  const blob=new Blob([content],{type:'text/csv;charset=utf-8;'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; a.click();
+}
+
+/* ============ GitHub 自动推送 ============ */
+const GH_REPO = 'camovibe/guanwangdongxiao';
+const GH_PATH = 'data.json';
+
+function saveGhToken(){
+  const token = document.getElementById('gh_token').value.trim();
+  if(!token){ toast('请输入 Token'); return; }
+  localStorage.setItem('gh_token', token);
+  document.getElementById('gh_status').textContent = 'Token 已保存（本地存储，不会上传）';
+  toast('Token 已保存');
+}
+function clearGhToken(){
+  localStorage.removeItem('gh_token');
+  document.getElementById('gh_token').value = '';
+  document.getElementById('gh_status').textContent = 'Token 已清除';
+  toast('Token 已清除');
+}
+
+async function pushToGitHub(token, content){
+  const apiBase = `https://api.github.com/repos/${GH_REPO}/contents/${GH_PATH}`;
+  toast('正在同步到团队看板...');
+  try {
+    // 1. 获取当前文件 SHA
+    let sha = null;
+    const getRes = await fetch(apiBase, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Accept': 'application/vnd.github+json'
+      }
+    });
+    if(getRes.ok){
+      const info = await getRes.json();
+      sha = info.sha;
+    }
+    // 2. PUT 更新
+    const body = {
+      message: `Update data.json via 产品渠道动销与利润罗盘系统 — ${new Date().toLocaleString('zh-CN')}`,
+      content: btoa(unescape(encodeURIComponent(content)))
+    };
+    if(sha) body.sha = sha;
+    const putRes = await fetch(apiBase, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Accept': 'application/vnd.github+json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(body)
+    });
+    if(putRes.ok){
+      toast('✅ 已同步到团队看板！约 1–2 分钟后刷新可见');
+    } else {
+      const err = await putRes.json().catch(()=>null);
+      toast('❌ 同步失败: ' + (err?.message || putRes.statusText));
+    }
+  } catch(e){
+    toast('❌ 同步失败: ' + e.message);
+  }
+}
+
+async function exportDataJson(){
+  const data = {products, settings, updatedAt: new Date().toISOString()};
+  const jsonStr = JSON.stringify(data, null, 2);
+  // 本地导出
+  const blob = new Blob([jsonStr], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'data.json';
+  a.click();
+  // 自动推送到 GitHub
+  const token = localStorage.getItem('gh_token');
+  if(token){
+    await pushToGitHub(token, jsonStr);
+  } else {
+    toast('已本地导出；未配置 GitHub Token，跳过自动同步');
+  }
+}
+
+function importCSV(e){
+  const file=e.target.files[0]; if(!file)return;
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    let txt=ev.target.result.replace(/^\ufeff/,'');
+    const lines=txt.split(/\r?\n/).filter(l=>l.trim());
+    let added=0;
+    for(let i=1;i<lines.length;i++){
+      const c=lines[i].split(',');
+      if(c.length<10||!c[1])continue;
+      const obj={name:c[0].trim(),sku:c[1].trim(),cat:(c[2]||'未分类').trim(),
+        cost:+c[3]||0,price:+c[4]||0,actualPrice:(c[5]||'').trim(),
+        weekSales:+c[6]||0,endInv:+c[7]||0,beginInv:+c[8]||0,ytdSales:+c[9]||0,
+        date:(c[10]||'').trim(),feeTax:(c[11]||'').trim(),feeOther:(c[12]||'').trim(),
+        shelfLife:(c[13]||'').trim()};
+      const idx=products.findIndex(x=>x.sku===obj.sku);
+      if(idx>=0)products[idx]=obj; else products.push(obj);
+      added++;
+    }
+    render(); toast('成功导入/更新 '+added+' 条'); e.target.value='';
+  };
+  reader.readAsText(file,'UTF-8');
+}
+function loadSample(){
+  products=[
+    {name:'便携榨汁杯',sku:'SKU001',cat:'小家电',cost:35,price:89,actualPrice:79,weekSales:420,endInv:1200,beginInv:800,ytdSales:9600,shelfLife:'',date:'2026-06-28',feeTax:'',feeOther:''},
+    {name:'无线蓝牙耳机',sku:'SKU002',cat:'数码',cost:68,price:159,actualPrice:139,weekSales:95,endInv:2400,beginInv:1500,ytdSales:3100,shelfLife:'',date:'2026-06-28',feeTax:'',feeOther:''},
+    {name:'儿童保温杯',sku:'SKU003',cat:'母婴',cost:22,price:59,actualPrice:49,weekSales:680,endInv:900,beginInv:1200,ytdSales:15800,shelfLife:'',date:'2026-06-28',feeTax:6,feeOther:2},
+    {name:'折叠收纳箱',sku:'SKU004',cat:'家居',cost:45,price:79,actualPrice:69,weekSales:30,endInv:3200,beginInv:2800,ytdSales:1500,shelfLife:'',date:'2026-06-28',feeTax:'',feeOther:''},
+    {name:'高端筋膜枪',sku:'SKU005',cat:'小家电',cost:210,price:299,actualPrice:279,weekSales:210,endInv:180,beginInv:600,ytdSales:8200,shelfLife:'',date:'2026-06-28',feeTax:10,feeOther:4},
+    {name:'益生菌软糖',sku:'SKU006',cat:'保健食品',cost:25,price:79,actualPrice:69,weekSales:350,endInv:2000,beginInv:1800,ytdSales:11200,shelfLife:300,date:'2026-06-28',feeTax:'',feeOther:''},
+    {name:'鲜食坚果礼盒',sku:'SKU007',cat:'食品',cost:40,price:99,actualPrice:89,weekSales:105,endInv:3000,beginInv:2000,ytdSales:5200,shelfLife:90,date:'2026-06-28',feeTax:'',feeOther:''}
+  ];
+  render(); toast('已载入示例数据（含效期示例）');
+}
+
+/* ============ Tab & Toast ============ */
+function switchTab(name){
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.add('hidden'));
+  document.getElementById('tab-'+name).classList.remove('hidden');
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('tab-active',b.dataset.tab===name));
+  if(name==='dashboard') renderDashboard();
+  goTop();
+}
+document.querySelectorAll('.tab-btn').forEach(b=>b.addEventListener('click',()=>switchTab(b.dataset.tab)));
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeListModal(); });
+let toastTimer;
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.style.opacity=1;clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.style.opacity=0,2000);}
+
+/* ============ 回到顶部（函数改名 goTop，避开 DOM 原生 scrollTop 属性冲突） ============ */
+function getScrollTop(){
+  return window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
+}
+function setScrollTop(y){
+  try{ window.scrollTo(0,y); }catch(e){}
+  if(document.documentElement) document.documentElement.scrollTop = y;
+  if(document.body) document.body.scrollTop = y;
+}
+function goTop(){
+  const startY = getScrollTop();
+  if(startY <= 0){ setScrollTop(0); return; }
+  const duration = 400, start = performance.now();
+  function step(now){
+    const t = Math.min(1,(now-start)/duration);
+    const ease = 1-Math.pow(1-t,3);
+    setScrollTop(startY*(1-ease));
+    if(t<1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+(function(){
+  const btn=document.getElementById('backTop');
+  const onScroll=()=>{
+    if(getScrollTop()>300) btn.classList.remove('hidden-btn');
+    else btn.classList.add('hidden-btn');
+  };
+  window.addEventListener('scroll',onScroll,{passive:true});
+  document.addEventListener('scroll',onScroll,{passive:true,capture:true});
+  onScroll();
+})();
+
+/* ============ 初始化 ============ */
+loadSettingsForm();
+
+const DASHBOARD_PASSWORD = "2026";  // ← 部署前务必修改此密码
+function checkPwd(){
+  const input = document.getElementById('pwdInput').value.trim();
+  const err = document.getElementById('pwdError');
+  if(!input){err.textContent='请输入密码';return;}
+  if(input === DASHBOARD_PASSWORD){
+    document.getElementById('password-screen').style.display='none';
+    document.getElementById('main-content').style.display='block';
+    loadDashboardData();
+  }else{
+    err.textContent='密码错误，请重试';
+  }
+}
+function loadDashboardData(){
+  fetch('./data.json?t=' + Date.now(), {cache:'no-store'})
+    .then(r=>{ if(!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+    .then(d=>{
+      products = d.products || [];
+      if(d.settings) settings = {...settings, ...d.settings};
+      const updatedAt = d.updatedAt || '未知';
+      const el = document.getElementById('updateInfo');
+      if(el) el.textContent = '数据更新时间：' + updatedAt + ' · 本页面为只读看板，如需修改请联系管理员';
+      render();
+      switchTab('dashboard');
+    })
+    .catch(e=>{
+      const el = document.getElementById('updateInfo');
+      if(el) el.textContent = '数据加载失败：' + e.message + '（请确认 data.json 已部署且可访问）';
+    });
+}
+</script>
+</div>
+</body>
+</html>
