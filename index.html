@@ -796,6 +796,7 @@ function downloadFile(content,name){
 /* ============ GitHub 自动推送 ============ */
 const GH_REPO = 'camovibe/guanwangdongxiao';
 const GH_PATH = 'data.json';
+const GH_BRANCH = 'main';  // 数据统一写 main 分支；部署端也必须以 main 为准
 
 function saveGhToken(){
   const token = document.getElementById('gh_token').value.trim();
@@ -815,9 +816,9 @@ async function pushToGitHub(token, content){
   const apiBase = `https://api.github.com/repos/${GH_REPO}/contents/${GH_PATH}`;
   toast('正在同步到团队看板...');
   try {
-    // 1. 获取当前文件 SHA
+    // 1. 获取当前文件 SHA（显式指定分支，防止写到非部署分支）
     let sha = null;
-    const getRes = await fetch(apiBase, {
+    const getRes = await fetch(apiBase + '?ref=' + GH_BRANCH, {
       headers: {
         'Authorization': `Bearer ${token}`,
         'Accept': 'application/vnd.github+json'
@@ -826,11 +827,17 @@ async function pushToGitHub(token, content){
     if(getRes.ok){
       const info = await getRes.json();
       sha = info.sha;
+    } else if(getRes.status !== 404){
+      // 401/403 通常是 Token 无效或缺少 Contents 读写权限，直接终止避免误创建
+      const err = await getRes.json().catch(()=>null);
+      toast('❌ 读取仓库失败: ' + (err?.message || getRes.statusText) + '（检查 Token 是否有该仓库 Contents: Read and write 权限）');
+      return;
     }
-    // 2. PUT 更新
+    // 2. PUT 更新（显式指定分支）
     const body = {
       message: `Update data.json via 产品渠道动销与利润罗盘系统 — ${new Date().toLocaleString('zh-CN')}`,
-      content: btoa(unescape(encodeURIComponent(content)))
+      content: btoa(unescape(encodeURIComponent(content))),
+      branch: GH_BRANCH
     };
     if(sha) body.sha = sha;
     const putRes = await fetch(apiBase, {
@@ -843,7 +850,7 @@ async function pushToGitHub(token, content){
       body: JSON.stringify(body)
     });
     if(putRes.ok){
-      toast('✅ 已同步到团队看板！约 1–2 分钟后刷新可见');
+      toast('✅ 已写入 ' + GH_BRANCH + ' 分支！静态站点需重新部署/发布后才可见（Pages 约 1–2 分钟；Cloudflare Workers 需触发一次新部署）');
     } else {
       const err = await putRes.json().catch(()=>null);
       toast('❌ 同步失败: ' + (err?.message || putRes.statusText));
@@ -968,21 +975,31 @@ function checkPwd(){
     err.textContent='密码错误，请重试';
   }
 }
-function loadDashboardData(){
-  fetch('./data.json?t=' + Date.now(), {cache:'no-store'})
-  .then(r=>{ if(!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
-  .then(d=>{
-    products = d.products || [];
-    if(d.settings) settings = {...settings, ...d.settings};
-    const updatedAt = d.updatedAt || '未知';
-    const el = document.getElementById('updateInfo');
-    if(el) el.textContent = '数据更新时间：' + updatedAt + ' · 本页面为只读看板，如需修改请联系管理员';
-    render();
-    switchTab('dashboard');
-  })
-  .catch(e=>{
-    const el = document.getElementById('updateInfo');
-    if(el) el.textContent = '数据加载失败：' + e.message + '（请确认 data.json 已部署且可访问）';
-  });
+async function loadDashboardData(){
+  const el = document.getElementById('updateInfo');
+  const ts = 't=' + Date.now();
+  // 依次尝试：① 部署站点同源 ② 直接读 GitHub main 分支（raw 兜底）
+  const candidates = [
+    './data.json?' + ts,
+    'https://raw.githubusercontent.com/' + GH_REPO + '/main/data.json?' + ts
+  ];
+  let lastErr = '';
+  for(const url of candidates){
+    try{
+      const r = await fetch(url, {cache:'no-store'});
+      if(!r.ok){ lastErr = url.split('?')[0] + ' → HTTP ' + r.status; continue; }
+      const d = await r.json();
+      products = d.products || [];
+      if(d.settings) settings = {...settings, ...d.settings};
+      const updatedAt = d.updatedAt || '未知';
+      if(el) el.textContent = '数据更新时间：' + updatedAt + ' · 来源：' + url.split('?')[0];
+      render();
+      switchTab('dashboard');
+      return;
+    }catch(e){
+      lastErr = url.split('?')[0] + ' → ' + e.message;
+    }
+  }
+  if(el) el.textContent = '数据加载失败（最后错误：' + lastErr + '）。请新开标签页直接访问该 URL 看具体状态码排查。';
 }
 </script></div></body></html>
