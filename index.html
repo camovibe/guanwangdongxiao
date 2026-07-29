@@ -1005,3 +1005,6 @@ async function loadDashboardData(){
       lastErr = url.split('?')[0] + ' → ' + e.message;
     }
   }
+  if(el) el.textContent = '数据加载失败（最后错误：' + lastErr + '）。请新开标签页直接访问该 URL 看具体状态码排查。';
+}
+</script></div></body></html>
