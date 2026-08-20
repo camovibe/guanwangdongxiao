@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>GNC业务阶段复盘｜全渠道经营洞察</title>
+<style>
+:root{--bg:#f4f6f8;--card:#fff;--ink:#17202a;--muted:#6b7785;--line:#e7ebef;--brand:#111;--accent:#c62828;--green:#16845b;--amber:#b7791f;--blue:#2457d6}
+*{box-sizing:border-box} body{margin:0;background:var(--bg);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",Arial,sans-serif;color:var(--ink)}
+.deck{max-width:1440px;margin:auto;padding:28px} .slide{background:var(--card);min-height:780px;margin:0 0 24px;padding:52px 58px;border:1px solid var(--line);border-radius:22px;box-shadow:0 10px 30px rgba(0,0,0,.05);position:relative;overflow:hidden}
+.kicker{font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:700}
+h1{font-size:52px;line-height:1.08;margin:14px 0 18px;letter-spacing:-.04em} h2{font-size:34px;margin:0 0 28px;letter-spacing:-.025em} h3{margin:0 0 8px;font-size:18px}
+.sub{font-size:19px;color:var(--muted);line-height:1.7;max-width:850px}
+.grid{display:grid;gap:18px} .g2{grid-template-columns:1.25fr .75fr} .g3{grid-template-columns:repeat(3,1fr)} .g4{grid-template-columns:repeat(4,1fr)}
+.card{border:1px solid var(--line);border-radius:16px;padding:20px;background:#fff} .metric{font-size:34px;font-weight:800;letter-spacing:-.03em} .label{font-size:13px;color:var(--muted);margin-top:5px}
+.good{color:var(--green)} .bad{color:var(--accent)} .warn{color:var(--amber)} .blue{color:var(--blue)}
+.callout{background:#111;color:#fff;border-radius:18px;padding:24px} .callout b{font-size:24px;display:block;margin-bottom:8px}
+.chart{width:100%;height:330px;position:relative} svg{width:100%;height:100%;overflow:visible} .axis{stroke:#dfe4e9;stroke-width:1} .line{fill:none;stroke-width:3} .bar{rx:5}
+.small{font-size:12px;color:var(--muted)} table{width:100%;border-collapse:collapse;font-size:13px} th,td{padding:11px 9px;border-bottom:1px solid var(--line);text-align:left} th{color:var(--muted);font-weight:600} td.num,th.num{text-align:right}
+.pill{display:inline-block;padding:5px 9px;border-radius:999px;background:#f1f3f5;color:#56616d;font-size:11px;margin-right:5px}
+.two-col{columns:2;column-gap:35px} .bullet{padding:11px 0;border-bottom:1px dashed var(--line);line-height:1.55}
+.footer{position:absolute;bottom:18px;left:58px;right:58px;color:#9aa3ad;font-size:11px;display:flex;justify-content:space-between}
+.hero{display:flex;align-items:center;min-height:650px} .hero-right{margin-left:auto;width:42%;font-size:120px;font-weight:900;line-height:.8;text-align:right;opacity:.08}
+.note{font-size:12px;color:#7b8793;line-height:1.55}
+/* 横向柱状图：保持文字和数字使用真实 CSS 字号，不随 SVG 缩放 */
+.hbars{width:100%;padding:4px 0 2px}
+.hbar-row{display:grid;grid-template-columns:minmax(155px,220px) 1fr 72px;align-items:center;gap:12px;min-height:34px;margin:3px 0}
+.hbar-label{font-size:15px;font-weight:600;color:#3f4953;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:right}
+.hbar-track{height:22px;background:#eef1f3;border-radius:5px;overflow:hidden}
+.hbar-fill{height:100%;border-radius:5px;min-width:3px}
+.hbar-value{font-size:14px;font-weight:700;color:#56616d;white-space:nowrap;text-align:left}
+@media(max-width:900px){.slide{padding:30px;min-height:auto}h1{font-size:38px}h2{font-size:28px}.g2,.g3,.g4{grid-template-columns:1fr}.hero{display:block}.hero-right{display:none}.footer{position:static;margin-top:20px}}
+@media print{body{background:#fff}.deck{padding:0}.slide{page-break-after:always;border:0;box-shadow:none;margin:0;border-radius:0;min-height:100vh}}
+</style>
+</head>
+<body>
+<div class="deck" id="app"></div>
+<script>
+const D={"periods": ["3/24", "3/30", "4/6", "4/13", "4/20", "4/27", "5/4", "5/11", "5/18", "5/25", "6/1", "6/8", "6/15", "6/22", "6/29", "7/6", "7/13", "7/20", "7/27", "8/3"], "weekly": [{"label": "3/24", "gmv": 178073, "vol": 1079, "aov": 165.03521779425395}, {"label": "3/30", "gmv": 168026, "vol": 1060, "aov": 158.51509433962264}, {"label": "4/6", "gmv": 97697, "vol": 603, "aov": 162.01824212271973}, {"label": "4/13", "gmv": 178602, "vol": 1124, "aov": 158.89857651245552}, {"label": "4/20", "gmv": 392863, "vol": 2337, "aov": 168.10569105691056}, {"label": "4/27", "gmv": 445296, "vol": 2523, "aov": 176.49464922711059}, {"label": "5/4", "gmv": 1204588, "vol": 8929, "aov": 134.9073804457386}, {"label": "5/11", "gmv": 608584, "vol": 4747, "aov": 128.20391826416684}, {"label": "5/18", "gmv": 934401, "vol": 5893, "aov": 158.56117427456303}, {"label": "5/25", "gmv": 832115, "vol": 5536, "aov": 150.30979046242774}, {"label": "6/1", "gmv": 818895, "vol": 5385, "aov": 152.06963788300837}, {"label": "6/8", "gmv": 647998, "vol": 4680, "aov": 138.4611111111111}, {"label": "6/15", "gmv": 661935, "vol": 4877, "aov": 135.7258560590527}, {"label": "6/22", "gmv": 764974, "vol": 5629, "aov": 135.8987386747202}, {"label": "6/29", "gmv": 792460, "vol": 5779, "aov": 137.1275307146565}, {"label": "7/6", "gmv": 722148, "vol": 5294, "aov": 136.4087646392142}, {"label": "7/13", "gmv": 629654, "vol": 4504, "aov": 139.79884547069273}, {"label": "7/20", "gmv": 595393, "vol": 4399, "aov": 135.34735167083429}, {"label": "7/27", "gmv": 1204046, "vol": 11615, "aov": 103.66302195436936}, {"label": "8/3", "gmv": 660863, "vol": 4847, "aov": 136.34474932948214}], "categories": [{"cat": "营养包", "gmv": 7604440, "recent": 1748154, "prior": 1805822, "change": -3.193448745225169, "trend": [395356, 355766, 590236, 406796]}, {"cat": "心脑血管健康", "gmv": 3026975, "recent": 637527, "prior": 662435, "change": -3.7600670254440027, "trend": [138558, 124848, 246935, 127186]}, {"cat": "基础维矿", "gmv": 977370, "recent": 145715, "prior": 179546, "change": -18.842525035366986, "trend": [13933, 18384, 82953, 30445]}, {"cat": "植提", "gmv": 921184, "recent": 247046, "prior": 219231, "change": 12.68753050435385, "trend": [35216, 53210, 94679, 63941]}, {"cat": "孕婴童营养", "gmv": 770474, "recent": 155934, "prior": 182211, "change": -14.421193012496502, "trend": [29990, 27738, 96440, 1766]}, {"cat": "骨骼健康", "gmv": 443773, "recent": 155541, "prior": 83720, "change": 85.78714763497372, "trend": [16595, 15434, 92792, 30720]}], "channels4w": [{"channel": "鲸灵", "gmv": 734955, "prior": 148419, "change": 395.1892951711034, "latest": 70382, "series": [0, 0, 0, 0, 53214, 11423, 34113, 26466, 39376, 46580, 49127, 48073, 32562, 38337, 39801, 37719, 30309, 23717, 610547, 70382]}, {"channel": "共享菜园", "gmv": 384651, "prior": 402021, "change": -4.320669815755895, "latest": 104805, "series": [0, 0, 0, 27859, 41618, 75093, 185369, 111235, 104753, 141953, 109241, 90910, 90814, 104369, 104014, 102824, 84508, 90636, 104702, 104805]}, {"channel": "洋葱omall", "gmv": 224098, "prior": 236877, "change": -5.394782946423671, "latest": 62494, "series": [46732, 34771, 38820, 34464, 45429, 56416, 64570, 58250, 54488, 76802, 70666, 51029, 61091, 65137, 68710, 41939, 54712, 52605, 54287, 62494]}, {"channel": "美团医药", "gmv": 203644, "prior": 214724, "change": -5.160112516532855, "latest": 58572, "series": [16565, 23147, 8720, 24174, 44146, 41726, 92474, 49106, 60370, 64566, 69253, 56335, 47363, 51797, 62751, 52813, 42924, 45621, 56527, 58572]}, {"channel": "爱库存", "gmv": 182402, "prior": 384332, "change": -52.540511849130446, "latest": 28549, "series": [21151, 24284, 16684, 29556, 36258, 47554, 577856, 149595, 418967, 140496, 71583, 31186, 105530, 122775, 78786, 77241, 50799, 61922, 41132, 28549]}, {"channel": "拼多多", "gmv": 100540, "prior": 150043, "change": -32.992542137920466, "latest": 14879, "series": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 14706, 26019, 27524, 35216, 40818, 46485, 33854, 31608, 20199, 14879]}, {"channel": "海拍客", "gmv": 84921, "prior": 114710, "change": -25.968965216633244, "latest": 21841, "series": [0, 0, 0, 10862, 24097, 26802, 42425, 18229, 27460, 39275, 40172, 25035, 24217, 29238, 33205, 28050, 22887, 19517, 20676, 21841]}, {"channel": "中石化-易捷国际", "gmv": 79399, "prior": 109761, "change": -27.66191998979601, "latest": 22719, "series": [41677, 32383, 19615, 11002, 31368, 25194, 40263, 27997, 36395, 44733, 47276, 34001, 28863, 30988, 27147, 22763, 18772, 18436, 19472, 22719]}, {"channel": "宝妈时光", "gmv": 77446, "prior": 74780, "change": 3.565124364803429, "latest": 19688, "series": [0, 0, 0, 6947, 20709, 17367, 4704, 11835, 11496, 17620, 25217, 23595, 17900, 15172, 22342, 19366, 24051, 14023, 19684, 19688]}, {"channel": "双击", "gmv": 70161, "prior": 86975, "change": -19.331991951710258, "latest": 21421, "series": [0, 0, 0, 0, 0, 0, 0, 7653, 14573, 14155, 20550, 18926, 16830, 24835, 26405, 18905, 15297, 15476, 17967, 21421]}, {"channel": "优时通", "gmv": 69468, "prior": 78227, "change": -11.19690132562926, "latest": 15911, "series": [0, 0, 0, 4022, 21007, 15977, 25747, 12619, 15388, 21804, 28589, 20992, 15736, 18588, 24467, 19436, 16174, 16136, 21247, 15911]}, {"channel": "扬帆海外购", "gmv": 58174, "prior": 78463, "change": -25.858047742247937, "latest": 13402, "series": [5283, 12967, 1019, 2490, 19300, 22912, 10433, 17788, 14639, 19772, 20943, 15328, 18376, 18027, 21931, 20129, 14354, 15621, 14797, 13402]}, {"channel": "大小宝贝", "gmv": 54950, "prior": 40707, "change": 34.9890682192252, "latest": 12176, "series": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6403, 7445, 8500, 11814, 12948, 16049, 13675, 13050, 12176]}, {"channel": "锦上江汇", "gmv": 54199, "prior": 54276, "change": -0.1418674920775298, "latest": 12976, "series": [0, 0, 0, 0, 0, 18260, 28855, 15155, 13575, 16578, 15839, 14727, 11932, 12562, 14968, 14814, 13679, 13233, 14311, 12976]}, {"channel": "万国优品", "gmv": 49595, "prior": 64437, "change": -23.033350404270834, "latest": 12517, "series": [0, 0, 0, 0, 0, 0, 0, 0, 0, 16045, 22197, 9959, 9694, 15922, 19626, 19195, 14084, 10378, 12616, 12517]}], "channelsLatest": [{"channel": "共享菜园", "gmv": 104805, "vol": 866}, {"channel": "鲸灵", "gmv": 70382, "vol": 835}, {"channel": "洋葱omall", "gmv": 62494, "vol": 363}, {"channel": "美团医药", "gmv": 58572, "vol": 445}, {"channel": "爱库存", "gmv": 28549, "vol": 201}, {"channel": "中石化-易捷国际", "gmv": 22719, "vol": 137}, {"channel": "海拍客", "gmv": 21841, "vol": 136}, {"channel": "双击", "gmv": 21421, "vol": 157}, {"channel": "宝妈时光", "gmv": 19688, "vol": 73}, {"channel": "优时通", "gmv": 15911, "vol": 100}, {"channel": "唐货街", "gmv": 15490, "vol": 78}, {"channel": "拼多多", "gmv": 14879, "vol": 169}, {"channel": "扬帆海外购", "gmv": 13402, "vol": 51}, {"channel": "锦上江汇", "gmv": 12976, "vol": 67}, {"channel": "万国优品", "gmv": 12517, "vol": 45}], "topSkus": [{"code": "493945", "name": "健安喜Vitapak男性40+每日营养包", "cat": "营养包", "sales": 10378, "gmv": 1854492, "lastSales": 654, "lastGmv": 116074, "lastStock": 1918, "lastPrice": 177.48, "prevGmv": 134391, "stockDays": 20.528738092689714}, {"code": "493948", "name": "健安喜Vitapak女性40+每日营养包", "cat": "营养包", "sales": 8798, "gmv": 1601284, "lastSales": 562, "lastGmv": 104770, "lastStock": 2933, "lastPrice": 186.42, "prevGmv": 148996, "stockDays": 36.53007846556233}, {"code": "493949", "name": "健安喜Vitapak女性50+每日营养包", "cat": "营养包", "sales": 6573, "gmv": 1306961, "lastSales": 208, "lastGmv": 41589, "lastStock": 2760, "lastPrice": 199.95, "prevGmv": 67003, "stockDays": 92.89801413665433}, {"code": "493946", "name": "健安喜Vitapak男性50+每日营养包", "cat": "营养包", "sales": 5616, "gmv": 1144621, "lastSales": 349, "lastGmv": 69788, "lastStock": 2385, "lastPrice": 199.97, "prevGmv": 86422, "stockDays": 47.83393501805054}, {"code": "490006", "name": "健安喜97%高纯度鱼油软胶囊 60粒", "cat": "心脑血管健康", "sales": 8810, "gmv": 1109354, "lastSales": 555, "lastGmv": 65429, "lastStock": 2086, "lastPrice": 117.89, "prevGmv": 108370, "stockDays": 26.308487829486694}, {"code": "493944", "name": "健安喜Vitapak男性30+每日营养包", "cat": "营养包", "sales": 5925, "gmv": 824374, "lastSales": 224, "lastGmv": 29892, "lastStock": 1830, "lastPrice": 133.45, "prevGmv": 39220, "stockDays": 57.1875}, {"code": "493939", "name": "健安喜四倍鱼油迷你软胶囊（800mg）", "cat": "心脑血管健康", "sales": 1939, "gmv": 552425, "lastSales": 68, "lastGmv": 18082, "lastStock": 345, "lastPrice": 265.91, "prevGmv": 32802, "stockDays": 35.53038105046344}, {"code": "490009", "name": "健安喜姜黄奶蓟精华", "cat": "植提", "sales": 3644, "gmv": 491569, "lastSales": 355, "lastGmv": 46786, "lastStock": 2444, "lastPrice": 131.79, "prevGmv": 57818, "stockDays": 48.195622165253404}, {"code": "493947", "name": "健安喜Vitapak女性30+每日营养包", "cat": "营养包", "sales": 3198, "gmv": 395436, "lastSales": 112, "lastGmv": 12507, "lastStock": 2724, "lastPrice": 111.67, "prevGmv": 75755, "stockDays": 170.25}, {"code": "490048", "name": "健安喜Vitapak®儿童每日营养包升级款", "cat": "孕婴童营养", "sales": 4208, "gmv": 389138, "lastSales": 5, "lastGmv": 817, "lastStock": 52, "lastPrice": 163.4, "prevGmv": 15267, "stockDays": 73.23943661971832}, {"code": "604204", "name": "健安喜维生素C缓释片1000毫克", "cat": "基础维矿", "sales": 3444, "gmv": 322737, "lastSales": 54, "lastGmv": 4285, "lastStock": 217, "lastPrice": 79.35, "prevGmv": 5147, "stockDays": 28.14526588845655}, {"code": "490060", "name": "健安喜高钙液体钙镁锌", "cat": "孕婴童营养", "sales": 4778, "gmv": 311459, "lastSales": 0, "lastGmv": 0, "lastStock": 0, "lastPrice": 0, "prevGmv": 72972, "stockDays": 0}], "growthSkus": [{"code": "493923", "name": "健安喜叶黄素20mg60粒*1盒", "cat": "植提", "sales": 3194, "gmv": 167542, "lastSales": 11, "lastGmv": 330, "lastStock": 0, "lastPrice": 30, "prevGmv": 60, "stockDays": 0.0, "weekGrowth": 450.0}, {"code": "490026", "name": "健安喜柠檬酸钙维生素D维生素K复合迷你钙", "cat": "骨骼健康", "sales": 1191, "gmv": 119488, "lastSales": 97, "lastGmv": 9495, "lastStock": 381, "lastPrice": 97.89, "prevGmv": 6356, "stockDays": 27.48917748917749, "weekGrowth": 49.386406544996866}, {"code": "490027", "name": "健安喜Vitapak男性20+每日营养包", "cat": "营养包", "sales": 2754, "gmv": 267955, "lastSales": 112, "lastGmv": 10231, "lastStock": 191, "lastPrice": 91.35, "prevGmv": 7644, "stockDays": 11.9375, "weekGrowth": 33.84353741496599}, {"code": "493960", "name": "健安喜硒元素（200微克）", "cat": "基础维矿", "sales": 2040, "gmv": 93167, "lastSales": 144, "lastGmv": 6919, "lastStock": 590, "lastPrice": 48.05, "prevGmv": 5946, "stockDays": 28.68254739912494, "weekGrowth": 16.36394214598049}, {"code": "785377", "name": "健安喜辅酶Q10软胶囊100MG", "cat": "心脑血管健康", "sales": 981, "gmv": 83548, "lastSales": 6, "lastGmv": 459, "lastStock": 19, "lastPrice": 76.5, "prevGmv": 461, "stockDays": 22.093023255813954, "weekGrowth": -0.4338394793926281}, {"code": "493945", "name": "健安喜Vitapak男性40+每日营养包", "cat": "营养包", "sales": 10378, "gmv": 1854492, "lastSales": 654, "lastGmv": 116074, "lastStock": 1918, "lastPrice": 177.48, "prevGmv": 134391, "stockDays": 20.528738092689714, "weekGrowth": -13.629632936729397}, {"code": "604204", "name": "健安喜维生素C缓释片1000毫克", "cat": "基础维矿", "sales": 3444, "gmv": 322737, "lastSales": 54, "lastGmv": 4285, "lastStock": 217, "lastPrice": 79.35, "prevGmv": 5147, "stockDays": 28.14526588845655, "weekGrowth": -16.747619972799686}, {"code": "493938", "name": "健安喜四倍鱼油迷你软胶囊（800mg）", "cat": "心脑血管健康", "sales": 1232, "gmv": 208960, "lastSales": 2, "lastGmv": 355, "lastStock": 0, "lastPrice": 177.5, "prevGmv": 429, "stockDays": 0.0, "weekGrowth": -17.249417249417252}, {"code": "490009", "name": "健安喜姜黄奶蓟精华", "cat": "植提", "sales": 3644, "gmv": 491569, "lastSales": 355, "lastGmv": 46786, "lastStock": 2444, "lastPrice": 131.79, "prevGmv": 57818, "stockDays": 48.195622165253404, "weekGrowth": -19.08056314642499}, {"code": "493946", "name": "健安喜Vitapak男性50+每日营养包", "cat": "营养包", "sales": 5616, "gmv": 1144621, "lastSales": 349, "lastGmv": 69788, "lastStock": 2385, "lastPrice": 199.97, "prevGmv": 86422, "stockDays": 47.83393501805054, "weekGrowth": -19.24741385295411}], "stockRisk": [{"code": "490061", "name": "健安喜七合一加钙优骨力氨糖软骨素运动关节片", "cat": "骨骼健康", "sales": 629, "gmv": 68939, "lastSales": 5, "lastGmv": 419, "lastStock": 3050, "lastPrice": 83.8, "prevGmv": 9701, "stockDays": 4295.774647887324}, {"code": "490044", "name": "健安喜VC30粒*1盒", "cat": "基础维矿", "sales": 448, "gmv": 16410, "lastSales": 14, "lastGmv": 377, "lastStock": 694, "lastPrice": 26.93, "prevGmv": 4088, "stockDays": 347.0}, {"code": "490038", "name": "健安喜深海鱼油胶囊", "cat": "心脑血管健康", "sales": 471, "gmv": 42139, "lastSales": 12, "lastGmv": 1115, "lastStock": 549, "lastPrice": 92.92, "prevGmv": 3733, "stockDays": 321.0526315789474}, {"code": "490052", "name": "健安喜儿童液体钙镁锌（包装升级款） 30袋", "cat": "孕婴童营养", "sales": 633, "gmv": 69877, "lastSales": 9, "lastGmv": 949, "lastStock": 367, "lastPrice": 105.44, "prevGmv": 8201, "stockDays": 284.49612403100775}, {"code": "490046", "name": "健安喜EPA1200 高纯度鱼油", "cat": "心脑血管健康", "sales": 107, "gmv": 23384, "lastSales": 6, "lastGmv": 1184, "lastStock": 193, "lastPrice": 197.33, "prevGmv": 5857, "stockDays": 224.41860465116278}, {"code": "493926", "name": "健安喜三倍鱼油迷你软胶囊", "cat": "心脑血管健康", "sales": 616, "gmv": 59842, "lastSales": 14, "lastGmv": 1321, "lastStock": 364, "lastPrice": 94.36, "prevGmv": 6397, "stockDays": 182.0}, {"code": "490003", "name": "健安喜七合一加钙优骨力氨糖软骨素运动关节片", "cat": "骨骼健康", "sales": 594, "gmv": 71915, "lastSales": 17, "lastGmv": 1917, "lastStock": 434, "lastPrice": 112.76, "prevGmv": 13922, "stockDays": 178.60082304526748}, {"code": "601400", "name": "健安喜浓缩大豆异黄酮胶囊90粒", "cat": "植提", "sales": 494, "gmv": 41106, "lastSales": 24, "lastGmv": 2064, "lastStock": 586, "lastPrice": 86, "prevGmv": 7270, "stockDays": 170.84548104956266}, {"code": "493947", "name": "健安喜Vitapak女性30+每日营养包", "cat": "营养包", "sales": 3198, "gmv": 395436, "lastSales": 112, "lastGmv": 12507, "lastStock": 2724, "lastPrice": 111.67, "prevGmv": 75755, "stockDays": 170.25}, {"code": "604205", "name": "健安喜褪黑素片3毫克", "cat": "基础维矿", "sales": 170, "gmv": 7297, "lastSales": 13, "lastGmv": 570, "lastStock": 310, "lastPrice": 43.85, "prevGmv": 1587, "stockDays": 166.66666666666666}], "audience": [{"name": "40+/50+核心人群", "basis": "Vitapak 男/女40+、50+", "direction": "核心", "note": "营养包贡献最大，且高龄段SKU位于GMV头部"}, {"name": "30+人群", "basis": "Vitapak 男/女30+", "direction": "培育", "note": "有稳定需求，但与40+/50+相比规模仍有明显差距"}, {"name": "心脑健康成熟人群", "basis": "97%高纯鱼油、四倍鱼油、EPA1200、Q10", "direction": "核心", "note": "鱼油/Q10形成第二增长支柱"}, {"name": "骨骼/关节关注人群", "basis": "钙、CaDK、氨糖软骨素", "direction": "增长", "note": "近4周骨骼健康GMV较前4周显著上升"}, {"name": "母婴家庭人群", "basis": "儿童营养包、儿童液体钙镁锌", "direction": "观察", "note": "数据存在明显节点波动，不宜仅凭单周放量判断长期趋势"}], "meta": {"version": "v3", "exportedAt": 1786617624645, "skuCount": 45, "weeks": 20}};
+const fmt=n=>n>=1e6?(n/1e6).toFixed(2)+'M':n>=1e4?(n/1e4).toFixed(1)+'万':Math.round(n).toLocaleString();
+const pct=n=>(n>=0?'+':'')+n.toFixed(1)+'%';
+const esc=s=>String(s).replace(/[&<>"]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[m]));
+function lineChart(series, labels, color="#111") {
+  const W=900,H=300,p={l:48,r:20,t:20,b:38}, max=Math.max(...series)*1.12,min=Math.min(...series)*.92;
+  const x=i=>p.l+i*(W-p.l-p.r)/(series.length-1), y=v=>p.t+(max-v)*(H-p.t-p.b)/(max-min||1);
+  const pts=series.map((v,i)=>`${x(i)},${y(v)}`).join(" ");
+  return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">
+    <line class="axis" x1="${p.l}" y1="${H-p.b}" x2="${W-p.r}" y2="${H-p.b}"/>
+    <polyline class="line" points="${pts}" stroke="${color}"/>
+    ${series.map((v,i)=>`<circle cx="${x(i)}" cy="${y(v)}" r="3.5" fill="${color}"/><text x="${x(i)}" y="${H-10}" text-anchor="middle" font-size="10" fill="#8a949f">${labels[i]}</text>`).join("")}
+  </svg>`;
+}
+function bars(rows, key, labelKey, color="#111"){
+  // 使用 HTML/CSS 柱状图而非 SVG：避免浏览器缩放 viewBox 后中文和数字变小。
+  const max=Math.max(...rows.map(x=>x[key]),1);
+  return `<div class="hbars">
+    ${rows.map((r,i)=>{
+      const w=Math.max(1,(r[key]/max)*100);
+      const label=String(r[labelKey]);
+      return `<div class="hbar-row">
+        <div class="hbar-label" title="${esc(label)}">${esc(label)}</div>
+        <div class="hbar-track"><div class="hbar-fill" style="width:${w}%;background:${color};opacity:${.92-i*.025}"></div></div>
+        <div class="hbar-value">${fmt(r[key])}</div>
+      </div>`;
+    }).join("")}
+  </div>`;
+}
+
+const first4=D.weekly.slice(0,4).reduce((a,x)=>a+x.gmv,0)/4;
+const last4=D.weekly.slice(-4).reduce((a,x)=>a+x.gmv,0)/4;
+const total=D.weekly.reduce((a,x)=>a+x.gmv,0);
+const latest=D.weekly[D.weekly.length-1], prev=D.weekly[D.weekly.length-2];
+const latestChange=(latest.gmv/prev.gmv-1)*100;
+
+const slides=[
+`<section class="slide hero">
+  <div><div class="kicker">GNC · 全渠道经营复盘</div>
+  <h1>从“卖货”到<br><span style="color:var(--accent)">经营结构</span></h1>
+  <p class="sub">基于 20 周全渠道 GMV、销量、SKU、平台与库存数据，对业务阶段性表现进行复盘，并进一步拆解平台、人群、品类、产品的下一阶段方向。</p>
+  <div style="margin-top:36px"><span class="pill">数据周期：${D.periods[0]} → ${D.periods.at(-1)}</span><span class="pill">45 SKU</span><span class="pill">20 周</span><span class="pill">全渠道</span></div></div>
+  <div class="hero-right">GNC</div>
+  <div class="footer"><span>经营复盘 · 截止当前数据周期</span><span>01</span></div>
+</section>`,
+
+`<section class="slide">
+  <div class="kicker">01 / Executive Summary</div><h2>先说结论：业务已经进入“规模化，但结构仍不稳定”的阶段</h2>
+  <div class="grid g4">
+    <div class="card"><div class="metric">${fmt(total)}</div><div class="label">20周累计 GMV</div></div>
+    <div class="card"><div class="metric">${fmt(last4)}</div><div class="label">近4周周均 GMV</div><div class="small good">较前4周 +${((last4/first4-1)*100).toFixed(1)}%</div></div>
+    <div class="card"><div class="metric">${fmt(latest.gmv)}</div><div class="label">最新周 GMV</div><div class="small ${latestChange<0?'bad':'good'}">${pct(latestChange)} vs 上周</div></div>
+    <div class="card"><div class="metric">${fmt(latest.vol)}</div><div class="label">最新周销量</div></div>
+  </div>
+  <div class="grid g2" style="margin-top:22px">
+    <div class="callout"><b>最重要的变化</b>业务规模相较周期初已经明显放大，但增长并不是线性的：平台端出现强烈的节点型波动，尤其是“鲸灵”在 7/27 的异常放量，使最新阶段的增长质量需要单独审视。</div>
+    <div class="card"><h3>经营判断</h3>
+      <div class="bullet">① <b>营养包</b>仍是第一主轴，40+/50+是最值得守住的核心结构。</div>
+      <div class="bullet">② <b>心脑血管健康</b>是第二支柱，鱼油仍承担较强的规模能力。</div>
+      <div class="bullet">③ <b>骨骼健康</b>近期明显抬头，值得从“单品销售”升级为品类经营。</div>
+      <div class="bullet">④ 平台不能只看 GMV，要开始看<strong>稳定性、复购潜力、价格与库存质量</strong>。</div>
+    </div>
+  </div>
+  <div class="footer"><span>核心判断均基于源数据；趋势解释中标注“推断”的部分不等同于原始用户画像</span><span>02</span></div>
+</section>`,
+
+`<section class="slide">
+  <div class="kicker">02 / Business Trend</div><h2>20周走势：增长是真的，但波动也是真的</h2>
+  <div class="card"><div class="chart">${lineChart(D.weekly.map(x=>x.gmv),D.periods,"#111")}</div></div>
+  <div class="grid g3" style="margin-top:18px">
+    <div class="card"><h3>周期初周均</h3><div class="metric">${fmt(first4)}</div><div class="label">前4周平均 GMV</div></div>
+    <div class="card"><h3>当前周均</h3><div class="metric good">${fmt(last4)}</div><div class="label">后4周平均 GMV</div></div>
+    <div class="card"><h3>规模提升</h3><div class="metric good">+${((last4/first4-1)*100).toFixed(1)}%</div><div class="label">后4周 vs 前4周</div></div>
+  </div>
+  <p class="note" style="margin-top:18px">解读：7/27 出现明显平台放量峰值，8/3 快速回落。因此“业务规模上去了”成立，但“增长已稳定”目前不能直接下结论。</p>
+  <div class="footer"><span>GMV趋势 · 周粒度</span><span>03</span></div>
+</section>`,
+
+`<section class="slide">
+  <div class="kicker">03 / Platform</div><h2>平台结构：头部平台正在形成，但平台质量分化明显</h2>
+  <div class="grid g2">
+    <div class="card"><h3>近4周平台 GMV TOP</h3><div class="chart" style="height:auto;min-height:420px;overflow:visible">${bars(D.channels4w.slice(0,10),"gmv","channel","#111")}</div></div>
+    <div>
+      <div class="card"><h3>最新周平台 TOP</h3><table><thead><tr><th>平台</th><th class="num">GMV</th><th class="num">占比</th></tr></thead><tbody>
+      ${D.channelsLatest.slice(0,10).map((r,i)=>`<tr><td>${esc(r.channel)}</td><td class="num">${fmt(r.gmv)}</td><td class="num">${(r.gmv/latest.gmv*100).toFixed(1)}%</td></tr>`).join("")}
+      </tbody></table></div>
+      <div class="callout" style="margin-top:18px"><b>关键风险：鲸灵的波动不能被当成常态增长</b>近4周“鲸灵”GMV显著高于其此前阶段，但主要由 7/27 的单周大额放量驱动。建议拆分“常规盘”和“节点盘”管理。</div>
+    </div>
+  </div>
+  <div class="footer"><span>平台趋势 · GMV / 订单量</span><span>04</span></div>
+</section>`,
+
+`<section class="slide">
+  <div class="kicker">04 / Platform Direction</div><h2>平台下一阶段：从“铺渠道”转向“分层经营渠道”</h2>
+  <div class="grid g3">
+    <div class="card"><h3 class="good">A类：稳定规模平台</h3><p>共享菜园、洋葱omall、美团医药等持续贡献规模。</p><p class="note">策略：稳定供货、固定节奏、建立月度经营目标。</p></div>
+    <div class="card"><h3 class="warn">B类：波动型放量平台</h3><p>鲸灵等存在明显节点型放量。</p><p class="note">策略：把活动、库存、价格单独建档，避免把一次性爆发当作长期预测。</p></div>
+    <div class="card"><h3 class="blue">C类：长尾试验平台</h3><p>大量平台贡献有限，但可承担新品测试、特定人群触达。</p><p class="note">策略：设最低经营门槛，低于门槛的平台不无限投入运营资源。</p></div>
+  </div>
+  <div class="card" style="margin-top:22px"><h3>平台管理指标建议</h3>
+  <div class="grid g4">
+    <div><b>规模</b><div class="label">GMV / 订单</div></div>
+    <div><b>稳定</b><div class="label">4周波动率 / 节点依赖</div></div>
+    <div><b>效率</b><div class="label">AOV / SKU产出</div></div>
+    <div><b>健康</b><div class="label">库存周转 / 价格带</div></div>
+  </div></div>
+  <div class="footer"><span>平台经营建议 · 基于现有数据推导</span><span>05</span></div>
+</section>`,
+
+`<section class="slide">
+  <div class="kicker">05 / Category</div><h2>品类结构：营养包是“底盘”，骨骼健康是“近期信号”</h2>
+  <div class="grid g2">
+    <div class="card"><h3>20周累计 GMV</h3><div class="chart" style="height:auto;min-height:420px;overflow:visible">${bars(D.categories,"gmv","cat","#111")}</div></div>
+    <div>
+      <table><thead><tr><th>品类</th><th class="num">累计GMV</th><th class="num">近4周变化</th><th>方向</th></tr></thead><tbody>
+      ${D.categories.map(r=>`<tr><td><b>${esc(r.cat)}</b></td><td class="num">${fmt(r.gmv)}</td><td class="num ${r.change>=0?'good':'bad'}">${pct(r.change)}</td><td>${r.change>=20?'加码':r.change>=0?'培育':r.change<=-15?'收缩/优化':'稳定'}</td></tr>`).join("")}
+      </tbody></table>
+      <div class="callout" style="margin-top:20px"><b>经营含义</b>不要只按“累计规模”排资源。下一阶段应同时看“规模 × 增长 × 库存 × 价格敏感度”，骨骼健康近期增长值得进一步验证是否形成持续性。</div>
+    </div>
+  </div>
+  <div class="footer"><span>品类趋势 · 20周累计 + 近4周对比</span><span>06</span></div>
+</section>`,
+
+`<section class="slide">
+  <div class="kicker">06 / Audience</div><h2>人群方向：数据没有直接给出用户画像，但产品结构已经透露出清晰的经营人群</h2>
+  <div class="grid g2">
+    <div>${D.audience.map((a,i)=>`<div class="card" style="margin-bottom:12px"><div style="display:flex;justify-content:space-between"><h3>${a.name}</h3><span class="pill">${a.direction}</span></div><div class="small">依据：${a.basis}</div><p style="margin-bottom:0">${a.note}</p></div>`).join("")}</div>
+    <div class="callout"><b>注意：不要把“商品人群”直接当成“真实用户画像”</b>当前文件提供的是 SKU、平台、销量、GMV、库存等经营数据，没有直接提供年龄、性别、会员生命周期、复购率等用户级字段。因此这里的人群方向属于“商品结构推断”，下一阶段应补齐真实用户数据进行验证。
+    <hr style="border:0;border-top:1px solid #444;margin:22px 0">
+    <b>建议建立“人群 × 品类 × 平台”三维矩阵</b>例如：40+/50+营养包 × 稳定型平台；心脑健康 × 成熟用户；骨骼健康 × 中老年/关节关注人群。</div>
+  </div>
+  <div class="footer"><span>人群方向 · 明确区分源数据与推断</span><span>07</span></div>
+</section>`,
+
+`<section class="slide">
+  <div class="kicker">07 / Product</div><h2>产品层面：头部 SKU 已经非常明确，下一步不是“再铺更多”，而是做深头部</h2>
+  <div class="grid g2">
+    <div class="card"><h3>20周累计 GMV TOP 12</h3><table><thead><tr><th>产品</th><th>品类</th><th class="num">GMV</th><th class="num">最新周</th></tr></thead><tbody>
+    ${D.topSkus.map(r=>`<tr><td>${esc(r.name)}</td><td>${esc(r.cat)}</td><td class="num">${fmt(r.gmv)}</td><td class="num">${fmt(r.lastGmv)}</td></tr>`).join("")}
+    </tbody></table></div>
+    <div>
+      <div class="card"><h3>产品结构判断</h3>
+      <div class="bullet"><b>第一层：营养包核心盘</b><br>男性40+、女性40+、女性50+、男性50+形成明显头部。</div>
+      <div class="bullet"><b>第二层：鱼油/心脑健康</b><br>97%高纯鱼油是强单品，四倍鱼油等承担品类宽度。</div>
+      <div class="bullet"><b>第三层：植提与基础维矿</b><br>具备稳定需求，但更适合作为连带购/补充型产品经营。</div>
+      <div class="bullet"><b>第四层：长尾 SKU</b><br>应以明确的“引流 / 补充 / 人群覆盖 / 清库存”角色管理，而不是平均分配资源。</div>
+      </div>
+    </div>
+  </div>
+  <div class="footer"><span>产品趋势 · 头部集中度与角色分层</span><span>08</span></div>
+</section>`,
+
+`<section class="slide">
+  <div class="kicker">08 / Inventory & Price</div><h2>真正影响下一阶段利润的，不只是销量，而是“销量 × 价格 × 库存”</h2>
+  <div class="grid g2">
+    <div class="card"><h3>当前库存覆盖较高的代表 SKU</h3><table><thead><tr><th>产品</th><th class="num">库存</th><th class="num">周销量</th><th class="num">约覆盖天数</th></tr></thead><tbody>
+    ${D.stockRisk.slice(0,8).map(r=>`<tr><td>${esc(r.name)}</td><td class="num">${r.lastStock.toLocaleString()}</td><td class="num">${r.lastSales.toLocaleString()}</td><td class="num ${r.stockDays>60?'bad':r.stockDays>30?'warn':'good'}">${Math.round(r.stockDays)}天</td></tr>`).join("")}
+    </tbody></table></div>
+    <div>
+      <div class="callout"><b>建议把库存经营改成“SKU级动作”</b>
+      <p>① 高销量 + 低库存：优先保障供应，避免爆款断货。</p>
+      <p>② 高销量 + 高库存：守价为主，通过平台扩量消化。</p>
+      <p>③ 低销量 + 高库存：阶段性价格策略 / 组合销售 / 渠道清理。</p>
+      <p>④ 低销量 + 低库存：不再主动补货，观察自然需求。</p></div>
+      <p class="note" style="margin-top:16px">源数据包含每周 begin / inbound / end / sales / GMV / unitPrice 等字段，因此可以继续向下做 SKU 级库存预警与价格弹性模型。</p>
+    </div>
+  </div>
+  <div class="footer"><span>库存与价格 · 源数据支持的经营框架</span><span>09</span></div>
+</section>`,
+
+`<section class="slide">
+  <div class="kicker">09 / Next Stage</div><h2>下一阶段，不建议继续“平均用力”，而应该建立四个经营抓手</h2>
+  <div class="grid g2">
+    <div class="card"><h3>① 守住核心盘</h3><p><b>40+/50+营养包 + 97%高纯鱼油</b>作为核心货盘，优先保障库存、价格与核心平台曝光。</p></div>
+    <div class="card"><h3>② 做大增长盘</h3><p><b>骨骼健康</b>近期增速明显，应继续验证持续性，并围绕钙 / 关节 / 复合营养做品类组合。</p></div>
+    <div class="card"><h3>③ 重构平台盘</h3><p>把平台分成稳定规模、节点放量、长尾试验三层；核心不是增加平台数量，而是提高有效平台产出。</p></div>
+    <div class="card"><h3>④ 建立经营算法</h3><p>每周固定输出 <b>SKU × 平台 × 品类 × 库存 × 价格</b> 的机会清单，让补货、促销、守价、清库存从经验决策变成数据决策。</p></div>
+  </div>
+  <div class="callout" style="margin-top:24px"><b>最终目标</b>不是把 GMV 做得更大，而是把“可持续 GMV”做得更大——降低节点依赖，提高核心 SKU 的稳定贡献，同时让库存和价格策略跟着需求变化。</div>
+  <div class="footer"><span>下一阶段经营方向</span><span>10</span></div>
+</section>`,
+
+`<section class="slide">
+  <div class="kicker">10 / Management Summary</div><h2>一句话复盘</h2>
+  <div style="font-size:38px;line-height:1.35;font-weight:800;max-width:1100px;margin-top:80px">
+  “这项业务已经证明了<span style="color:var(--accent)">增长能力</span>，现在真正要证明的是<span style="text-decoration:underline">增长质量</span>。”
+  </div>
+  <div class="grid g3" style="margin-top:80px">
+    <div><div class="metric">营养包</div><div class="label">当前底盘</div></div>
+    <div><div class="metric">骨骼健康</div><div class="label">重点验证的增长信号</div></div>
+    <div><div class="metric">平台分层</div><div class="label">下一阶段经营能力</div></div>
+  </div>
+  <p class="note" style="margin-top:70px">数据源：用户提供的全渠道经营数据文件；本演示稿为基于该文件自动生成的阶段性经营复盘。对真实用户画像、长期趋势等超出原始字段的信息，已明确标注为推断。</p>
+  <div class="footer"><span>GNC 全渠道业务阶段复盘</span><span>11</span></div>
+</section>`
+];
+
+document.getElementById('app').innerHTML=slides.join('');
+</script>
+</body></html>\n<style>@media(max-width:900px){
+.hbar-row{grid-template-columns:minmax(105px,150px) 1fr 62px;gap:8px}
+.hbar-label{font-size:12px}
+.hbar-value{font-size:12px}
+.hbar-track{height:18px}
+}</style>\n
