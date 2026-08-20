@@ -23,43 +23,31 @@
   #backTop.hidden-btn{opacity:0;visibility:hidden;transform:translateY(12px);pointer-events:none;}
 </style>
 <style>
-  #password-screen{position:fixed;inset:0;z-index:9999;background:linear-gradient(135deg,#1e1b4b,#312e81);display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;}
-  #password-screen .card{background:rgba(255,255,255,0.05);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:40px;max-width:380px;width:90%;text-align:center;box-shadow:0 25px 50px -12px rgba(0,0,0,0.25);}
-  #password-screen h2{font-size:20px;font-weight:700;margin-bottom:8px;}
-  #password-screen p{font-size:13px;color:#a5b4fc;margin-bottom:24px;line-height:1.6;}
-  #password-screen input{width:100%;padding:12px 16px;border-radius:10px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.08);color:#fff;font-size:15px;outline:none;margin-bottom:16px;transition:border-color .2s;}
-  #password-screen input:focus{border-color:#818cf8;}
-  #password-screen input::placeholder{color:#818cf8;}
-  #password-screen button{width:100%;padding:12px;border-radius:10px;border:none;background:#4f46e5;color:#fff;font-size:15px;font-weight:600;cursor:pointer;transition:background .2s;}
-  #password-screen button:hover{background:#4338ca;}
-  #password-screen .error{color:#f87171;font-size:13px;margin-top:12px;min-height:20px;}
-  #password-screen .hint{color:#818cf8;font-size:11px;margin-top:16px;}
-  #main-content{display:none;}
+#password-screen{position:fixed;inset:0;z-index:9999;background:linear-gradient(135deg,#1e1b4b,#312e81);display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;}
+#password-screen .card{background:rgba(255,255,255,0.05);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:40px;max-width:380px;width:90%;text-align:center;box-shadow:0 25px 50px -12px rgba(0,0,0,0.25);}
+#password-screen h2{font-size:20px;font-weight:700;margin-bottom:8px;}
+#password-screen p{font-size:13px;color:#a5b4fc;margin-bottom:24px;line-height:1.6;}
+#password-screen input{width:100%;padding:12px 16px;border-radius:10px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.08);color:#fff;font-size:15px;outline:none;margin-bottom:16px;transition:border-color .2s;}
+#password-screen input:focus{border-color:#818cf8;}
+#password-screen input::placeholder{color:#818cf8;}
+#password-screen button{width:100%;padding:12px;border-radius:10px;border:none;background:#4f46e5;color:#fff;font-size:15px;font-weight:600;cursor:pointer;transition:background .2s;}
+#password-screen button:hover{background:#4338ca;}
+#password-screen .error{color:#f87171;font-size:13px;margin-top:12px;min-height:20px;}
+#password-screen .hint{color:#818cf8;font-size:11px;margin-top:16px;}
+#main-content{display:none;}
 </style>
 </head>
 <body class="bg-slate-100 text-slate-800">
-<div id="password-screen">
-  <div class="card">
-    <h2>🔐 产品渠道动销与利润罗盘</h2>
-    <p>本页面含成本、利润等敏感经营数据，请输入密码后访问。</p>
-    <input type="password" id="pwdInput" placeholder="输入密码" onkeydown="if(event.key=='Enter')checkPwd()">
-    <button onclick="checkPwd()">进入看板</button>
-    <div class="error" id="pwdError"></div>
-    <div class="hint">⚠️ 本页面为简易密码保护，懂技术的人仍可能绕过。如需更高安全级别，请使用 Cloudflare Access 等服务端鉴权方案。</div>
-  </div>
-</div>
-<div id="main-content">
-
-<div class="max-w-screen-2xl mx-auto p-3 sm:p-6">
+<div id="password-screen"><div class="card"><h2>🔐 产品渠道动销与利润罗盘</h2><p>本页面含成本、利润等敏感经营数据，请输入密码后访问。</p><input type="password" id="pwdInput" placeholder="输入密码" onkeydown="if(event.key=='Enter')checkPwd()"><button onclick="checkPwd()">进入看板</button><div class="error" id="pwdError"></div><div class="hint">⚠️ 本页面为简易密码保护，懂技术的人仍可能绕过。如需更高安全级别，请使用 Cloudflare Access 等服务端鉴权方案。</div></div></div>
+<div id="main-content" class="max-w-screen-2xl mx-auto p-3 sm:p-6">
 
   <!-- 头部 -->
   <header class="mb-5">
     <h1 class="text-xl sm:text-2xl font-bold text-slate-900 flex items-center gap-2">
       <span class="inline-block w-2 h-6 bg-indigo-600 rounded"></span>
-      产品渠道动销与利润罗盘系统 <span class="text-xs font-normal text-slate-400">v1.7.2-readonly</span>
+      产品渠道动销与利润罗盘系统 <span class="text-xs font-normal text-slate-400">v1.8.4</span>
     </h1>
-    <p class="text-sm text-slate-500 mt-1">库销比 · 滚动周转 · 效期报损预警(随日期动态倒扣) · 智能促销边界 · 渠道利润看板</p>
-    <p id="updateInfo" class="text-xs text-indigo-500 mt-1"></p>
+    <p class="text-sm text-slate-500 mt-1">库销比 · 滚动周转 · 效期报损预警(随日期动态倒扣) · 智能促销边界 · 渠道利润看板 · 6个月智能补货(按品类618/双11系数 · 近期暴增抑制 · 清仓SKU动销回归)</p>
   </header>
 
   <!-- Tab 导航 -->
@@ -67,6 +55,7 @@
     <button data-tab="dashboard" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium bg-white shadow-sm hover:bg-indigo-50 transition">渠道看板</button>
     <button data-tab="overview" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium bg-white shadow-sm hover:bg-indigo-50 transition">数据总览</button>
     <button data-tab="alerts" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium bg-white shadow-sm hover:bg-indigo-50 transition">预警与营销建议</button>
+    <button data-tab="replenish" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium bg-white shadow-sm hover:bg-indigo-50 transition">补货计划</button>
   </nav>
 
   <!-- ============ 渠道看板 ============ -->
@@ -172,6 +161,56 @@
     <div id="alertsContainer" class="grid grid-cols-1 gap-4"></div>
   </section>
 
+  <!-- ============ 补货计划 ============ -->
+  <section id="tab-replenish" class="tab-panel hidden">
+    <div class="bg-white rounded-xl shadow-sm p-4 mb-4">
+      <div class="flex flex-wrap justify-between items-center gap-2 mb-3">
+        <h3 class="text-sm font-semibold">补货测算参数（按品类 618/双11 系数 · 近期暴增抑制 · 清仓SKU动销回归）</h3>
+        <button onclick="saveRepParams()" class="px-3 py-1.5 text-xs bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">保存参数并重算</button>
+      </div>
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 mb-3 text-sm">
+        <label>近期动销权重(0-1)<input id="rep_recentWeight" type="number" step="0.1" min="0" max="1" class="inp"></label>
+        <label>安全库存(月)<input id="rep_safety" type="number" step="0.1" class="inp"></label>
+        <label>近期暴增采信系数<input id="rep_spikeSens" type="number" step="0.5" min="0.5" class="inp" title="越小越保守，越不易被短期暴增带高补货量；默认2"></label>
+        <label>清仓判定阈值(到手价≤保本×%)<input id="rep_clearThresh" type="number" step="5" min="0" class="inp" title="综合到手价 ≤ 保本极限底价 × 该百分比 时判定为清仓SKU；默认110"></label>
+        <label>清仓SKU动销回归系数<input id="rep_clearRevert" type="number" step="0.1" min="0" max="1" class="inp" title="清仓SKU补货基准=全年去季节化均销×该系数，回到起量前水平；默认0.5"></label>
+      </div>
+      <div class="flex flex-wrap items-center gap-2 mb-2">
+        <span class="text-xs text-slate-500">编辑对象：</span>
+        <select id="rep_coefTarget" onchange="switchCoefTarget()" class="flt" style="width:220px"></select>
+        <button onclick="resetCatCoef()" class="px-2 py-1 text-xs border border-slate-300 text-slate-600 rounded hover:bg-slate-50">重置为通用默认</button>
+        <span class="text-xs text-slate-400">（选「品类」可为该品类单独设一套系数；带 ✓ 表示已定制，未定制的品类自动继承通用默认）</span>
+      </div>
+      <div id="repCoefGrid" class="grid grid-cols-3 sm:grid-cols-6 gap-2"></div>
+    </div>
+    <div id="repKpis" class="grid grid-cols-2 lg:grid-cols-5 gap-3 mb-4"></div>
+    <div class="bg-white rounded-xl shadow-sm p-4 mb-4">
+      <div class="flex flex-wrap justify-between items-center gap-2 mb-3">
+        <h3 class="text-sm font-semibold">未来6个月 全渠道建议补货量 / 预计销量 / 补货成本</h3>
+        <button onclick="downloadReplenishChart()" class="px-3 py-1.5 text-xs bg-emerald-600 text-white rounded-lg hover:bg-emerald-700">一键下载图表(PNG)</button>
+      </div>
+      <canvas id="chartReplenish" height="120"></canvas>
+      <p class="text-xs text-slate-400 mt-2">柱色按<strong>通用大促节点</strong>提示：<span class="text-rose-600">红=大促月(618/双11)</span>、<span class="text-amber-600">橙=预热月</span>、蓝=平月；浅蓝柱=预计销量；绿线=补货成本(万元)。各 SKU 的销量已按其<strong>所属品类系数</strong>测算。</p>
+    </div>
+    <div class="bg-white rounded-xl shadow-sm p-4 overflow-x-auto scrollbar-thin">
+      <div class="flex flex-wrap justify-between items-center gap-2 mb-3">
+        <h3 class="text-sm font-semibold">分SKU 补货计划（每格：建议补货 / 需=预计销量）</h3>
+        <div class="flex flex-wrap gap-2 items-center">
+          <input oninput="repSearch(this.value)" class="flt" style="width:140px" placeholder="搜索产品/SKU">
+          <select id="rep_cat" onchange="repCatChange(this.value)" class="flt" style="width:120px"></select>
+          <label class="flex items-center gap-1 text-xs text-slate-500"><input type="checkbox" onchange="repToggleNeed(this)"> 仅显示需补货</label>
+          <button onclick="exportReplenishCSV()" class="px-3 py-1.5 text-xs bg-amber-600 text-white rounded-lg hover:bg-amber-700">导出补货计划CSV</button>
+        </div>
+      </div>
+      <div id="repTableWrap"></div>
+      <p class="text-xs text-slate-400 mt-3">测算逻辑：基准日销 = 近期周销与全年均销「按品类系数去季节化」后按权重融合；<strong>🏷️清仓SKU（综合到手价≤保本底价×阈值%）自动回归到起量前均销</strong>（=全年去季节化均销×回归系数），不采信清仓期的高动销；<strong>⚡近期暴增(&gt;常销1.5倍)按饱和曲线打折</strong>、🔻骤降(&lt;0.5倍)保守下调；各月预计销量 = 基准日销 × 当月天数 × <strong>该品类当月系数</strong>；采用「目标库存(order-up-to)」滚动模型，安全库存前瞻下月需求（大促自动前置备货），并按剩余效期收紧上限；补货件数向上取整为整数。🚫=暂停补货。结果仅供参考，请结合实际情况调整。</p>
+    </div>
+  </section>
+
+  <!-- ============ 数据录入 ============ -->
+
+  <!-- ============ 参数设置 ============ -->
+
 </div>
 
 <!-- 产品清单弹窗 -->
@@ -187,7 +226,6 @@
   </div>
 </div>
 
-<!-- 回到顶部浮动按钮 -->
 <button id="backTop" onclick="goTop()" title="回到顶部"
   class="hidden-btn fixed bottom-6 right-6 z-40 w-12 h-12 rounded-full bg-indigo-600 text-white shadow-lg hover:bg-indigo-700 flex items-center justify-center">
   <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
@@ -195,40 +233,180 @@
   </svg>
 </button>
 
-<!-- Toast -->
 <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-sm px-4 py-2 rounded-lg shadow-lg opacity-0 pointer-events-none transition-opacity z-50"></div>
 
 <script>
+/* ================= 内嵌初始数据（直接用 JS 对象，最稳，不依赖 JSON 脚本标签） ================= */
+const SEED_VERSION = '2026-08-10T04:31:02Z-v3';
+const SEED = {
+  products: [
+    {name:"GNC健安喜97%高纯度鱼油软胶囊 60粒",sku:"490006",cat:"心脑血管健康",cost:32.74,price:139,actualPrice:"68.29",weekSales:951,endInv:13661,beginInv:29890,ytdSales:32027,date:"2026/8/10",feeTax:"17",feeOther:"23",shelfLife:"234"},
+    {name:"GNC健安喜Vitapak?男士每日营养包进阶款\\30包*1盒\\490020",sku:"490020",cat:"营养包",cost:101.22,price:399,actualPrice:"208.54",weekSales:88,endInv:1393,beginInv:3457,ytdSales:5806,date:"2026/8/10",feeTax:"17",feeOther:"23",shelfLife:"144"},
+    {name:"GNC健安喜Vitapak男性30+每日营养包",sku:"493944",cat:"营养包",cost:50.94,price:139,actualPrice:"124.73",weekSales:43,endInv:777,beginInv:1993,ytdSales:2622,date:"2026/8/10",feeTax:"17",feeOther:"23",shelfLife:"203"},
+    {name:"GNC健安喜Vitapak男性40+每日营养包",sku:"493945",cat:"营养包",cost:59.46,price:229,actualPrice:"200.57",weekSales:81,endInv:2089,beginInv:3798,ytdSales:6115,date:"2026/8/10",feeTax:"17",feeOther:"23",shelfLife:"144"},
+    {name:"GNC健安喜Vitapak女性50+每日营养包",sku:"493949",cat:"营养包",cost:58.62,price:259,actualPrice:"195.77",weekSales:119,endInv:2863,beginInv:2932,ytdSales:5912,date:"2026/8/10",feeTax:"17",feeOther:"23",shelfLife:"175"},
+    {name:"GNC健安喜Vitapak男性50+每日营养包",sku:"493946",cat:"营养包",cost:59.98,price:259,actualPrice:"204.12",weekSales:117,endInv:1922,beginInv:1592,ytdSales:5054,date:"2026/8/10",feeTax:"17",feeOther:"23",shelfLife:"264"},
+    {name:"健安喜维生素C缓释片（1000毫克180片）",sku:"604204",cat:"基础维矿",cost:39.85,price:79,actualPrice:"86.76",weekSales:106,endInv:846,beginInv:1505,ytdSales:3029,date:"2026/8/10",feeTax:"17",feeOther:"23",shelfLife:"356"},
+    {name:"GNC健安喜叶黄素胶囊20毫克60粒",sku:"493923",cat:"植提",cost:12.11,price:33,actualPrice:"39.71",weekSales:3,endInv:0,beginInv:3518,ytdSales:3959,date:"2026/8/10",feeTax:"17",feeOther:"23",shelfLife:"325"},
+    {name:"GNC健安喜Vitapak女性30+每日营养包",sku:"493947",cat:"营养包",cost:43.26,price:139,actualPrice:"114.82",weekSales:53,endInv:1324,beginInv:1633,ytdSales:4571,date:"2026/8/10",feeTax:"17",feeOther:"23",shelfLife:"203"},
+    {name:"GNC健安喜泛醇200mg软胶囊（200mg 30粒 ）",sku:"490050",cat:"心脑血管健康",cost:83.15,price:289,actualPrice:"145.13",weekSales:87,endInv:1320,beginInv:2344,ytdSales:1040,date:"2026/8/10",feeTax:"17",feeOther:"23",shelfLife:"600"},
+    {name:"GNC健安喜七合一加钙优骨力氨糖软骨素运动关节片160片/瓶",sku:"490003",cat:"骨骼健康",cost:50.83,price:109,actualPrice:"82.32",weekSales:95,endInv:618,beginInv:3060,ytdSales:3064,date:"2026/8/10",feeTax:"17",feeOther:"23",shelfLife:"630"},
+    {name:"GNC姜黄奶蓟精华120粒",sku:"490009",cat:"植提",cost:38.51,price:169,actualPrice:"113.91",weekSales:48,endInv:530,beginInv:1249,ytdSales:2172,date:"2026/8/10",feeTax:"17",feeOther:"23",shelfLife:"661"},
+    {name:"健安喜Vitapak?男性40+每日营养包升级版\\30包*1盒\\490077",sku:"490077",cat:"营养包",cost:62.74,price:279,actualPrice:"184.53",weekSales:75,endInv:619,beginInv:1002,ytdSales:2662,date:"2026/8/10",feeTax:"17",feeOther:"23",shelfLife:"144"},
+    {name:"健安喜辅酶Q10软胶囊200MG\\150粒*1瓶\\490062",sku:"490062",cat:"心脑血管健康",cost:61.29,price:269,actualPrice:"152.32",weekSales:101,endInv:647,beginInv:1078,ytdSales:2870,date:"2026/8/10",feeTax:"17",feeOther:"23",shelfLife:"691"},
+    {name:"健安喜Vitapak?女性40+每日营养包升级版\\30包*1盒\\490080",sku:"490080",cat:"营养包",cost:62.39,price:279,actualPrice:"176.99",weekSales:78,endInv:1307,beginInv:1070,ytdSales:2057,date:"2026/8/10",feeTax:"17",feeOther:"23",shelfLife:"175"},
+    {name:"健安喜男士多种维生素矿物质缓释片\\120粒*1瓶",sku:"490022",cat:"基础维矿",cost:32.43,price:129,actualPrice:"103.97",weekSales:207,endInv:61,beginInv:975,ytdSales:3153,date:"2026/8/10",feeTax:"17",feeOther:"23",shelfLife:"295"},
+    {name:"健安喜优骨力葡萄糖氨软骨素120粒\\120粒*1瓶",sku:"490030",cat:"骨骼健康",cost:54.55,price:189,actualPrice:"128.75",weekSales:55,endInv:687,beginInv:462,ytdSales:1307,date:"2026/8/10",feeTax:"17",feeOther:"23",shelfLife:"600"},
+    {name:"GNC健安喜复合辅酶胶囊14粒/盒",sku:"2001029",cat:"心脑血管健康",cost:9.66,price:69,actualPrice:"32.75",weekSales:7,endInv:495,beginInv:1130,ytdSales:663,date:"2026/8/10",feeTax:"17",feeOther:"23",shelfLife:"417"},
+    {name:"GNC健安喜Vitapak女性40+每日营养包",sku:"493948",cat:"营养包",cost:59,price:229,actualPrice:"185.8",weekSales:75,endInv:1329,beginInv:5051,ytdSales:4366,date:"2026/8/10",feeTax:"17",feeOther:"23",shelfLife:"144"},
+    {name:"健安喜女士营养包进阶款\\30包*1盒",sku:"490032",cat:"营养包",cost:102.72,price:399,actualPrice:"188.54",weekSales:109,endInv:98,beginInv:1263,ytdSales:3937,date:"2026/8/10",feeTax:"17",feeOther:"23",shelfLife:"144"},
+    {name:"GNC健安喜辅酶Q10软胶囊100mg120粒/瓶",sku:"785378",cat:"心脑血管健康",cost:38.97,price:129,actualPrice:"100.76",weekSales:100,endInv:787,beginInv:724,ytdSales:1989,date:"2026/8/10",feeTax:"17",feeOther:"23",shelfLife:"814"},
+    {name:"健安喜Vitapak?男性30+每日营养包升级版\\30包*1盒\\490076",sku:"490076",cat:"营养包",cost:55.28,price:219,actualPrice:"139.73",weekSales:39,endInv:591,beginInv:387,ytdSales:847,date:"2026/8/10",feeTax:"17",feeOther:"23",shelfLife:"325"},
+    {name:"GNC健安喜泛醇100mg软胶囊 ?（100mg 30粒 ）",sku:"490049",cat:"心脑血管健康",cost:50.62,price:149,actualPrice:"121.03",weekSales:50,endInv:1,beginInv:1276,ytdSales:2000,date:"2026/8/10",feeTax:"17",feeOther:"23",shelfLife:"600"},
+    {name:"健安喜女士多种维生素矿物质缓释片\\120粒*1瓶",sku:"490023",cat:"基础维矿",cost:32.53,price:129,actualPrice:"123.11",weekSales:61,endInv:1297,beginInv:583,ytdSales:2024,date:"2026/8/10",feeTax:"17",feeOther:"23",shelfLife:"264"},
+    {name:"GNC健安喜辅酶Q10软胶囊200mg60粒/瓶",sku:"785379",cat:"心脑血管健康",cost:33.63,price:129,actualPrice:"101.57",weekSales:0,endInv:2,beginInv:1115,ytdSales:1602,date:"2026/8/10",feeTax:"17",feeOther:"23",shelfLife:"691"},
+    {name:"GNC健安喜柠檬酸钙片1000mg180片",sku:"493924",cat:"骨骼健康",cost:19.16,price:49,actualPrice:"47.13",weekSales:46,endInv:202,beginInv:1366,ytdSales:1175,date:"2026/8/10",feeTax:"17",feeOther:"23",shelfLife:"661"},
+    {name:"健安喜Vitapak?女性30+每日营养包升级版\\30包*1盒\\490079",sku:"490079",cat:"营养包",cost:52.71,price:219,actualPrice:"135.55",weekSales:66,endInv:372,beginInv:629,ytdSales:1020,date:"2026/8/10",feeTax:"17",feeOther:"23",shelfLife:"387"},
+    {name:"GNC健安喜高含量钙片1000mg 180片",sku:"493925",cat:"骨骼健康",cost:17.06,price:49,actualPrice:"37.31",weekSales:48,endInv:687,beginInv:827,ytdSales:1716,date:"2026/8/10",feeTax:"17",feeOther:"23",shelfLife:"509"},
+    {name:"健安喜EPA1200 高纯度鱼油\\60粒*1盒\\490046",sku:"490046",cat:"心脑血管健康",cost:63.25,price:329,actualPrice:"148.14",weekSales:204,endInv:1065,beginInv:1543,ytdSales:3057,date:"2026/8/10",feeTax:"17",feeOther:"23",shelfLife:"387"},
+    {name:"健安喜双层缓释维生素B\\60粒*1瓶",sku:"490041",cat:"基础维矿",cost:18.86,price:79,actualPrice:"68.06",weekSales:54,endInv:387,beginInv:640,ytdSales:1703,date:"2026/8/10",feeTax:"17",feeOther:"23",shelfLife:"203"},
+    {name:"健安喜儿童液体钙镁锌（包装升级款）\\30条*1盒\\490052",sku:"490052",cat:"孕婴童营养",cost:32.49,price:149,actualPrice:"88.48",weekSales:55,endInv:1088,beginInv:2612,ytdSales:1537,date:"2026/8/10",feeTax:"17",feeOther:"23",shelfLife:"113"},
+    {name:"GNC健安喜辅酶Q10软胶囊100MG*60粒/瓶",sku:"785377",cat:"心脑血管健康",cost:20.99,price:69,actualPrice:"69.76",weekSales:28,endInv:271,beginInv:1319,ytdSales:976,date:"2026/8/10",feeTax:"17",feeOther:"23",shelfLife:"569"},
+    {name:"健安喜维生素D维生素K柠檬酸钙\\120粒*1瓶",sku:"490054",cat:"骨骼健康",cost:13,price:49,actualPrice:"71.94",weekSales:23,endInv:377,beginInv:622,ytdSales:615,date:"2026/8/10",feeTax:"17",feeOther:"23",shelfLife:"175"},
+    {name:"健安喜Vitapak?儿童每日营养包升级款\\30包*1盒",sku:"490048",cat:"营养包",cost:57.85,price:179,actualPrice:"128.3",weekSales:21,endInv:284,beginInv:557,ytdSales:1465,date:"2026/8/10",feeTax:"17",feeOther:"23",shelfLife:"203"},
+    {name:"健安喜Vitapak?女性50+每日营养包升级版\\30包*1盒\\490081",sku:"490081",cat:"营养包",cost:58.23,price:279,actualPrice:"156.84",weekSales:0,endInv:0,beginInv:297,ytdSales:597,date:"2026/8/10",feeTax:"17",feeOther:"23",shelfLife:"383"},
+    {name:"健安喜尿酸控制胶囊\\120粒*1瓶",sku:"490015",cat:"植提",cost:36.42,price:199,actualPrice:"91.52",weekSales:16,endInv:495,beginInv:1086,ytdSales:498,date:"2026/8/10",feeTax:"17",feeOther:"23",shelfLife:"22"},
+    {name:"GNC健安喜葡萄籽精华300mg100粒",sku:"601401",cat:"植提",cost:24.85,price:85,actualPrice:"69.89",weekSales:28,endInv:277,beginInv:368,ytdSales:868,date:"2026/8/10",feeTax:"17",feeOther:"23",shelfLife:"448"},
+    {name:"健安喜高钙液体钙镁锌\\20条*1盒\\490060",sku:"490060",cat:"孕婴童营养",cost:17.89,price:109,actualPrice:"85.88",weekSales:19,endInv:249,beginInv:496,ytdSales:579,date:"2026/8/10",feeTax:"17",feeOther:"23",shelfLife:"83"},
+    {name:"健安喜多重眼脑养护鱼油\\60粒*1盒\\453523",sku:"453523",cat:"心脑血管健康",cost:40.04,price:269,actualPrice:"106.48",weekSales:7,endInv:311,beginInv:386,ytdSales:376,date:"2026/8/10",feeTax:"17",feeOther:"23",shelfLife:"325"},
+    {name:"健安喜柠檬酸钙维生素D维生素K复合迷你钙\\360粒/瓶\\490026",sku:"490026",cat:"骨骼健康",cost:29.31,price:159,actualPrice:"93.41",weekSales:25,endInv:514,beginInv:1018,ytdSales:1073,date:"2026/8/10",feeTax:"17",feeOther:"23",shelfLife:"175"},
+    {name:"健安喜维生素E软胶囊180mg",sku:"493959",cat:"基础维矿",cost:19.81,price:49,actualPrice:"39.59",weekSales:28,endInv:669,beginInv:439,ytdSales:754,date:"2026/8/10",feeTax:"17",feeOther:"23",shelfLife:"630"},
+    {name:"GNC健安喜三倍卵磷脂软胶囊 180粒",sku:"493980",cat:"心脑血管健康",cost:28.56,price:79,actualPrice:"67.89",weekSales:12,endInv:1144,beginInv:1903,ytdSales:760,date:"2026/8/10",feeTax:"17",feeOther:"23",shelfLife:"417"},
+    {name:"GNC健安喜三倍卵磷脂软胶囊 360粒",sku:"493995",cat:"心脑血管健康",cost:52.99,price:159,actualPrice:"121.59",weekSales:28,endInv:419,beginInv:1326,ytdSales:916,date:"2026/8/10",feeTax:"17",feeOther:"23",shelfLife:"203"},
+    {name:"健安喜EPA1200?高纯度鱼油（派样装）\\6粒*1盒\\490068",sku:"490068",cat:"心脑血管健康",cost:8.76,price:49.9,actualPrice:"-",weekSales:13,endInv:259,beginInv:0,ytdSales:2025,date:"2026/8/10",feeTax:"17",feeOther:"23",shelfLife:"387"},
+    {name:"GNC健安喜非转基因浓缩大豆异黄酮90粒/瓶",sku:"601400",cat:"植提",cost:21.69,price:109,actualPrice:"67.05",weekSales:20,endInv:189,beginInv:143,ytdSales:626,date:"2026/8/10",feeTax:"17",feeOther:"23",shelfLife:"844"},
+    {name:"GNC健安喜三倍浓缩加强型鱼油软胶囊（240粒小粒装）",sku:"493927",cat:"心脑血管健康",cost:84.28,price:169,actualPrice:"144.83",weekSales:20,endInv:529,beginInv:956,ytdSales:1325,date:"2026/8/10",feeTax:"17",feeOther:"23",shelfLife:"753"},
+    {name:"健安喜Vitapak?男性50+每日营养包升级版\\30包*1盒\\490078",sku:"490078",cat:"营养包",cost:59.51,price:279,actualPrice:"192.14",weekSales:14,endInv:622,beginInv:355,ytdSales:946,date:"2026/8/10",feeTax:"17",feeOther:"23",shelfLife:"325"},
+    {name:"健安喜95%高纯度鱼油软胶囊\\180粒*1瓶\\490094",sku:"490094",cat:"心脑血管健康",cost:100.57,price:339,actualPrice:"151.3",weekSales:18,endInv:104,beginInv:470,ytdSales:577,date:"2026/8/10",feeTax:"17",feeOther:"23",shelfLife:"814"},
+    {name:"GNC健安喜四倍鱼油迷你软胶囊 ?（800mg 120粒）",sku:"493938",cat:"心脑血管健康",cost:68.96,price:159,actualPrice:"132.97",weekSales:33,endInv:459,beginInv:1092,ytdSales:634,date:"2026/8/10",feeTax:"17",feeOther:"23",shelfLife:"600"},
+    {name:"健安喜褪黑素片3毫克\\120片*1瓶",sku:"604205",cat:"基础维矿",cost:8.62,price:39,actualPrice:"25.97",weekSales:46,endInv:274,beginInv:979,ytdSales:1320,date:"2026/8/10",feeTax:"17",feeOther:"23",shelfLife:"325"},
+    {name:"GNC健安喜儿童液体钙镁锌30袋",sku:"490005",cat:"孕婴童营养",cost:30.31,price:99,actualPrice:"40.67",weekSales:402,endInv:14049,beginInv:73,ytdSales:3923,date:"2026/8/10",feeTax:"17",feeOther:"23",shelfLife:"22"},
+    {name:"GNC健安喜硒元素200微克90片/瓶",sku:"493960",cat:"基础维矿",cost:12.62,price:59,actualPrice:"44.95",weekSales:25,endInv:803,beginInv:609,ytdSales:1254,date:"2026/8/10",feeTax:"17",feeOther:"23",shelfLife:"722"},
+    {name:"健安喜胃肠双联益生菌\\60粒*1盒",sku:"490018",cat:"益生菌",cost:97.11,price:279,actualPrice:"184.34",weekSales:23,endInv:323,beginInv:0,ytdSales:982,date:"2026/8/10",feeTax:"17",feeOther:"23",shelfLife:"234"},
+    {name:"健安喜女性私处健康益生菌\\60粒*1瓶\\490010",sku:"490010",cat:"益生菌",cost:46.75,price:129,actualPrice:"46.79",weekSales:11,endInv:182,beginInv:13192,ytdSales:218,date:"2026/8/10",feeTax:"17",feeOther:"23",shelfLife:"325"},
+    {name:"健安喜七合一加钙优骨力氨糖软骨素运动关节片\\120粒*1瓶",sku:"490061",cat:"骨骼健康",cost:40.14,price:99,actualPrice:"70.84",weekSales:20,endInv:328,beginInv:381,ytdSales:459,date:"2026/8/10",feeTax:"17",feeOther:"23",shelfLife:"630"},
+    {name:"GNC健安喜四倍鱼油迷你软胶囊 800mg 240粒",sku:"493939",cat:"心脑血管健康",cost:134.77,price:279,actualPrice:"216.16",weekSales:47,endInv:513,beginInv:1026,ytdSales:1259,date:"2026/8/10",feeTax:"17",feeOther:"23",shelfLife:"753"},
+    {name:"GNC健安喜三倍鱼油迷你软胶囊（120粒）",sku:"493926",cat:"心脑血管健康",cost:44.68,price:89,actualPrice:"89.87",weekSales:12,endInv:243,beginInv:397,ytdSales:531,date:"2026/8/10",feeTax:"17",feeOther:"23",shelfLife:"478"},
+    {name:"健安喜多重抗衰鱼油\\60粒*1盒",sku:"453522",cat:"心脑血管健康",cost:59.96,price:0,actualPrice:"219.62",weekSales:7,endInv:91,beginInv:88,ytdSales:270,date:"2026/8/10",feeTax:"17",feeOther:"23",shelfLife:"387"},
+    {name:"健安喜透明质酸护眼软胶囊\\60粒*1盒\\490085",sku:"490085",cat:"植提",cost:28.62,price:179,actualPrice:"72.02",weekSales:27,endInv:425,beginInv:0,ytdSales:481,date:"2026/8/10",feeTax:"17",feeOther:"23",shelfLife:"478"},
+    {name:"GNC健安喜奶蓟精华片 650mg 120粒",sku:"493942",cat:"植提",cost:37.94,price:119,actualPrice:"93.91",weekSales:19,endInv:327,beginInv:356,ytdSales:726,date:"2026/8/10",feeTax:"17",feeOther:"23",shelfLife:"691"},
+    {name:"健安喜Vitapak@男性20+每日营养包\\30包/盒\\490027",sku:"490027",cat:"营养包",cost:43.32,price:139,actualPrice:"105.68",weekSales:7,endInv:174,beginInv:231,ytdSales:231,date:"2026/8/10",feeTax:"17",feeOther:"23",shelfLife:"144"},
+    {name:"GNC健安喜辅酶Q10软胶囊400mg60粒/瓶",sku:"785380",cat:"心脑血管健康",cost:57.38,price:199,actualPrice:"147.41",weekSales:15,endInv:35,beginInv:695,ytdSales:471,date:"2026/8/10",feeTax:"17",feeOther:"23",shelfLife:"448"},
+    {name:"健安喜儿童液体钙镁锌（包装升级款试用装） 3袋",sku:"490053",cat:"孕婴童营养",cost:4.69,price:29.9,actualPrice:"0.66",weekSales:4,endInv:19603,beginInv:852,ytdSales:742,date:"2026/8/10",feeTax:"17",feeOther:"23",shelfLife:"52"},
+    {name:"健安喜维C莓果免疫粉\\30条*1盒\\490089",sku:"490089",cat:"基础维矿",cost:19.43,price:129,actualPrice:"31.19",weekSales:13,endInv:366,beginInv:0,ytdSales:236,date:"2026/8/10",feeTax:"17",feeOther:"23",shelfLife:"495"},
+    {name:"健安喜深海鱼油胶囊\\400粒/1瓶\\490029",sku:"490029",cat:"心脑血管健康",cost:94.57,price:199,actualPrice:"143.56",weekSales:11,endInv:425,beginInv:788,ytdSales:814,date:"2026/8/10",feeTax:"17",feeOther:"23",shelfLife:"417"},
+    {name:"健安喜麦角硫因美白银耀瓶",sku:"490090",cat:"口服美容",cost:31.66,price:0,actualPrice:"38.96",weekSales:1,endInv:32,beginInv:0,ytdSales:21,date:"2026/8/10",feeTax:"17",feeOther:"23",shelfLife:"405"},
+    {name:"GNC健安喜清肺排毒胶囊\\60粒*1瓶\\490019",sku:"490019",cat:"植提",cost:56.81,price:199,actualPrice:"107",weekSales:19,endInv:155,beginInv:979,ytdSales:305,date:"2026/8/10",feeTax:"17",feeOther:"23",shelfLife:"203"},
+    {name:"健安喜活性叶酸片800mcg\\100片*1瓶\\490025",sku:"490025",cat:"基础维矿",cost:22.69,price:148,actualPrice:"112.1",weekSales:6,endInv:166,beginInv:118,ytdSales:282,date:"2026/8/10",feeTax:"17",feeOther:"23",shelfLife:"175"},
+    {name:"健安喜Vitapak@女性20+每日营养包\\30包/盒\\490028",sku:"490028",cat:"营养包",cost:47.42,price:139,actualPrice:"96.36",weekSales:7,endInv:84,beginInv:111,ytdSales:337,date:"2026/8/10",feeTax:"17",feeOther:"23",shelfLife:"144"},
+    {name:"健安喜麦角硫因抗衰晶萃瓶",sku:"490087",cat:"口服美容",cost:18.86,price:0,actualPrice:"114.26",weekSales:0,endInv:0,beginInv:0,ytdSales:28,date:"2026/8/10",feeTax:"17",feeOther:"23",shelfLife:"405"},
+    {name:"健安喜Vitapak儿童每日营养包升级款（体验装）",sku:"490051",cat:"营养包",cost:7.88,price:39.9,actualPrice:"0.11",weekSales:4,endInv:296,beginInv:853,ytdSales:561,date:"2026/8/10",feeTax:"17",feeOther:"23",shelfLife:"203"},
+    {name:"健安喜深海鱼油胶囊\\120粒*1瓶\\490038",sku:"490038",cat:"心脑血管健康",cost:35.36,price:79,actualPrice:"72.21",weekSales:3,endInv:177,beginInv:305,ytdSales:132,date:"2026/8/10",feeTax:"17",feeOther:"23",shelfLife:"569"},
+    {name:"健安喜N-乙酰葡萄糖氨复合饮品\\10包*1盒\\490036",sku:"490036",cat:"骨骼健康",cost:9.86,price:129,actualPrice:"24.67",weekSales:0,endInv:0,beginInv:17649,ytdSales:1697,date:"2026/8/10",feeTax:"17",feeOther:"23",shelfLife:"52"},
+    {name:"GNC健安喜番茄红素软胶囊60粒",sku:"493993",cat:"植提",cost:37.92,price:79,actualPrice:"73.88",weekSales:1,endInv:629,beginInv:632,ytdSales:624,date:"2026/8/10",feeTax:"17",feeOther:"23",shelfLife:"569"},
+    {name:"健安喜97%高纯度鱼油软胶囊（派样装）\\12粒*1盒\\490037",sku:"490037",cat:"心脑血管健康",cost:6.47,price:39.9,actualPrice:"0.69",weekSales:0,endInv:53,beginInv:17,ytdSales:1794,date:"2026/8/10",feeTax:"17",feeOther:"23",shelfLife:"234"},
+    {name:"健安喜维生素C缓释片1000毫克\\30粒*1瓶\\490044",sku:"490044",cat:"基础维矿",cost:9.31,price:33,actualPrice:"0.01",weekSales:0,endInv:831,beginInv:0,ytdSales:1209,date:"2026/8/10",feeTax:"17",feeOther:"23",shelfLife:"417"},
+    {name:"杰士邦xGNC男性雄风片\\60粒*1盒\\490093",sku:"490093",cat:"植提",cost:46.69,price:0,actualPrice:"66.61",weekSales:15,endInv:182,beginInv:0,ytdSales:18,date:"2026/8/10",feeTax:"17",feeOther:"23",shelfLife:"448"},
+    {name:"健安喜维生素D3胶囊 5000IU\\180粒*1瓶\\490058",sku:"490058",cat:"基础维矿",cost:17.28,price:75,actualPrice:"1.67",weekSales:14,endInv:160,beginInv:0,ytdSales:40,date:"2026/8/10",feeTax:"17",feeOther:"23",shelfLife:"447"},
+    {name:"健安喜麦角硫因护巢红氧瓶",sku:"490088",cat:"口服美容",cost:24.92,price:0,actualPrice:"67",weekSales:1,endInv:38,beginInv:0,ytdSales:15,date:"2026/8/10",feeTax:"17",feeOther:"23",shelfLife:"405"},
+    {name:"健安喜泛醇200mg软胶囊\\60粒*1盒\\490063",sku:"490063",cat:"心脑血管健康",cost:172.46,price:499,actualPrice:"287.46",weekSales:0,endInv:3,beginInv:1184,ytdSales:1178,date:"2026/8/10",feeTax:"17",feeOther:"23",shelfLife:"630"},
+    {name:"健安喜多重眼脑养护鱼油（派样装）\\6粒*1盒\\490067",sku:"490067",cat:"心脑血管健康",cost:5.51,price:0,actualPrice:"0.44",weekSales:0,endInv:2,beginInv:614,ytdSales:635,date:"2026/8/10",feeTax:"17",feeOther:"23",shelfLife:"325"},
+    {name:"健安喜心脑血管健康三合一\\90粒*1盒\\490021",sku:"490021",cat:"心脑血管健康",cost:117.05,price:439,actualPrice:"134.75",weekSales:0,endInv:0,beginInv:155,ytdSales:169,date:"2026/8/10",feeTax:"17",feeOther:"23",shelfLife:"-9"}
+  ],
+  settings: {
+    feeTax:17, feeOther:23, targetMargin:15,
+    isrLow:0.5, isrHealthy:2.5, isrHigh:3,
+    toSlow:1, toHealthy:3, toGood:6,
+    shelfWarnDays:90, shelfCoverSafe:1.5
+  }
+};
+
+/* ================= 默认季节/大促系数 ================= */
+const DEFAULT_SEASON = [1.3,0.8,1.0,1.0,1.3,2.2,0.9,1.0,1.0,1.3,2.5,1.4];
+const DEFAULT_SEASON_BYCAT = {
+  '营养包':      [1.6,0.8,1.0,1.0,1.4,2.5,0.9,1.0,1.0,1.4,2.9,1.6],
+  '心脑血管健康':[1.3,0.85,1.0,1.0,1.3,2.1,0.95,1.0,1.0,1.3,2.4,1.4],
+  '基础维矿':    [1.2,0.85,1.0,1.0,1.25,2.0,0.95,1.0,1.0,1.25,2.3,1.3],
+  '植提':        [1.2,0.85,1.0,1.0,1.2,1.9,0.95,1.0,1.0,1.2,2.1,1.3],
+  '骨骼健康':    [1.3,0.85,1.0,1.0,1.3,2.1,0.95,1.0,1.0,1.3,2.4,1.4],
+  '孕婴童营养':  [1.2,0.9,1.0,1.0,1.2,1.9,1.0,1.0,1.0,1.2,2.0,1.3],
+  '益生菌':      [1.3,0.85,1.0,1.0,1.3,2.1,0.95,1.0,1.0,1.3,2.4,1.4],
+  '口服美容':    [1.4,0.85,1.0,1.0,1.35,2.3,0.9,1.0,1.0,1.4,2.7,1.5]
+};
+
 /* ================= 状态 ================= */
 let products = [];
 let settings = {
   feeTax: 8, feeOther: 3, targetMargin: 15,
   isrLow: 0.5, isrHealthy: 2, isrHigh: 3,
   toSlow: 1, toHealthy: 3, toGood: 6,
-  shelfWarnDays: 30, shelfCoverSafe: 1.5
+  shelfWarnDays: 30, shelfCoverSafe: 1.5,
+  repRecentWeight: 0.6,
+  repSafetyMonths: 1.0,
+  repSpikeSensitivity: 2,
+  repClearanceThreshold: 110,
+  repClearanceRevertRatio: 0.5,
+  repSeason: DEFAULT_SEASON.slice(),
+  repSeasonByCat: JSON.parse(JSON.stringify(DEFAULT_SEASON_BYCAT))
 };
 let charts = {};
 let currentHealthLabels = [];
+let repFilter = {q:'',cat:'',onlyNeed:false};
+let repCoefTarget = '';
 
 /* ============ 持久化(容错) ============ */
-function persist(){ try{ localStorage.setItem('channelTool', JSON.stringify({products,settings})); }catch(e){} }
+function persist(){ try{ localStorage.setItem('channelTool', JSON.stringify({products,settings})); localStorage.setItem('channelTool_ver', SEED_VERSION); }catch(e){} }
+function ensureRepSettings(){
+  if(!Array.isArray(settings.repSeason)||settings.repSeason.length!==12) settings.repSeason=DEFAULT_SEASON.slice();
+  if(!settings.repSeasonByCat||typeof settings.repSeasonByCat!=='object') settings.repSeasonByCat=JSON.parse(JSON.stringify(DEFAULT_SEASON_BYCAT));
+  if(settings.repRecentWeight==null||isNaN(settings.repRecentWeight)) settings.repRecentWeight=0.6;
+  if(settings.repSafetyMonths==null||isNaN(settings.repSafetyMonths)) settings.repSafetyMonths=1.0;
+  if(settings.repSpikeSensitivity==null||isNaN(settings.repSpikeSensitivity)) settings.repSpikeSensitivity=2;
+  if(settings.repClearanceThreshold==null||isNaN(settings.repClearanceThreshold)) settings.repClearanceThreshold=110;
+  if(settings.repClearanceRevertRatio==null||isNaN(settings.repClearanceRevertRatio)) settings.repClearanceRevertRatio=0.5;
+}
 function restore(){
-  try{ const d=JSON.parse(localStorage.getItem('channelTool')); if(d){ if(Array.isArray(d.products)) products=d.products; if(d.settings&&typeof d.settings==='object') settings={...settings,...d.settings}; } }catch(e){}
-  const token = localStorage.getItem('gh_token');
-  if(token){
-    const el = document.getElementById('gh_token');
-    if(el) el.value = token;
-    const st = document.getElementById('gh_status');
-    if(st) st.textContent = 'Token 已配置，导出时将自动同步到团队看板';
-  }
+  try{
+    const ver = localStorage.getItem('channelTool_ver');
+    const d = JSON.parse(localStorage.getItem('channelTool'));
+    if(d && ver===SEED_VERSION){
+      if(Array.isArray(d.products)) products=d.products;
+      if(d.settings&&typeof d.settings==='object') settings={...settings,...d.settings};
+    }
+  }catch(e){}
+  ensureRepSettings();
+  try{
+    const token = localStorage.getItem('gh_token');
+    if(token){
+      const el = document.getElementById('gh_token');
+      if(el) el.value = token;
+      const st = document.getElementById('gh_status');
+      if(st) st.textContent = 'Token 已配置，导出时将自动同步到团队看板';
+    }
+  }catch(e){}
 }
 
-/* ============ 日期辅助：计算数据日期到今天流逝的自然天数(不为负) ============ */
+/* ============ 日期辅助 ============ */
+function parseDate(str){
+  if(!str) return null;
+  const s=String(str).trim().replace(/\//g,'-');
+  let d=new Date(s+'T00:00:00');
+  if(isNaN(d.getTime())) d=new Date(s);
+  return isNaN(d.getTime())?null:d;
+}
 function daysElapsed(dateStr){
-  if(!dateStr) return 0;
-  const d0 = new Date(dateStr + 'T00:00:00');
-  if(isNaN(d0.getTime())) return 0;
-  const today = new Date(); today.setHours(0,0,0,0);
+  const d0=parseDate(dateStr); if(!d0) return 0;
+  const today=new Date(); today.setHours(0,0,0,0);
   return Math.max(0, Math.round((today - d0) / 86400000));
 }
 
@@ -250,31 +428,29 @@ function compute(p){
   const denom = 1-totalFee-settings.targetMargin/100;
   const targetFloor = denom>0 ? p.cost/denom : null;
   const ytdGMV = actual*p.ytdSales, ytdProfit = unitProfit*p.ytdSales;
-  /* ---- 综合平均周销（年累积销售 / 数据日期在今年的第几天 × 7） ---- */
-  const dayOfYear = p.date ? Math.ceil((new Date(p.date) - new Date(new Date(p.date).getFullYear(), 0, 0)) / 86400000) : null;
+  const pd = p.date ? parseDate(p.date) : null;
+  const dayOfYear = pd ? Math.ceil((pd - new Date(pd.getFullYear(), 0, 0)) / 86400000) : null;
   const avgDailySales = (dayOfYear && dayOfYear > 0) ? p.ytdSales / dayOfYear : 0;
   const avgWeekSales = avgDailySales * 7;
 
-  /* ---- 效期测算(随当天日期动态推算) ---- */
   const shelfLifeRaw = (p.shelfLife!=null&&p.shelfLife!==''&&!isNaN(p.shelfLife)&&Number(p.shelfLife)>0)?Number(p.shelfLife):null;
-  const shelfElapsed = shelfLifeRaw!=null ? daysElapsed(p.date) : 0;   // 数据日期至今已流逝天数
+  const shelfElapsed = shelfLifeRaw!=null ? daysElapsed(p.date) : 0;
   let shelfLife=null, shelfCover=null, expiryQty=null, expiryLoss=null, needDaily=null;
   if(shelfLifeRaw!=null){
-    shelfLife = Math.max(0, shelfLifeRaw - shelfElapsed);              // 截至今天的真实剩余效期
+    shelfLife = Math.max(0, shelfLifeRaw - shelfElapsed);
     if(shelfLife<=0){
-      // 已过效期:全部库存视为报损
       expiryQty  = p.endInv;
       expiryLoss = p.endInv*p.cost;
       needDaily  = Infinity;
       shelfCover = p.endInv>0 ? 0 : Infinity;
     }else{
-      const sellableByExpiry = daily*shelfLife;         // 效期内按当前速度能卖出的量
-      expiryQty  = Math.max(0, p.endInv - sellableByExpiry); // 预计报损件数
-      expiryLoss = expiryQty*p.cost;                    // 预计报损金额(成本口径)
-      needDaily  = p.endInv/shelfLife;                  // 到期前清完所需日均
+      const sellableByExpiry = daily*shelfLife;
+      expiryQty  = Math.max(0, p.endInv - sellableByExpiry);
+      expiryLoss = expiryQty*p.cost;
+      needDaily  = p.endInv/shelfLife;
       if(p.endInv<=0) shelfCover=Infinity;
       else if(daily<=0) shelfCover=0;
-      else shelfCover = shelfLife/(p.endInv/daily);     // 剩余效期 ÷ 可售天数
+      else shelfCover = shelfLife/(p.endInv/daily);
     }
   }
   return {feeTax,feeOther,totalFee,actual,daily,isr,sellDays,turnover,unitProfit,margin,breakeven,targetFloor,ytdGMV,ytdProfit,
@@ -315,7 +491,6 @@ function advise(p,m){
   const disc = (fp)=> (p.price>0&&fp!=null)?(fp/p.price*10).toFixed(1)+'折':'—';
   const fmtP = (v)=> v==null?'—':'¥'+v.toFixed(2);
 
-  /* --- 效期优先(风险最高，放最前) --- */
   if(!shelf.none){
     if(m.shelfLife<=0){
       advice.push(`🔴 该批次<b>已超出效期</b>（数据日期至今已过 ${m.shelfElapsed} 天，超过录入的 ${m.shelfLifeRaw} 天效期），当前库存 <b>${fmt(p.endInv)}</b> 件基本全部面临报废，潜在报损 <b>¥${fmt(m.expiryLoss)}</b>（成本口径）。请立即核实实物批次并做<strong>下架 / 报损 / 退供处理</strong>，同步核减库存并更新数据。`);
@@ -355,16 +530,15 @@ const badge=(c,t)=>`<span class="inline-block px-2 py-0.5 rounded text-xs bg-${c
 const fmt=(v,d=0)=> (v==null||!isFinite(v))?'∞':Number(v).toLocaleString('zh-CN',{maximumFractionDigits:d});
 
 function render(){
-  const countEl = document.getElementById('countLabel');
-  if(countEl) countEl.textContent = products.length;
+  const countEl = document.getElementById('countLabel'); if(countEl) countEl.textContent = products.length;
   try{ renderOverview(); }catch(e){ console.error('renderOverview 失败:',e); }
   try{ renderInputList(); }catch(e){ console.error('renderInputList 失败:',e); }
   try{ renderDashboard(); }catch(e){ console.error('renderDashboard 失败:',e); }
   try{ renderAlerts(); }catch(e){ console.error('renderAlerts 失败:',e); }
+  try{ renderReplenish(); }catch(e){ console.error('renderReplenish 失败:',e); }
   persist();
 }
 
-/* ---------- 数据总览筛选 ---------- */
 function textMatch(field,expr){ if(!expr) return true; return String(field).toLowerCase().includes(expr.toLowerCase()); }
 function matchNum(v,expr){
   if(!expr) return true;
@@ -499,16 +673,11 @@ function renderDashboard(){
       }
   });
 
-  /* ---- 库销比 × 滚动周转 组合图 ---- */
   drawChart('chartMix','bar',{labels:mixLabels,datasets:[
     {label:'库销比',data:mixIsr,backgroundColor:'#a5b4fc'},
     {label:'滚动周转',data:mixTo,type:'line',borderColor:'#f43f5e',backgroundColor:'#f43f5e',pointRadius:4,yAxisID:'y1'}
   ]},{scales:{y:{beginAtZero:true,title:{display:true,text:'库销比'}},y1:{beginAtZero:true,position:'right',title:{display:true,text:'滚动周转'},grid:{drawOnChartArea:false}}}});
 
-  /* ---- SKU 利润健康度气泡图 ---- */
-  /* X=期末库存（件）：≤3100 每 100 一格；>3100 按 1/100 压缩，使 10000 步长与 100 步长格距一致，不牺牲布局空间 */
-  /* Y=到手价（元）：每 10 元一格，不压缩，象限按刻度等比放大（画布加宽加高），容器横向滚动 */
-  /* 库存 < 20 件视为无库存：气泡置灰，不参与利润健康度配色 */
   const X_BREAK = 3100, X_COMPRESS = 100, OUT_OF_STOCK = 20;
   const tx = v => v <= X_BREAK ? v : X_BREAK + (v - X_BREAK) / X_COMPRESS;
   const bubbleData = products.map(p=>{
@@ -521,7 +690,6 @@ function renderDashboard(){
     else { bc='#10b981'; fc='rgba(16,185,129,0.35)'; }
     return {x:tx(p.endInv), inv:p.endInv, y:m.actual, r:r, sku:p.sku, name:p.name, m:m, weekSales:p.weekSales, bc:bc, fc:fc};
   });
-  /* 象限等比放大：宽度按库存刻度（每 100 格约 22px）、高度按价格刻度（每 10 元约 16px） */
   const maxInvT = bubbleData.length ? Math.max(...bubbleData.map(d=>d.x)) : 100;
   const maxActual = bubbleData.length ? Math.max(...bubbleData.map(d=>d.y)) : 100;
   const yMax = Math.ceil(maxActual/10)*10 + 10;
@@ -530,7 +698,6 @@ function renderDashboard(){
     wrap.style.minWidth = Math.max(720, Math.round(maxInvT/100*22)+80) + 'px';
     wrap.style.height = Math.max(400, Math.round(yMax/10*16)+80) + 'px';
   }
-  /* 内核实心圆=最近一周周销（与外圈同一比例尺，内核越小=近期动销越弱于综合均值）；最近周销>综合周销时加虚线外环提示动销走强 */
   const salesComparePlugin = {id:'salesCompare', afterDatasetsDraw(chart){
     const meta = chart.getDatasetMeta(0);
     const c = chart.ctx;
@@ -602,10 +769,10 @@ function renderDashboard(){
 
 function drawChart(id,type,data,extra={},extraPlugins=[]){
   const ctx=document.getElementById(id); if(!ctx)return;
+  if(typeof Chart==='undefined'){ return; }
   if(charts[id]) charts[id].destroy();
   const opts={responsive:true,plugins:{legend:{labels:{boxWidth:12,font:{size:11}}}}};
   const inlinePlugins=[].concat(extraPlugins);
-  /* doughnut 百分比标签（Chart.js 4 须以内联插件注册，options.plugins.afterDraw 不会被执行） */
   if(type==='doughnut'||type==='pie'){
     inlinePlugins.push({id:'pctLabels',afterDraw:function(chart){
       const dataset=chart.data.datasets[0];
@@ -669,6 +836,345 @@ function renderAlerts(){
       ${(m.expiryLoss&&m.expiryLoss>0)?`<div class="mt-2 text-xs bg-rose-50 text-rose-700 rounded-lg p-2">⏳ 效期测算：预计报损约 <b>${Math.round(m.expiryQty)}</b> 件 / <b>¥${fmt(m.expiryLoss)}</b>${isFinite(m.needDaily)?`，清完所需日均 <b>${m.needDaily.toFixed(1)}</b> 件`:'（已过效期）'}</div>`:''}
     </div>`;
   });
+}
+
+/* ============ 补货计划模块 ============ */
+const repWhiteBg={id:'repWhiteBg',beforeDraw(chart){const c=chart.ctx;c.save();c.globalCompositeOperation='destination-over';c.fillStyle='#ffffff';c.fillRect(0,0,chart.width,chart.height);c.restore();}};
+
+function getSeasonArr(cat){
+  const byCat=settings.repSeasonByCat||{};
+  if(byCat[cat]&&Array.isArray(byCat[cat])&&byCat[cat].length===12) return byCat[cat];
+  return settings.repSeason;
+}
+function getForecastMonths(){
+  const now=new Date(); const y0=now.getFullYear(), mo0=now.getMonth();
+  const arr=[];
+  for(let i=1;i<=6;i++){
+    const d=new Date(y0,mo0+i,1);
+    const y=d.getFullYear(), m=d.getMonth()+1;
+    arr.push({y,m,label:String(y).slice(2)+'年'+m+'月',coef:(settings.repSeason[m-1]||1),dim:new Date(y,m,0).getDate()});
+  }
+  return arr;
+}
+
+function forecastSKU(p){
+  const m=compute(p);
+  const now=new Date(); const curMonth=now.getMonth()+1;
+  const season=getSeasonArr(p.cat);
+  const coefOf=(mon)=>season[((mon-1)%12+12)%12]||1;
+
+  const recentDaily=(Number(p.weekSales)||0)/7;
+  const avgDaily=m.avgDailySales||0;
+  let sum=0; for(let k=1;k<=curMonth;k++) sum+=coefOf(k);
+  const avgCoefElapsed=curMonth>0?sum/curMonth:1;
+  const recentBase=coefOf(curMonth)>0?recentDaily/coefOf(curMonth):recentDaily;
+  const avgBase=avgCoefElapsed>0?avgDaily/avgCoefElapsed:avgDaily;
+  const w=settings.repRecentWeight;
+
+  // —— 清仓 SKU 判定：综合到手价 ≤ 保本极限底价 × 阈值% ——
+  const clearThresh=(settings.repClearanceThreshold>0?settings.repClearanceThreshold:110)/100;
+  const isClearance=(m.breakeven>0 && m.actual>0 && m.actual <= m.breakeven*clearThresh);
+
+  // —— 基准日销：清仓回归 优先，其次近期暴增/骤降抑制 ——
+  let baseDaily, anomaly=null, spikeRatio=null, clearance=false;
+  if(isClearance){
+    // 清仓期高动销不可采信：回到起量前的常销均值 = 全年去季节化均销 × 回归系数
+    clearance=true; anomaly='clearance';
+    const revert=(settings.repClearanceRevertRatio>0?settings.repClearanceRevertRatio:0.5);
+    const stableBase = avgBase>0 ? avgBase : recentBase;
+    baseDaily = Math.max(0, stableBase*revert);
+  } else if(avgBase>0 && recentBase>0){
+    spikeRatio = recentBase/avgBase;
+    const blended = w*recentBase + (1-w)*avgBase;
+    const SPIKE_UP = 1.5, DIP_DOWN = 0.5;
+    const sens = settings.repSpikeSensitivity>0 ? settings.repSpikeSensitivity : 2;
+    if(spikeRatio > SPIKE_UP){
+      const surge = spikeRatio - 1;
+      const trust = sens/(sens+surge);
+      const guardedBase = avgBase*(1 + surge*trust);
+      baseDaily = Math.min(blended, guardedBase);
+      anomaly = 'spike';
+    } else if(spikeRatio < DIP_DOWN){
+      baseDaily = Math.min(blended, recentBase*0.6 + avgBase*0.4);
+      anomaly = 'dip';
+    } else {
+      baseDaily = blended;
+    }
+  } else if(recentBase>0){
+    baseDaily = recentBase;
+  } else {
+    baseDaily = avgBase;
+  }
+  baseDaily=Math.max(0,baseDaily);
+
+  const y0=now.getFullYear(),mo0=now.getMonth();
+  const mn=[];
+  for(let i=1;i<=7;i++){
+    const d=new Date(y0,mo0+i,1);
+    const yy=d.getFullYear(),mm=d.getMonth()+1;
+    const dim=new Date(yy,mm,0).getDate();
+    const coef=coefOf(mm);
+    mn.push({y:yy,m:mm,dim,coef,label:String(yy).slice(2)+'年'+mm+'月',demand:baseDaily*dim*coef});
+  }
+
+  const shelfDays=m.shelfLife;
+  const shelfMonths=shelfDays!=null?shelfDays/30:Infinity;
+  const normMonthly=baseDaily*30;
+  const invMonths=normMonthly>0?p.endInv/normMonthly:(p.endInv>0?Infinity:0);
+
+  let curExpiryQty=0;
+  if(shelfDays!=null){
+    curExpiryQty = baseDaily>0 ? Math.max(0, p.endInv - baseDaily*shelfDays) : p.endInv;
+  }
+
+  let suspended=false, note='';
+  if(shelfDays!=null&&shelfDays<=0){
+    suspended=true; note='已过效期，暂停补货，立即报损 / 下架处理';
+  }else if(curExpiryQty>normMonthly&&normMonthly>0){
+    suspended=true; note='库存临期严重（预计报损约'+Math.round(curExpiryQty)+'件），暂停补货，优先清仓 / 调拨';
+  }else if(baseDaily<=0){
+    suspended=true; note='近一年及近期均无动销，暂不补货，评估是否汰换';
+  }else if(isFinite(invMonths)&&invMonths>6){
+    note='当前库存约可覆盖 '+invMonths.toFixed(1)+' 个月，短期无需补货';
+  }
+
+  if(anomaly==='clearance'){
+    const extra='🏷️ 综合到手价 ¥'+m.actual.toFixed(2)+' ≤ 保本底价 ¥'+m.breakeven.toFixed(2)+'×'+settings.repClearanceThreshold+'%，判定为清仓期动销，补货已回归起量前均值（全年均销×回归系数'+settings.repClearanceRevertRatio+'），不采信清仓高动销';
+    note = note ? (note+'；'+extra) : extra;
+  } else if(anomaly==='spike'){
+    const extra='⚡近期约为全年常销的 '+spikeRatio.toFixed(1)+' 倍，判定短期暴增，补货量已按「向常销回归」抑制';
+    note = note ? (note+'；'+extra) : extra;
+  } else if(anomaly==='dip'){
+    const extra='🔻近期约为全年常销的 '+(spikeRatio*100).toFixed(0)+'%（明显偏低），已保守下调补货';
+    note = note ? (note+'；'+extra) : extra;
+  }
+
+  const safety=settings.repSafetyMonths;
+  let inv=Number(p.endInv)||0;
+  const rows=[];
+  for(let i=0;i<6;i++){
+    const cur=mn[i], nxt=mn[i+1];
+    const demand=cur.demand;
+    let coverMonths=safety;
+    if(isFinite(shelfMonths)) coverMonths=Math.min(coverMonths, Math.max(0.3, shelfMonths*0.5));
+    const targetEnd=nxt.demand*coverMonths;
+    let replenish=0, endInv;
+    if(suspended){
+      replenish=0; endInv=Math.max(0, inv-demand);
+    }else{
+      replenish=Math.max(0, demand+targetEnd-inv);
+      replenish=Math.ceil(replenish);          // 补货件数向上取整，无小数、且不缺货
+      endInv=inv+replenish-demand; if(endInv<0) endInv=0;
+    }
+    rows.push({label:cur.label,coef:cur.coef,m:cur.m,demand,replenish,beginInv:inv,endInv,targetEnd});
+    inv=endInv;
+  }
+  const totalRep=rows.reduce((a,r)=>a+r.replenish,0);
+  const totalRepCost=totalRep*(Number(p.cost)||0);
+  return {p,m,baseDaily,rows,curExpiryQty,suspended,note,shelfDays,totalRep,totalRepCost,invMonths,anomaly,spikeRatio,clearance};
+}
+
+function seasonArrFor(target){
+  if(!target) return settings.repSeason.slice();
+  const byCat=settings.repSeasonByCat||(settings.repSeasonByCat={});
+  if(Array.isArray(byCat[target])&&byCat[target].length===12) return byCat[target].slice();
+  return settings.repSeason.slice();
+}
+function commitCoefGrid(){
+  const arr=[];
+  document.querySelectorAll('.rep-coef').forEach(el=>{const i=+el.dataset.idx;const v=+el.value;arr[i]=isNaN(v)?1:Math.max(0,v);});
+  if(arr.length===12 && arr.every(x=>x!=null)){
+    if(!repCoefTarget){ settings.repSeason=arr; }
+    else { (settings.repSeasonByCat||(settings.repSeasonByCat={}))[repCoefTarget]=arr; }
+  }
+}
+function renderCoefGrid(){
+  const grid=document.getElementById('repCoefGrid'); if(!grid) return;
+  const arr=seasonArrFor(repCoefTarget);
+  grid.innerHTML=arr.map((v,i)=>{
+    const mm=i+1;
+    const tag=mm===6?' 618':(mm===11?' 双11':'');
+    const hot=v>=1.8;
+    return `<label class="text-xs ${hot?'text-rose-600 font-medium':'text-slate-500'}">${mm}月${tag}<input type="number" step="0.1" class="inp mt-1 rep-coef" data-idx="${i}" value="${v}"></label>`;
+  }).join('');
+}
+function switchCoefTarget(){
+  commitCoefGrid();
+  repCoefTarget=document.getElementById('rep_coefTarget').value;
+  refreshCoefTargetOptions();
+  renderCoefGrid();
+}
+function refreshCoefTargetOptions(){
+  const sel=document.getElementById('rep_coefTarget'); if(!sel) return;
+  const cats=[...new Set(products.map(p=>p.cat))];
+  sel.innerHTML='<option value="">通用默认（未单独设置的品类）</option>'+cats.map(c=>{
+    const has=settings.repSeasonByCat&&settings.repSeasonByCat[c];
+    return `<option value="${c}" ${c===repCoefTarget?'selected':''}>${c}${has?' ✓已定制':''}</option>`;
+  }).join('');
+}
+function loadRepParams(){
+  const rw=document.getElementById('rep_recentWeight'); if(rw) rw.value=settings.repRecentWeight;
+  const sf=document.getElementById('rep_safety'); if(sf) sf.value=settings.repSafetyMonths;
+  const ss=document.getElementById('rep_spikeSens'); if(ss) ss.value=settings.repSpikeSensitivity;
+  const ct=document.getElementById('rep_clearThresh'); if(ct) ct.value=settings.repClearanceThreshold;
+  const cr=document.getElementById('rep_clearRevert'); if(cr) cr.value=settings.repClearanceRevertRatio;
+  refreshCoefTargetOptions();
+  renderCoefGrid();
+}
+function saveRepParams(){
+  const rw=+document.getElementById('rep_recentWeight').value;
+  const sf=+document.getElementById('rep_safety').value;
+  const ssv=+document.getElementById('rep_spikeSens').value;
+  const ctv=+document.getElementById('rep_clearThresh').value;
+  const crv=+document.getElementById('rep_clearRevert').value;
+  settings.repRecentWeight=isNaN(rw)?0.6:Math.min(1,Math.max(0,rw));
+  settings.repSafetyMonths=isNaN(sf)?1.0:Math.max(0,sf);
+  settings.repSpikeSensitivity=isNaN(ssv)?2:Math.max(0.5,ssv);
+  settings.repClearanceThreshold=isNaN(ctv)?110:Math.max(0,ctv);
+  settings.repClearanceRevertRatio=isNaN(crv)?0.5:Math.min(1,Math.max(0,crv));
+  commitCoefGrid();
+  persist(); loadRepParams(); renderReplenish(); toast('补货参数已保存并重算');
+}
+function resetCatCoef(){
+  if(!repCoefTarget){ toast('当前为通用默认，无法重置'); return; }
+  if(settings.repSeasonByCat && settings.repSeasonByCat[repCoefTarget]) delete settings.repSeasonByCat[repCoefTarget];
+  refreshCoefTargetOptions(); renderCoefGrid();
+  persist(); renderReplenish(); toast('该品类已重置为继承通用默认');
+}
+
+function repSearch(v){ repFilter.q=v; renderReplenish(); }
+function repCatChange(v){ repFilter.cat=v; renderReplenish(); }
+function repToggleNeed(el){ repFilter.onlyNeed=el.checked; renderReplenish(); }
+
+function renderReplenish(){
+  const wrap=document.getElementById('repTableWrap'); if(!wrap) return;
+  const kpiBox=document.getElementById('repKpis');
+  const months=getForecastMonths();
+  if(!products.length){
+    if(kpiBox) kpiBox.innerHTML='';
+    wrap.innerHTML='<div class="p-6 text-center text-slate-400">暂无数据，请先在「数据录入」添加或载入数据</div>';
+    if(charts['chartReplenish']){ charts['chartReplenish'].destroy(); delete charts['chartReplenish']; }
+    return;
+  }
+  const forecasts=products.map(forecastSKU);
+
+  const catSel=document.getElementById('rep_cat');
+  if(catSel){
+    const cats=[...new Set(products.map(p=>p.cat))];
+    const cur=repFilter.cat;
+    catSel.innerHTML='<option value="">全部品类</option>'+cats.map(c=>`<option ${c===cur?'selected':''}>${c}</option>`).join('');
+  }
+
+  const monTotals=months.map(()=>({rep:0,demand:0,cost:0}));
+  forecasts.forEach(f=>f.rows.forEach((r,i)=>{monTotals[i].rep+=r.replenish;monTotals[i].demand+=r.demand;monTotals[i].cost+=r.replenish*(Number(f.p.cost)||0);}));
+  const totalUnits=monTotals.reduce((a,x)=>a+x.rep,0);
+  const totalCost=monTotals.reduce((a,x)=>a+x.cost,0);
+  const needCnt=forecasts.filter(f=>f.totalRep>0).length;
+  const suspCnt=forecasts.filter(f=>f.suspended).length;
+  const clearCnt=forecasts.filter(f=>f.clearance).length;
+
+  if(kpiBox) kpiBox.innerHTML=`
+    <div class="bg-white rounded-xl shadow-sm p-4"><div class="text-xs text-slate-400">6个月建议补货总件数</div><div class="text-lg sm:text-2xl font-bold text-indigo-600 mt-1">${fmt(totalUnits)}</div></div>
+    <div class="bg-white rounded-xl shadow-sm p-4"><div class="text-xs text-slate-400">6个月补货预算(成本)</div><div class="text-lg sm:text-2xl font-bold text-emerald-600 mt-1">¥${fmt(totalCost)}</div></div>
+    <div class="bg-white rounded-xl shadow-sm p-4"><div class="text-xs text-slate-400">需补货 SKU 数</div><div class="text-lg sm:text-2xl font-bold text-slate-900 mt-1">${needCnt}</div></div>
+    <div class="bg-white rounded-xl shadow-sm p-4"><div class="text-xs text-slate-400">🏷️清仓回归 SKU 数</div><div class="text-lg sm:text-2xl font-bold text-sky-600 mt-1">${clearCnt}</div></div>
+    <div class="bg-white rounded-xl shadow-sm p-4"><div class="text-xs text-slate-400">暂停补货 SKU 数(临期/滞销)</div><div class="text-lg sm:text-2xl font-bold text-rose-600 mt-1">${suspCnt}</div></div>`;
+
+  drawChart('chartReplenish','bar',{labels:months.map(x=>x.label),datasets:[
+    {label:'建议补货(件)',data:monTotals.map(x=>+x.rep.toFixed(0)),backgroundColor:months.map(x=>x.coef>=1.8?'#f43f5e':(x.coef>=1.2?'#f59e0b':'#6366f1'))},
+    {label:'预计销量(件)',data:monTotals.map(x=>+x.demand.toFixed(0)),backgroundColor:'#c7d2fe'},
+    {label:'补货成本(万元)',data:monTotals.map(x=>+(x.cost/10000).toFixed(1)),type:'line',borderColor:'#10b981',backgroundColor:'#10b981',pointRadius:4,yAxisID:'y1'}
+  ]},{
+    scales:{
+      y:{beginAtZero:true,title:{display:true,text:'件数'}},
+      y1:{beginAtZero:true,position:'right',title:{display:true,text:'补货成本(万元)'},grid:{drawOnChartArea:false}}
+    },
+    plugins:{legend:{labels:{boxWidth:12,font:{size:11}}}}
+  },[repWhiteBg]);
+
+  const q=repFilter.q.toLowerCase(), cat=repFilter.cat;
+  let list=forecasts.filter(f=>
+    (!q || f.p.name.toLowerCase().includes(q) || String(f.p.sku).toLowerCase().includes(q)) &&
+    (!cat || f.p.cat===cat) &&
+    (!repFilter.onlyNeed || f.totalRep>0)
+  );
+  list.sort((a,b)=>b.totalRep-a.totalRep);
+
+  const monthHead=months.map(x=>{
+    const tag=x.m===6?' 618':(x.m===11?' 双11':'');
+    const cls=x.coef>=1.8?'text-rose-600':(x.coef>=1.2?'text-amber-600':'');
+    return `<th class="p-2 text-right ${cls}">${x.label}${tag}</th>`;
+  }).join('');
+
+  let html=`<table class="w-full text-xs sm:text-sm border-collapse"><thead>
+    <tr class="bg-slate-50 text-slate-500 text-left">
+      <th class="p-2">#</th><th class="p-2">产品</th><th class="p-2">SKU</th><th class="p-2">品类</th>
+      <th class="p-2 text-right">基准日销</th><th class="p-2 text-right">当前库存</th><th class="p-2 text-right">剩余效期</th>
+      ${monthHead}
+      <th class="p-2 text-right">合计补货</th><th class="p-2 text-right">补货成本</th><th class="p-2">备注</th>
+    </tr></thead><tbody>`;
+  if(!list.length){
+    html+=`<tr><td colspan="${10+months.length}" class="p-6 text-center text-slate-400">无符合条件的产品</td></tr>`;
+  }else{
+    list.forEach((f,idx)=>{
+      let flag='';
+      if(f.suspended) flag='🚫 ';
+      else if(f.clearance) flag='🏷️ ';
+      else if(f.anomaly==='spike') flag='⚡ ';
+      else if(f.anomaly==='dip') flag='🔻 ';
+      const rowBg=f.suspended?'bg-rose-50':(f.clearance?'bg-sky-50':(f.anomaly==='spike'?'bg-amber-50':''));
+      const cells=f.rows.map(r=>{
+        const strong=r.replenish>0;
+        return `<td class="p-2 text-right" title="期初 ${fmt(r.beginInv,0)} / 期末 ${fmt(r.endInv,0)} / 目标库存 ${fmt(r.targetEnd,0)}">
+          <span class="${strong?'font-semibold text-indigo-700':'text-slate-300'}">${r.replenish>0?fmt(r.replenish,0):'—'}</span>
+          <br><span class="text-slate-400" style="font-size:10px">需${fmt(r.demand,0)}</span></td>`;
+      }).join('');
+      const shelfTxt=f.shelfDays!=null?(f.shelfDays<=0?'<span class="text-rose-600 font-semibold">已过期</span>':f.shelfDays+'天'):'—';
+      html+=`<tr class="border-t hover:bg-slate-50 ${rowBg}">
+        <td class="p-2 text-center text-slate-400">${idx+1}</td>
+        <td class="p-2 font-medium">${flag}${f.p.name}</td>
+        <td class="p-2 text-slate-400">${f.p.sku}</td>
+        <td class="p-2">${f.p.cat}</td>
+        <td class="p-2 text-right">${f.baseDaily.toFixed(1)}</td>
+        <td class="p-2 text-right">${fmt(f.p.endInv)}</td>
+        <td class="p-2 text-right">${shelfTxt}</td>
+        ${cells}
+        <td class="p-2 text-right font-semibold ${f.totalRep>0?'text-indigo-700':'text-slate-300'}">${f.totalRep>0?fmt(f.totalRep,0):'—'}</td>
+        <td class="p-2 text-right ${f.totalRepCost>0?'text-emerald-600':'text-slate-300'}">${f.totalRepCost>0?'¥'+fmt(f.totalRepCost):'—'}</td>
+        <td class="p-2 ${f.suspended?'text-rose-600':(f.clearance?'text-sky-700':'text-slate-500')}" style="white-space:normal;min-width:160px">${f.note||''}</td>
+      </tr>`;
+    });
+  }
+  html+='</tbody></table>';
+  wrap.innerHTML=html;
+}
+
+function downloadReplenishChart(){
+  const ch=charts['chartReplenish'];
+  if(!ch){ toast('暂无可下载的图表'); return; }
+  try{
+    const url=ch.toBase64Image('image/png',1);
+    const a=document.createElement('a'); a.href=url; a.download='补货计划图表.png'; a.click();
+    toast('图表已下载');
+  }catch(e){ toast('下载失败：'+e.message); }
+}
+
+function csvSafe(s){ s=String(s==null?'':s); return /[",\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s; }
+function exportReplenishCSV(){
+  if(!products.length){ toast('无数据可导出'); return; }
+  const months=getForecastMonths();
+  const head=['产品名称','SKU','品类','基准日销','当前库存','剩余效期天数','清仓SKU'];
+  months.forEach(x=>{ head.push(x.label+'建议补货'); head.push(x.label+'预计销量'); });
+  head.push('合计补货','补货成本','备注');
+  const rows=[head.map(csvSafe).join(',')];
+  products.map(forecastSKU).forEach(f=>{
+    const r=[csvSafe(f.p.name),csvSafe(f.p.sku),csvSafe(f.p.cat),f.baseDaily.toFixed(2),(Number(f.p.endInv)||0),(f.shelfDays!=null?f.shelfDays:''),(f.clearance?'是':'')];
+    f.rows.forEach(x=>{ r.push(Math.round(x.replenish)); r.push(Math.round(x.demand)); });
+    r.push(Math.round(f.totalRep), f.totalRepCost.toFixed(2), csvSafe(f.note||''));
+    rows.push(r.join(','));
+  });
+  downloadFile('\ufeff'+rows.join('\n'),'补货计划_未来6个月.csv');
+  toast('补货计划CSV 已导出');
 }
 
 /* ============ 清单弹窗 & 联动 ============ */
@@ -784,7 +1290,7 @@ function downloadTemplate(){
 }
 function exportData(){
   let rows=[HEADERS.join(',')];
-  products.forEach(p=>rows.push([p.name,p.sku,p.cat,p.cost,p.price,p.actualPrice,p.weekSales,p.endInv,p.beginInv,p.ytdSales,p.date,p.feeTax,p.feeOther,p.shelfLife].join(',')));
+  products.forEach(p=>rows.push([csvSafe(p.name),csvSafe(p.sku),csvSafe(p.cat),p.cost,p.price,p.actualPrice,p.weekSales,p.endInv,p.beginInv,p.ytdSales,p.date,p.feeTax,p.feeOther,p.shelfLife].join(',')));
   downloadFile('\ufeff'+rows.join('\n'),'渠道数据导出.csv');
 }
 function downloadFile(content,name){
@@ -795,17 +1301,16 @@ function downloadFile(content,name){
 /* ============ GitHub 自动推送 ============ */
 const GH_REPO = 'camovibe/guanwangdongxiao';
 const GH_PATH = 'data.json';
-const GH_BRANCH = 'main';  // 数据统一写 main 分支；部署端也必须以 main 为准
 
 function saveGhToken(){
   const token = document.getElementById('gh_token').value.trim();
   if(!token){ toast('请输入 Token'); return; }
-  localStorage.setItem('gh_token', token);
+  try{ localStorage.setItem('gh_token', token); }catch(e){}
   document.getElementById('gh_status').textContent = 'Token 已保存（本地存储，不会上传）';
   toast('Token 已保存');
 }
 function clearGhToken(){
-  localStorage.removeItem('gh_token');
+  try{ localStorage.removeItem('gh_token'); }catch(e){}
   document.getElementById('gh_token').value = '';
   document.getElementById('gh_status').textContent = 'Token 已清除';
   toast('Token 已清除');
@@ -815,66 +1320,37 @@ async function pushToGitHub(token, content){
   const apiBase = `https://api.github.com/repos/${GH_REPO}/contents/${GH_PATH}`;
   toast('正在同步到团队看板...');
   try {
-    // 1. 获取当前文件 SHA（显式指定分支，防止写到非部署分支）
     let sha = null;
-    const getRes = await fetch(apiBase + '?ref=' + GH_BRANCH, {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Accept': 'application/vnd.github+json'
-      }
+    const getRes = await fetch(apiBase, {
+      headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/vnd.github+json' }
     });
-    if(getRes.ok){
-      const info = await getRes.json();
-      sha = info.sha;
-    } else if(getRes.status !== 404){
-      // 401/403 通常是 Token 无效或缺少 Contents 读写权限，直接终止避免误创建
-      const err = await getRes.json().catch(()=>null);
-      toast('❌ 读取仓库失败: ' + (err?.message || getRes.statusText) + '（检查 Token 是否有该仓库 Contents: Read and write 权限）');
-      return;
-    }
-    // 2. PUT 更新（显式指定分支）
+    if(getRes.ok){ const info = await getRes.json(); sha = info.sha; }
     const body = {
       message: `Update data.json via 产品渠道动销与利润罗盘系统 — ${new Date().toLocaleString('zh-CN')}`,
-      content: btoa(unescape(encodeURIComponent(content))),
-      branch: GH_BRANCH
+      content: btoa(unescape(encodeURIComponent(content)))
     };
     if(sha) body.sha = sha;
     const putRes = await fetch(apiBase, {
       method: 'PUT',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Accept': 'application/vnd.github+json',
-        'Content-Type': 'application/json'
-      },
+      headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/vnd.github+json', 'Content-Type': 'application/json' },
       body: JSON.stringify(body)
     });
-    if(putRes.ok){
-      toast('✅ 已写入 ' + GH_BRANCH + ' 分支！静态站点需重新部署/发布后才可见（Pages 约 1–2 分钟；Cloudflare Workers 需触发一次新部署）');
-    } else {
-      const err = await putRes.json().catch(()=>null);
-      toast('❌ 同步失败: ' + (err?.message || putRes.statusText));
-    }
-  } catch(e){
-    toast('❌ 同步失败: ' + e.message);
-  }
+    if(putRes.ok){ toast('✅ 已同步到团队看板！约 1–2 分钟后刷新可见'); }
+    else { const err = await putRes.json().catch(()=>null); toast('❌ 同步失败: ' + (err?.message || putRes.statusText)); }
+  } catch(e){ toast('❌ 同步失败: ' + e.message); }
 }
 
 async function exportDataJson(){
   const data = {products, settings, updatedAt: new Date().toISOString()};
   const jsonStr = JSON.stringify(data, null, 2);
-  // 本地导出
   const blob = new Blob([jsonStr], {type:'application/json'});
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
   a.download = 'data.json';
   a.click();
-  // 自动推送到 GitHub
-  const token = localStorage.getItem('gh_token');
-  if(token){
-    await pushToGitHub(token, jsonStr);
-  } else {
-    toast('已本地导出；未配置 GitHub Token，跳过自动同步');
-  }
+  let token=null; try{ token = localStorage.getItem('gh_token'); }catch(e){}
+  if(token){ await pushToGitHub(token, jsonStr); }
+  else { toast('已本地导出；未配置 GitHub Token，跳过自动同步'); }
 }
 
 function importCSV(e){
@@ -896,7 +1372,7 @@ function importCSV(e){
       if(idx>=0)products[idx]=obj; else products.push(obj);
       added++;
     }
-    render(); toast('成功导入/更新 '+added+' 条'); e.target.value='';
+    render(); loadRepParams(); toast('成功导入/更新 '+added+' 条'); e.target.value='';
   };
   reader.readAsText(file,'UTF-8');
 }
@@ -910,7 +1386,7 @@ function loadSample(){
     {name:'益生菌软糖',sku:'SKU006',cat:'保健食品',cost:25,price:79,actualPrice:69,weekSales:350,endInv:2000,beginInv:1800,ytdSales:11200,shelfLife:300,date:'2026-06-28',feeTax:'',feeOther:''},
     {name:'鲜食坚果礼盒',sku:'SKU007',cat:'食品',cost:40,price:99,actualPrice:89,weekSales:105,endInv:3000,beginInv:2000,ytdSales:5200,shelfLife:90,date:'2026-06-28',feeTax:'',feeOther:''}
   ];
-  render(); toast('已载入示例数据（含效期示例）');
+  render(); loadRepParams(); toast('已载入示例数据（含效期示例）');
 }
 
 /* ============ Tab & Toast ============ */
@@ -919,6 +1395,7 @@ function switchTab(name){
   document.getElementById('tab-'+name).classList.remove('hidden');
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('tab-active',b.dataset.tab===name));
   if(name==='dashboard') renderDashboard();
+  if(name==='replenish') renderReplenish();
   goTop();
 }
 document.querySelectorAll('.tab-btn').forEach(b=>b.addEventListener('click',()=>switchTab(b.dataset.tab)));
@@ -926,15 +1403,9 @@ document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeListModal(); 
 let toastTimer;
 function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.style.opacity=1;clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.style.opacity=0,2000);}
 
-/* ============ 回到顶部（函数改名 goTop，避开 DOM 原生 scrollTop 属性冲突） ============ */
-function getScrollTop(){
-  return window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
-}
-function setScrollTop(y){
-  try{ window.scrollTo(0,y); }catch(e){}
-  if(document.documentElement) document.documentElement.scrollTop = y;
-  if(document.body) document.body.scrollTop = y;
-}
+/* ============ 回到顶部 ============ */
+function getScrollTop(){ return window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0; }
+function setScrollTop(y){ try{ window.scrollTo(0,y); }catch(e){} if(document.documentElement) document.documentElement.scrollTop = y; if(document.body) document.body.scrollTop = y; }
 function goTop(){
   const startY = getScrollTop();
   if(startY <= 0){ setScrollTop(0); return; }
@@ -949,10 +1420,7 @@ function goTop(){
 }
 (function(){
   const btn=document.getElementById('backTop');
-  const onScroll=()=>{
-    if(getScrollTop()>300) btn.classList.remove('hidden-btn');
-    else btn.classList.add('hidden-btn');
-  };
+  const onScroll=()=>{ if(getScrollTop()>300) btn.classList.remove('hidden-btn'); else btn.classList.add('hidden-btn'); };
   window.addEventListener('scroll',onScroll,{passive:true});
   document.addEventListener('scroll',onScroll,{passive:true,capture:true});
   onScroll();
@@ -974,37 +1442,24 @@ function checkPwd(){
     err.textContent='密码错误，请重试';
   }
 }
-async function loadDashboardData(){
-  const el = document.getElementById('updateInfo');
-  const ts = 't=' + Date.now();
-  // 依次尝试：① 部署站点同源 ② 直接读 GitHub main 分支（raw 兜底）
-  const candidates = [
-    './data.json?' + ts,
-    'https://raw.githubusercontent.com/' + GH_REPO + '/main/data.json?' + ts
-  ];
-  let lastErr = '';
-  for(const url of candidates){
-    try{
-      const r = await fetch(url, {cache:'no-store'});
-      if(!r.ok){ lastErr = url.split('?')[0] + ' → HTTP ' + r.status; continue; }
-      const d = await r.json();
-      products = d.products || [];
-      if(d.settings) settings = {...settings, ...d.settings};
-      const updatedAt = d.updatedAt || '未知';
-      if(el) el.textContent = '数据更新时间：' + updatedAt + ' · 来源：' + url.split('?')[0];
-      // 渲染错误单独捕获，避免被当成"取数失败"误触发下一个候选源
-      try{
-        render();
-        switchTab('dashboard');
-      }catch(re){
-        console.error('渲染失败:', re);
-        if(el) el.textContent += '（⚠️ 数据已加载但渲染异常：' + re.message + '）';
-      }
-      return;
-    }catch(e){
-      lastErr = url.split('?')[0] + ' → ' + e.message;
-    }
-  }
-  if(el) el.textContent = '数据加载失败（最后错误：' + lastErr + '）。请新开标签页直接访问该 URL 看具体状态码排查。';
+function loadDashboardData(){
+  fetch('./data.json?t=' + Date.now(), {cache:'no-store'})
+  .then(r=>{ if(!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+  .then(d=>{
+    products = d.products || [];
+    if(d.settings) settings = {...settings, ...d.settings};
+    const updatedAt = d.updatedAt || '未知';
+    const el = document.getElementById('updateInfo');
+    if(el) el.textContent = '数据更新时间：' + updatedAt + ' · 本页面为只读看板，如需修改请联系管理员';
+    render();
+    switchTab('dashboard');
+  })
+  .catch(e=>{
+    const el = document.getElementById('updateInfo');
+    if(el) el.textContent = '数据加载失败：' + e.message + '（请确认 data.json 已部署且可访问）';
+  });
 }
-</script></div></body></html>
+</script>
+</script>
+</body>
+</html>
