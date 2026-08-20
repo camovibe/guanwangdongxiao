@@ -47,6 +47,7 @@
       <span class="inline-block w-2 h-6 bg-indigo-600 rounded"></span>
       产品渠道动销与利润罗盘系统 <span class="text-xs font-normal text-slate-400">v1.8.4</span>
     </h1>
+    <p id="updateInfo" class="text-xs text-slate-400 mt-1">正在加载数据...</p>
     <p class="text-sm text-slate-500 mt-1">库销比 · 滚动周转 · 效期报损预警(随日期动态倒扣) · 智能促销边界 · 渠道利润看板 · 6个月智能补货(按品类618/双11系数 · 近期暴增抑制 · 清仓SKU动销回归)</p>
   </header>
 
@@ -1482,7 +1483,6 @@ function loadDashboardData(){
     if(el) el.textContent = '数据加载失败：' + e.message + '（请确认 data.json 已部署且可访问）';
   });
 }
-</script>
 </script>
 </body>
 </html>
