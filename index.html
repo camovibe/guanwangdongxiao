@@ -40,7 +40,7 @@
   <p style="color:#6366f1;font-size:11px;margin-top:24px;opacity:0.5;">v1.8.5 · 只读版本</p>
 </div>
 
-<div class="max-w-screen-2xl mx-auto p-3 sm:p-6">
+<div id="main-content" class="max-w-screen-2xl mx-auto p-3 sm:p-6" style="display:none;">
 
   <!-- 头部 -->
   <header class="mb-5">
@@ -1485,11 +1485,12 @@ function boot(){
   try{ render(); }catch(e){ console.error('初始渲染失败：',e); }
   switchTab('dashboard');
 }
-if(document.readyState==='loading'){
-  document.addEventListener('DOMContentLoaded', boot);
-}else{
-  boot();
-}
+// 只读版：阻止 boot() 自动执行，改由密码验证后调用 loadDashboardData()
+// if(document.readyState==='loading'){
+//   document.addEventListener('DOMContentLoaded', boot);
+// }else{
+//   boot();
+// }
 
 // ====== 密码保护 + data.json 加载 ======
 const DASHBOARD_PASSWORD = '2026';
@@ -1507,18 +1508,22 @@ function checkPwd(){
 }
 
 function loadDashboardData(){
+  console.log('[只读版] 开始加载 data.json...');
   fetch('./data.json?t=' + Date.now(), {cache:'no-store'})
   .then(r=>{ if(!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
   .then(d=>{
+    console.log('[只读版] data.json 加载成功, products:', (d.products||[]).length);
     products = d.products || [];
     if(d.settings) settings = {...settings, ...d.settings};
+    ensureRepSettings();
     const updatedAt = d.updatedAt || '未知';
     const el = document.getElementById('updateInfo');
     if(el) el.textContent = '数据更新时间：' + updatedAt + ' · 本页面为只读看板，如需修改请联系管理员';
-    render();
+    try{ render(); console.log('[只读版] render() 成功'); }catch(e){ console.error('[只读版] render() 失败:', e); }
     switchTab('dashboard');
   })
   .catch(e=>{
+    console.error('[只读版] data.json 加载失败:', e);
     const el = document.getElementById('updateInfo');
     if(el) el.textContent = '数据加载失败：' + e.message + '（请确认 data.json 已部署且可访问）';
   });
