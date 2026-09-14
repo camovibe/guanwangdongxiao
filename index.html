@@ -21,6 +21,8 @@
   .alert-card{scroll-margin-top:80px;}
   #backTop{transition:opacity .3s, transform .3s, visibility .3s;}
   #backTop.hidden-btn{opacity:0;visibility:hidden;transform:translateY(12px);pointer-events:none;}
+  /* 团队-只读模式：仅隐藏编辑入口，属界面模式，不构成真正访问控制 */
+  body.mode-readonly .edit-only{display:none !important;}
 </style>
 </head>
 <body class="bg-slate-100 text-slate-800">
@@ -37,19 +39,18 @@
     <button onclick="checkPwd()" style="width:100%;padding:14px;border-radius:12px;border:none;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;font-size:15px;font-weight:600;cursor:pointer;transition:all 0.2s;box-shadow:0 4px 16px rgba(99,102,241,0.3);">进入看板</button>
     <p id="pwd-error" style="color:#f87171;font-size:13px;margin-top:14px;text-align:center;min-height:18px;"></p>
   </div>
-  <p style="color:#6366f1;font-size:11px;margin-top:24px;opacity:0.5;">v1.8.5 · 只读版本</p>
+  <p style="color:#6366f1;font-size:11px;margin-top:24px;opacity:0.5;">v1.11.0 · 只读版本</p>
 </div>
-
 <div id="main-content" class="max-w-screen-2xl mx-auto p-3 sm:p-6" style="display:none;">
 
   <!-- 头部 -->
   <header class="mb-5">
     <h1 class="text-xl sm:text-2xl font-bold text-slate-900 flex items-center gap-2">
       <span class="inline-block w-2 h-6 bg-indigo-600 rounded"></span>
-      产品渠道动销与利润罗盘系统 <span class="text-xs font-normal text-slate-400">v1.8.5</span>
+      产品渠道动销与利润罗盘系统 <span class="text-xs font-normal text-slate-400">v1.11.0</span>
     </h1>
     <p id="updateInfo" class="text-xs text-slate-400 mt-1">正在加载数据...</p>
-    <p class="text-sm text-slate-500 mt-1">库销比 · 滚动周转 · 效期报损预警(随日期动态倒扣) · 智能促销边界 · 渠道利润看板 · 6个月智能补货(按品类618/双11系数 · 近期暴增抑制 · 清仓SKU动销回归) · 断货毛利损失(场景B/不补货 · 清仓控价还原)</p>
+    <p class="text-sm text-slate-500 mt-1">库销比 · 年累计周转率(估算) · 效期报损预警(随日期动态倒扣) · 智能促销边界 · 渠道贡献利润看板 · 轻量补货参考(默认模式：仅周销+库存+日期即可测算) · 未来六个月需求与采购预算情景(按品类618/双11系数 · 非一次性采购量) · 不补货贡献利润缺口(情景估算 · 恢复销售价/控价假设单列)</p>
   </header>
 
   <!-- Tab 导航 -->
@@ -57,21 +58,23 @@
     <button data-tab="dashboard" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium bg-white shadow-sm hover:bg-indigo-50 transition">渠道看板</button>
     <button data-tab="overview" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium bg-white shadow-sm hover:bg-indigo-50 transition">数据总览</button>
     <button data-tab="alerts" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium bg-white shadow-sm hover:bg-indigo-50 transition">预警与营销建议</button>
-    <button data-tab="replenish" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium bg-white shadow-sm hover:bg-indigo-50 transition">补货计划</button>  </nav>
+    <button data-tab="replenish" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium bg-white shadow-sm hover:bg-indigo-50 transition">补货计划</button>
+  </nav>
 
   <!-- ============ 渠道看板 ============ -->
   <section id="tab-dashboard" class="tab-panel">
+    <div id="dqBarDashboard" class="mb-4"></div>
     <div class="grid grid-cols-2 lg:grid-cols-5 gap-3 mb-5">
       <div class="bg-white rounded-xl shadow-sm p-4">
-        <div class="text-xs text-slate-400">累计GMV（到手价×累计销量）</div>
+        <div class="text-xs text-slate-400">累计GMV（估算）（到手价×累计销量）</div>
         <div id="kpi-gmv" class="text-lg sm:text-2xl font-bold text-slate-900 mt-1">-</div>
       </div>
       <div class="bg-white rounded-xl shadow-sm p-4">
-        <div class="text-xs text-slate-400">累计利润</div>
+        <div class="text-xs text-slate-400">累计贡献利润（估算）</div>
         <div id="kpi-profit" class="text-lg sm:text-2xl font-bold text-emerald-600 mt-1">-</div>
       </div>
       <div class="bg-white rounded-xl shadow-sm p-4">
-        <div class="text-xs text-slate-400">加权利润率</div>
+        <div class="text-xs text-slate-400">加权贡献利润率（估算）</div>
         <div id="kpi-margin" class="text-lg sm:text-2xl font-bold text-indigo-600 mt-1">-</div>
       </div>
       <div id="card-alert" onclick="showAlertList()" class="bg-white rounded-xl shadow-sm p-4 cursor-pointer hover:ring-2 hover:ring-rose-200 transition select-none">
@@ -83,9 +86,10 @@
         <div id="kpi-expiry" class="text-lg sm:text-2xl font-bold text-amber-600 mt-1">-</div>
       </div>
     </div>
+    <p class="text-xs text-slate-400 mb-4 leading-relaxed">口径说明（无交易流水时均为估算，并非自动重建历史实际成交利润）：累计GMV = 当前有效到手价 × 年累计销量；累计贡献利润 = 当前有效单件贡献利润 × 年累计销量；加权贡献利润率 = 贡献利润 ÷ GMV；年累计周转率 = 年累计销量 ÷ 期初期末库存均值。目标利润率为渠道贡献口径目标，<strong>不等同完整财务净利润率</strong>。</p>
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
       <div class="bg-white rounded-xl shadow-sm p-4">
-        <h3 class="text-sm font-semibold mb-3">各品类 累计GMV 与 累计利润</h3>
+        <h3 class="text-sm font-semibold mb-3">各品类 累计GMV（估算）与 累计贡献利润（估算）</h3>
         <canvas id="chartCategory" height="140"></canvas>
       </div>
       <div class="bg-white rounded-xl shadow-sm p-4">
@@ -98,12 +102,12 @@
       </div>
     </div>
     <div class="bg-white rounded-xl shadow-sm p-4">
-      <h3 class="text-sm font-semibold mb-3">各产品 库销比（柱）与 滚动周转率（点）</h3>
+      <h3 class="text-sm font-semibold mb-3">各产品 库销比（柱）与 年累计周转率（估算·点）</h3>
       <canvas id="chartMix" height="120"></canvas>
     </div>
     <div class="bg-white rounded-xl shadow-sm p-4">
       <h3 class="text-sm font-semibold mb-3">SKU 利润健康度气泡图</h3>
-      <p class="text-xs text-slate-400 mb-2">X=期末库存（≤3100 件每 100 一格；3100 以上每 10000 一格且格距与 100 格等长）· Y=到手价（每 10 元一格，不压缩，象限等比放大、可横向滚动）· 外圈大小=综合周销 · <span class="text-slate-500 font-medium">实心内核=最近一周周销</span>（内核越小=近期动销越弱于均值；出现虚线外环=最近周销已超过综合周销）· 颜色=利润健康度（红=亏损/保本边缘；<span class="text-slate-500 font-medium">库存&lt;20 件视为无库存，置灰</span>）· 点击查看单品建议</p>
+      <p class="text-xs text-slate-400 mb-2">X=期末库存（分段坐标：≤3100 件每 100 一格；3100 以上每 10000 原始件一格，格长与低段 100 格相同；tooltip 始终显示真实库存）· Y=到手价（每 10 元一格，不压缩）· 两轴单位与格距不同，仅各自轴内等距，不代表库存与价格存在物理等比关系；图宽可横向滚动 · 外圈大小=年累计均周销 · <span class="text-slate-500 font-medium">实心内核=最近一周周销</span>（内核按比例=内核/外圈=√(近期÷年均)， capped 于外圈；内核越小=近期动销越弱于均值；出现虚线外环=最近周销已超过年累计均周销；年均=0 且近期&gt;0 时为「新增动销，无同比基准」）· 颜色=利润健康度（红=亏损/保本边缘；<span class="text-slate-500 font-medium">库存&lt;20 件在图中置灰仅为可视化近似，真实库存（如 19 件）仍全部参与核算</span>）· 点击查看单品建议</p>
       <div class="overflow-x-auto scrollbar-thin"><div id="bubbleWrap" style="min-width:640px;height:380px;position:relative;"><canvas id="chartBubble"></canvas></div></div>
     </div>
   </section>
@@ -115,20 +119,22 @@
         <h3 class="text-sm font-semibold">全部产品指标（剩余效期已按今天动态倒扣）<span id="ovCount" class="text-xs font-normal text-slate-400 ml-2"></span></h3>
         <div class="flex gap-2">
           <button onclick="clearOverviewFilters()" class="px-3 py-1.5 text-xs bg-slate-200 rounded-lg hover:bg-slate-300">清空筛选</button>
-          <button onclick="exportData()" class="px-3 py-1.5 text-xs bg-emerald-600 text-white rounded-lg hover:bg-emerald-700">导出当前数据CSV</button>
-          </div>
+          <button onclick="exportData('all')" class="px-3 py-1.5 text-xs bg-emerald-600 text-white rounded-lg hover:bg-emerald-700">导出全部CSV</button>
+          <button onclick="exportData('filtered')" class="px-3 py-1.5 text-xs bg-emerald-500 text-white rounded-lg hover:bg-emerald-600">导出筛选结果CSV</button>
+          <button onclick="exportDataJson()" class="px-3 py-1.5 text-xs bg-amber-600 text-white rounded-lg hover:bg-amber-700">导出 data.json</button>
+        </div>
       </div>
-      <p class="text-xs text-slate-400 mb-3">筛选提示：数值列支持 <code>&gt;3</code>、<code>&lt;1</code>、<code>&gt;=2</code>、<code>1-3</code>（区间）等写法；文本 / 状态列按关键字模糊匹配（如状态输入「积压」「断货」「滞销」「报损」「临期」）。<strong>剩余效期</strong>列显示的是按今天推算后的真实剩余天数。</p>
+      <p class="text-xs text-slate-400 mb-3">筛选提示：数值列支持 <code>&gt;3</code>、<code>&lt;1</code>、<code>&gt;=2</code>、<code>1-3</code>（区间）与纯数字精确匹配（如输 1 只匹配 1，不匹配 10/21/100）；文本 / 状态列按关键字模糊匹配（如状态输入「积压」「断货」「滞销」「报损」「临期」「亏损」「保本」「利润偏低」「营销投入」）。<strong>剩余效期</strong>列显示的是按今天推算后的真实剩余天数。无法识别的表达式会在右上计数处给出提示，并按「不匹配」处理，不会静默放行全部。</p>
       <table class="w-full text-xs sm:text-sm border-collapse">
         <thead>
           <tr class="bg-slate-50 text-slate-500 text-left">
             <th class="p-2">#</th><th class="p-2">产品</th><th class="p-2">SKU</th><th class="p-2">品类</th>
             <th class="p-2 text-right">成本</th><th class="p-2 text-right">控价</th><th class="p-2 text-right">到手价</th>
-            <th class="p-2 text-right">单件利润</th><th class="p-2 text-right">利润率</th><th class="p-2 text-right">保本极限底价</th><th class="p-2 text-right">累计利润</th>
+            <th class="p-2 text-right">单件利润</th><th class="p-2 text-right">利润率</th><th class="p-2 text-right">保本极限底价</th><th class="p-2 text-right">累计贡献利润(估算)</th>
             <th class="p-2 text-right">日均销</th><th class="p-2 text-right">期末库存</th>
             <th class="p-2 text-right">库销比</th><th class="p-2 text-right">可售天数</th>
             <th class="p-2 text-right">剩余效期</th><th class="p-2 text-right">预计报损</th>
-            <th class="p-2 text-right">滚动周转</th><th class="p-2">状态</th>
+            <th class="p-2 text-right">年累计周转率(估算)</th><th class="p-2">状态</th>
           </tr>
           <tr class="bg-white border-b">
             <th class="p-1"></th><th class="p-1"><input id="flt_name" oninput="renderOverview()" class="flt" placeholder="产品名"></th>
@@ -148,7 +154,7 @@
             <th class="p-1"><input id="flt_shelf" oninput="renderOverview()" class="flt" placeholder="<30"></th>
             <th class="p-1"><input id="flt_loss" oninput="renderOverview()" class="flt" placeholder=">0"></th>
             <th class="p-1"><input id="flt_turnover" oninput="renderOverview()" class="flt" placeholder="<1"></th>
-            <th class="p-1"><input id="flt_status" oninput="renderOverview()" class="flt" placeholder="如 报损/临期"></th>
+            <th class="p-1"><input id="flt_status" oninput="renderOverview()" class="flt" placeholder="如 报损/临期/亏损"></th>
           </tr>
         </thead>
         <tbody id="overviewBody"></tbody>
@@ -163,17 +169,40 @@
 
   <!-- ============ 补货计划 ============ -->
   <section id="tab-replenish" class="tab-panel hidden">
+    <div id="dqBarReplenish" class="mb-4"></div>
+    <!-- 轻量模式（默认）：三个核心选项 -->
+    <div class="bg-white rounded-xl shadow-sm p-4 mb-4 border-l-4 border-indigo-400">
+      <div class="flex flex-wrap justify-between items-center gap-2 mb-1">
+        <h3 class="text-sm font-semibold">轻量补货设置（默认模式 · 仅三项，均为<span class="text-amber-600">测算假设</span>，非真实业务数据）</h3>
+        <button onclick="saveLiteParams()" class="edit-only px-3 py-1.5 text-xs bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">保存设置并重算</button>
+      </div>
+      <p class="text-xs text-slate-400 mb-3">日常测算只需要：SKU、最近一周销量、当前可售库存、数据日期（整份导入文件共用）。以下默认值全局生效；个别 SKU 可在「数据录入 → 高级字段（选填）」中覆盖采购提前期。</p>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
+        <label>通常下单后多久到货（天，测算假设）<input id="rep_leadDays" type="number" step="1" min="0" class="inp" title="全局默认采购提前期；SKU 未单独覆盖时使用；留空=提前期未知（不输出最晚下单日，参考量未覆盖等待到货期间的需求）"></label>
+        <label>通常多久检查一次补货（天，测算假设）<input id="rep_checkDays" type="number" step="1" min="1" class="inp" title="补货检查周期：覆盖期 = 提前期 + 检查周期"></label>
+        <label>备货偏好（测算假设）<select id="rep_bias" class="inp" title="偏保守=少备货（需求×0.85）；均衡=折中（×1.0）；偏充足=减少缺货（×1.15）">
+          <option value="conservative">偏保守（少备货）</option>
+          <option value="balanced">均衡（折中）</option>
+          <option value="generous">偏充足（减少缺货）</option>
+        </select></label>
+      </div>
+      <p class="text-xs text-slate-400 mt-3">口径：近期覆盖期 = 提前期 + 检查周期；预计需求 = 基准日销 × 覆盖期 × 备货偏好系数；建议补货参考量 = max(0, 预计需求 − 可售库存 − 期内已登记在途)。未填 MOQ/箱规时，参考量≠可直接下单量（详见下方标签）。</p>
+    </div>
+
     <div class="bg-white rounded-xl shadow-sm p-4 mb-4">
+      <details id="repAdvanced">
+        <summary class="cursor-pointer text-sm font-semibold select-none">高级设置（测算口径 · 默认无需修改，展开可调整）</summary>
+        <div class="mt-3">
       <div class="flex flex-wrap justify-between items-center gap-2 mb-3">
-        <h3 class="text-sm font-semibold">补货测算参数（按品类 618/双11 系数 · 近期暴增抑制 · 清仓SKU动销回归）</h3>
-        <button onclick="saveRepParams()" class="px-3 py-1.5 text-xs bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">保存参数并重算</button>
+        <h3 class="text-sm font-semibold text-slate-500">补货测算参数（按品类 618/双11 系数 · 近期暴增抑制 · 疑似清仓SKU动销回归）</h3>
+        <button onclick="saveRepParams()" class="edit-only px-3 py-1.5 text-xs bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">保存高级参数并重算</button>
       </div>
       <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 mb-3 text-sm">
         <label>近期动销权重(0-1)<input id="rep_recentWeight" type="number" step="0.1" min="0" max="1" class="inp"></label>
         <label>安全库存(月)<input id="rep_safety" type="number" step="0.1" class="inp"></label>
         <label>近期暴增采信系数<input id="rep_spikeSens" type="number" step="0.5" min="0.5" class="inp" title="越小越保守，越不易被短期暴增带高补货量；默认2"></label>
-        <label>清仓判定阈值(到手价≤保本×%)<input id="rep_clearThresh" type="number" step="5" min="0" class="inp" title="综合到手价 ≤ 保本极限底价 × 该百分比 时判定为清仓SKU；默认110"></label>
-        <label>清仓SKU动销回归系数<input id="rep_clearRevert" type="number" step="0.1" min="0" max="1" class="inp" title="清仓SKU补货基准=全年去季节化均销×该系数，回到起量前水平；默认0.5"></label>
+        <label>疑似清仓识别阈值(到手价≤保本×%)<input id="rep_clearThresh" type="number" step="5" min="0" class="inp" title="疑似清仓识别：综合到手价 ≤ 保本极限底价 × 该百分比 时触发疑似清仓规则；auto 模式仅作疑似标记并保守回归，人工策略优先；默认110"></label>
+        <label>疑似清仓SKU动销回归系数<input id="rep_clearRevert" type="number" step="0.1" min="0" max="1" class="inp" title="疑似/确认清仓SKU补货基准=全年去季节化均销×该系数，回到起量前水平；默认0.5"></label>
       </div>
       <div class="flex flex-wrap items-center gap-2 mb-2">
         <span class="text-xs text-slate-500">编辑对象：</span>
@@ -182,11 +211,14 @@
         <span class="text-xs text-slate-400">（选「品类」可为该品类单独设一套系数；带 ✓ 表示已定制，未定制的品类自动继承通用默认）</span>
       </div>
       <div id="repCoefGrid" class="grid grid-cols-3 sm:grid-cols-6 gap-2"></div>
+        </div>
+      </details>
     </div>
+    <div id="repLiteWrap" class="mb-4"></div>
     <div id="repKpis" class="grid grid-cols-2 lg:grid-cols-6 gap-3 mb-4"></div>
     <div class="bg-white rounded-xl shadow-sm p-4 mb-4">
       <div class="flex flex-wrap justify-between items-center gap-2 mb-3">
-        <h3 class="text-sm font-semibold">未来6个月 全渠道建议补货量 / 预计销量 / 补货成本</h3>
+        <h3 class="text-sm font-semibold">未来六个月需求与采购预算情景（分月滚动 · 勿当作现在一次性采购量）</h3>
         <button onclick="downloadReplenishChart()" class="px-3 py-1.5 text-xs bg-emerald-600 text-white rounded-lg hover:bg-emerald-700">一键下载图表(PNG)</button>
       </div>
       <canvas id="chartReplenish" height="120"></canvas>
@@ -199,11 +231,12 @@
           <input oninput="repSearch(this.value)" class="flt" style="width:140px" placeholder="搜索产品/SKU">
           <select id="rep_cat" onchange="repCatChange(this.value)" class="flt" style="width:120px"></select>
           <label class="flex items-center gap-1 text-xs text-slate-500"><input type="checkbox" onchange="repToggleNeed(this)"> 仅显示需补货</label>
-          <button onclick="exportReplenishCSV()" class="px-3 py-1.5 text-xs bg-amber-600 text-white rounded-lg hover:bg-amber-700">导出补货计划CSV</button>
+          <button onclick="exportReplenishCSV('all')" class="px-3 py-1.5 text-xs bg-amber-600 text-white rounded-lg hover:bg-amber-700">导出补货计划CSV（全部）</button>
+          <button onclick="exportReplenishCSV('filtered')" class="px-3 py-1.5 text-xs bg-amber-500 text-white rounded-lg hover:bg-amber-600">导出补货计划CSV（筛选结果）</button>
         </div>
       </div>
       <div id="repTableWrap"></div>
-      <p class="text-xs text-slate-400 mt-3">测算逻辑：基准日销 = 近期周销与全年均销「按品类系数去季节化」后按权重融合；<strong>🏷️清仓SKU（综合到手价≤保本底价×阈值%）自动回归到起量前均销</strong>（=全年去季节化均销×回归系数），不采信清仓期的高动销；<strong>⚡近期暴增(&gt;常销1.5倍)按饱和曲线打折</strong>、🔻骤降(&lt;0.5倍)保守下调；各月预计销量 = 基准日销 × 当月天数 × <strong>该品类当月系数</strong>；采用「目标库存(order-up-to)」滚动模型，安全库存前瞻下月需求（大促自动前置备货），并按剩余效期收紧上限；补货件数向上取整为整数。🚫=暂停补货。<strong>断货毛利损失（场景B）</strong>：在「不补货」前提下，用上述预计销量逐月消耗当前库存，覆盖不到的缺口件数 × 单位毛利即为损失；单位毛利默认用<strong>综合到手价</strong>口径，<strong>清仓SKU改用控价还原</strong>（不采信清仓低价，控价为0时回退综合到手价），且仅取正毛利（负毛利视为断货止损、不计损失）。结果仅供参考，请结合实际情况调整。</p>
+      <p class="text-xs text-slate-400 mt-3">测算逻辑：基准日销 = 近期周销与全年均销「按品类系数去季节化」后按权重融合；<strong>🏷️疑似清仓识别（原清仓判定：综合到手价≤保本底价×阈值%）</strong>：auto 模式触发时标记「疑似清仓，待确认」并按保守回归处理（=全年去季节化均销×回归系数），不采信疑似清仓期的高动销；人工策略（normal/clearance/gift/discontinued 与补货策略 hold/manual）优先于自动规则，人工 normal 可覆盖疑似清仓；<strong>⚡近期暴增(&gt;常销1.5倍)按饱和曲线打折</strong>、🔻骤降(&lt;0.5倍)保守下调；各月预计销量 = 基准日销 × 当月天数 × <strong>该品类当月系数</strong>；采用「目标库存(order-up-to)」滚动模型，安全库存前瞻下月需求（大促自动前置备货），并按剩余效期收紧上限；补货件数向上取整为整数。🚫=按策略暂停补货（hold 仍测算需求/缺口/库存风险；manual 展示人工数量与依据；discontinued 停新增采购；gift 不按普通商业销量自动补货）。<strong>不补货贡献利润缺口（情景估算）</strong>：在「不补货」前提下，用上述预计销量逐月消耗当前库存，覆盖不到的缺口件数 × 单位贡献利润即为缺口；单位贡献利润默认用<strong>当前有效实际价</strong>口径，<strong>疑似/确认清仓SKU可另列恢复销售价情景</strong>（优先用人工填写的恢复销售价；未填且触发疑似清仓时可用控价作「按控价假设」参考情景——控价未必能成交，且仅取正贡献利润（≤0 视为断货止损、不计缺口））。购买新货时采购成本为真实新增成本，不与旧库存沉没成本混算。结果仅供参考，请结合实际情况调整。</p>
     </div>
   </section>
 
@@ -348,6 +381,7 @@ const DEFAULT_SEASON_BYCAT = {
 
 /* ================= 状态 ================= */
 let products = [];
+let salesHistory = {};   /* 周销历史自动留存：{ sku: [ {date, weekSales, endInv, price, actualPrice, cost} ] }，持久化于 LS_KEY / data.json */
 let settings = {
   feeTax: 8, feeOther: 3, targetMargin: 15,
   isrLow: 0.5, isrHealthy: 2, isrHigh: 3,
@@ -358,6 +392,14 @@ let settings = {
   repSpikeSensitivity: 2,
   repClearanceThreshold: 110,
   repClearanceRevertRatio: 0.5,
+  /* 轻量模式三个核心选项（测算假设，非真实业务数据） */
+  repLeadDays: 7,
+  repCheckDays: 7,
+  repBias: 'balanced',   /* conservative 偏保守(×0.85) / balanced 均衡(×1.0) / generous 偏充足(×1.15) */
+  businessTimeZone: 'Asia/Shanghai',
+  analysisDate: '',
+  dataFreshWarnDays: 7,
+  dataFreshBlockDays: 14,
   repSeason: DEFAULT_SEASON.slice(),
   repSeasonByCat: JSON.parse(JSON.stringify(DEFAULT_SEASON_BYCAT))
 };
@@ -365,9 +407,87 @@ let charts = {};
 let currentHealthLabels = [];
 let repFilter = {q:'',cat:'',onlyNeed:false};
 let repCoefTarget = '';
+/* —— 安全渲染 / 隔离 / 缓存 共享状态 —— */
+let alertSkuMap = Object.create(null);   // sku -> 预警卡片安全内部ID（不拼接进元素ID/HTML/JS字符串）
+let quarantinedProducts = [];            // 校验无效的原始数据：隔离于此，不进入 products/KPI，不删除
+let filterExprError = false;             // 本轮筛选是否存在无法识别的数值表达式（用于提示，不静默匹配全部）
+let overviewDelegated = false, inputDelegated = false; // tbody 事件委托只绑定一次
+let repCache = null;                     // 补货测算缓存：key 含 dataRevision/参数版本/analysisDate，筛选只重绘表格
+
+/* ================= 数据版本与同步状态（内存） =================
+   SCHEMA_VERSION  数据结构版本（迁移用）；SEED_VERSION 仅表示内置示例版本，
+                     不再参与"用户数据是否有效"的判定。
+   dataRevision    内存数据版本：只有真实修改（保存/删除/清空/导入/参数）才递增；
+                     切 Tab、筛选、画图、渲染均不改变它。
+   其余三者分别记录，绝不混用：localModifiedAt=本地修改时间、
+                     syncMeta.remoteUpdatedAt=远端数据版本、analysisDate=分析日期。 */
+const SCHEMA_VERSION = 2;
+let dataRevision = 0;
+let ghToken = '';              // 仅内存：不写任何存储/导出/日志，刷新即失
+let ghBaseSHA = null;          // 上次加载/同步成功时的远端 SHA（写入冲突判断基点）
+let lastSyncedRevision = -1;   // 已同步到远端的 dataRevision；-1=从未同步
+let localModifiedAt = null;    // 本地最近一次真实修改时间（ISO 字符串）
+let corruptRaw = null;         // 损坏的本地原文，保留供导出恢复
+const DEFAULT_SETTINGS = JSON.parse(JSON.stringify(settings));
+const teamCfg = {mode:'local', branch:'main', dataUrl:''};
+const syncMeta = {remoteUpdatedAt:null, lastRemoteOkAt:null};
+let pendingRemote = null;
 
 /* ============ 持久化(容错) ============ */
-function persist(){ try{ localStorage.setItem('channelTool', JSON.stringify({products,settings})); localStorage.setItem('channelTool_ver', SEED_VERSION); }catch(e){} }
+const LS_KEY='channelTool', LS_SYNC='channelTool_sync', LS_BACKUP='channelTool_backup', LS_VER='channelTool_ver';
+function storageOK(){
+  try{ const k='__ct_probe__'; localStorage.setItem(k,'1'); localStorage.removeItem(k); return true; }catch(e){ return false; }
+}
+/* 底层写库：成功返回 true；失败返回 false（由调用方决定如何提示，绝不谎称"已保存"） */
+function saveLocal(){
+  if(!storageOK()) return false;
+  try{
+    localStorage.setItem(LS_KEY, JSON.stringify({schemaVersion:SCHEMA_VERSION, products, settings, salesHistory, localModifiedAt}));
+    return true;
+  }catch(e){ return false; }
+}
+/* 兼容旧调用：仅写库，不再递增 dataRevision */
+function persist(){ return saveLocal(); }
+/* 统一真实修改入口：递增数据版本 + 落库 */
+function markDirty(){
+  dataRevision++;
+  localModifiedAt = new Date().toISOString();
+  return saveLocal();
+}
+function loadSyncState(){
+  try{
+    const s = JSON.parse(localStorage.getItem(LS_SYNC) || 'null');
+    if(s && typeof s === 'object'){
+      ghBaseSHA = s.baseSHA || null;
+      if(typeof s.lastSyncedRevision === 'number') lastSyncedRevision = s.lastSyncedRevision;
+      if(s.remoteUpdatedAt) syncMeta.remoteUpdatedAt = s.remoteUpdatedAt;
+      if(s.lastRemoteOkAt) syncMeta.lastRemoteOkAt = s.lastRemoteOkAt;
+      if(s.branch) teamCfg.branch = s.branch;
+      if(s.dataUrl) teamCfg.dataUrl = s.dataUrl;
+      if(s.mode) teamCfg.mode = s.mode;
+    }
+  }catch(e){}
+}
+function saveSyncState(){
+  if(!storageOK()) return;
+  try{
+    localStorage.setItem(LS_SYNC, JSON.stringify({
+      baseSHA:ghBaseSHA, lastSyncedRevision,
+      remoteUpdatedAt:syncMeta.remoteUpdatedAt, lastRemoteOkAt:syncMeta.lastRemoteOkAt,
+      branch:teamCfg.branch, dataUrl:teamCfg.dataUrl, mode:teamCfg.mode
+    }));
+  }catch(e){}
+}
+/* 数据结构迁移：只处理结构版本升级，不做不透明的字段自动合并 */
+function migrateData(d){
+  const v = d.schemaVersion || 1;
+  if(v < 2){
+    // v1 -> v2：原 updatedAt 概念拆分为 localModifiedAt / remoteUpdatedAt / analysisDate，
+    // products/settings 结构兼容，无需字段搬迁。
+  }
+  d.schemaVersion = SCHEMA_VERSION;
+  return d;
+}
 function ensureRepSettings(){
   if(!Array.isArray(settings.repSeason)||settings.repSeason.length!==12) settings.repSeason=DEFAULT_SEASON.slice();
   if(!settings.repSeasonByCat||typeof settings.repSeasonByCat!=='object') settings.repSeasonByCat=JSON.parse(JSON.stringify(DEFAULT_SEASON_BYCAT));
@@ -376,40 +496,171 @@ function ensureRepSettings(){
   if(settings.repSpikeSensitivity==null||isNaN(settings.repSpikeSensitivity)) settings.repSpikeSensitivity=2;
   if(settings.repClearanceThreshold==null||isNaN(settings.repClearanceThreshold)) settings.repClearanceThreshold=110;
   if(settings.repClearanceRevertRatio==null||isNaN(settings.repClearanceRevertRatio)) settings.repClearanceRevertRatio=0.5;
+  if(!settings.businessTimeZone) settings.businessTimeZone='Asia/Shanghai';
+  if(settings.analysisDate==null) settings.analysisDate='';
+  if(settings.dataFreshWarnDays==null||isNaN(settings.dataFreshWarnDays)) settings.dataFreshWarnDays=7;
+  if(settings.dataFreshBlockDays==null||isNaN(settings.dataFreshBlockDays)) settings.dataFreshBlockDays=14;
+  /* 轻量模式三个核心选项：缺失回填默认测算假设（旧存档无此字段时自动补齐） */
+  if(settings.repLeadDays==null||isNaN(settings.repLeadDays)) settings.repLeadDays=7;
+  if(settings.repCheckDays==null||isNaN(settings.repCheckDays)) settings.repCheckDays=7;
+  if(['conservative','balanced','generous'].indexOf(settings.repBias)<0) settings.repBias='balanced';
 }
+/* restore() 返回明确状态：
+   found       本地存在合法已保存数据（products=[] 也是合法数据，不是 missing）
+   missing     本地没有任何已保存数据
+   corrupt     本地数据损坏（原文保留在 corruptRaw，供导出恢复；绝不静默用 SEED 覆盖）
+   unavailable 本地存储不可用（getItem 抛错等） */
 function restore(){
-  try{
-    const ver = localStorage.getItem('channelTool_ver');
-    const d = JSON.parse(localStorage.getItem('channelTool'));
-    if(d && ver===SEED_VERSION){
-      if(Array.isArray(d.products)) products=d.products;
-      if(d.settings&&typeof d.settings==='object') settings={...settings,...d.settings};
+  let status;
+  if(!storageOK()){
+    status = 'unavailable';
+  }else{
+    const raw = localStorage.getItem(LS_KEY);
+    if(raw == null){
+      status = 'missing';
+    }else{
+      try{
+        const parsed = JSON.parse(raw);
+        const needsMigration = (parsed && typeof parsed === 'object' && (parsed.schemaVersion || 1) < SCHEMA_VERSION);
+        const d = migrateData(parsed);
+        if(!d || typeof d !== 'object' || !Array.isArray(d.products)) throw new Error('结构不完整：缺少 products 数组');
+        if(d.settings && typeof d.settings === 'object') settings = {...settings, ...d.settings};
+        /* 周销历史：旧存档无此字段时为空对象，并由下方 found 分支用现有产品快照引导入 */
+        salesHistory = (d.salesHistory && typeof d.salesHistory === 'object' && !Array.isArray(d.salesHistory)) ? d.salesHistory : {};
+        /* 逐条校验：无效数据不删除、不进入正常 products（避免 NaN 污染 KPI），隔离并保留原始记录 */
+        const validList = [], invalidList = [];
+        (d.products||[]).forEach(p=>{
+          const r = validateProduct(p);
+          if(r.errors.length) invalidList.push({raw:p, errors:r.errors});
+          else validList.push(r.product);
+        });
+        products = validList;
+        quarantinedProducts = invalidList;
+        if(d.localModifiedAt) localModifiedAt = d.localModifiedAt;
+        if(needsMigration) saveLocal(); // 迁移后把新版本写回存储
+        status = 'found';
+      }catch(e){
+        corruptRaw = raw; // 保留原始内容供导出恢复
+        status = 'corrupt';
+      }
     }
-  }catch(e){}
-  ensureRepSettings();
-  try{
-    const token = localStorage.getItem('gh_token');
-    if(token){
-      const el = document.getElementById('gh_token');
-      if(el) el.value = token;
-      const st = document.getElementById('gh_status');
-      if(st) st.textContent = 'Token 已配置，导出时将自动同步到团队看板';
+  }
+  if(status === 'found'){
+    products.forEach(p=>{ const nd=normalizeDate(p.date); if(nd) p.date=nd; });
+    ensureRepSettings();
+    /* 旧存档无周销历史字段：用现有产品快照引导入（同 SKU+同日期不重复累计） */
+    if(!Object.keys(salesHistory).length) products.forEach(recordHistorySnapshot);
+    if(quarantinedProducts.length){
+      backupLocal('发现无效数据，隔离前自动备份'); /* 保留原始备份，绝不直接删除 */
+      toast('⚠️ 已隔离 '+quarantinedProducts.length+' 条无效数据（未参与统计与KPI），原始记录已备份。请到数据录入页修正后重新导入。');
     }
-  }catch(e){}
+  }
+  loadSyncState();
+  return status;
 }
 
 /* ============ 日期辅助 ============ */
-function parseDate(str){
-  if(!str) return null;
-  const s=String(str).trim().replace(/\//g,'-');
-  let d=new Date(s+'T00:00:00');
-  if(isNaN(d.getTime())) d=new Date(s);
-  return isNaN(d.getTime())?null:d;
+function optionalFinite(value) {
+  if (value == null) return null;
+  const text = String(value).trim();
+  if (text === '') return null;
+  const number = Number(text);
+  return Number.isFinite(number) ? number : null;
 }
-function daysElapsed(dateStr){
-  const d0=parseDate(dateStr); if(!d0) return 0;
-  const today=new Date(); today.setHours(0,0,0,0);
-  return Math.max(0, Math.round((today - d0) / 86400000));
+
+function normalizeDate(value) {
+  if (value == null) return '';
+  const match = String(value).trim()
+    .match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})$/);
+  if (!match) return '';
+
+  const y = Number(match[1]);
+  const m = Number(match[2]);
+  const d = Number(match[3]);
+  if (y < 100 || y > 9999) return '';
+
+  const check = new Date(Date.UTC(y, m - 1, d));
+  if (
+    check.getUTCFullYear() !== y ||
+    check.getUTCMonth() !== m - 1 ||
+    check.getUTCDate() !== d
+  ) return '';
+
+  return [
+    String(y).padStart(4, '0'),
+    String(m).padStart(2, '0'),
+    String(d).padStart(2, '0')
+  ].join('-');
+}
+
+function parseDate(value) {
+  const normalized = normalizeDate(value);
+  if (!normalized) return null;
+  const [y, m, d] = normalized.split('-').map(Number);
+  return new Date(y, m - 1, d);
+}
+
+function dateOrdinal(value) {
+  const normalized = normalizeDate(value);
+  if (!normalized) return null;
+  const [y, m, d] = normalized.split('-').map(Number);
+  return Date.UTC(y, m - 1, d) / 86400000;
+}
+
+function getBusinessToday() {
+  const zone = settings.businessTimeZone || 'Asia/Shanghai';
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone: zone,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit'
+  }).formatToParts(new Date());
+
+  const values = Object.fromEntries(
+    parts.filter(p => p.type !== 'literal')
+      .map(p => [p.type, p.value])
+  );
+  return `${values.year}-${values.month}-${values.day}`;
+}
+
+function getAsOfYmd() {
+  return normalizeDate(settings.analysisDate) || getBusinessToday();
+}
+
+function getAsOfDate() {
+  return parseDate(getAsOfYmd());
+}
+
+function daysElapsed(dateStr) {
+  const start = dateOrdinal(dateStr);
+  const end = dateOrdinal(getAsOfYmd());
+  if (start == null || end == null) return 0;
+  return Math.max(0, end - start);
+}
+
+function ordToYmd(ord) {
+  const dt = new Date(ord * 86400000);
+  return [
+    String(dt.getUTCFullYear()).padStart(4, '0'),
+    String(dt.getUTCMonth() + 1).padStart(2, '0'),
+    String(dt.getUTCDate()).padStart(2, '0')
+  ].join('-');
+}
+
+/* ============ 零值安全取值 ============ */
+function finiteOr(value, fallback) {
+  const number = optionalFinite(value);
+  return number === null ? fallback : number;
+}
+
+function seasonCoef(arr, month) {
+  const value = finiteOr(arr?.[month - 1], 1);
+  return Math.max(0, value);
+}
+
+function fmtMarginPct(margin) {
+  if (margin == null) return '—（零收入）';
+  return (margin * 100).toFixed(1) + '%';
 }
 
 /* ============ 计算核心 ============ */
@@ -417,7 +668,11 @@ function compute(p){
   const feeTax = (p.feeTax!==''&&p.feeTax!=null&&!isNaN(p.feeTax))?Number(p.feeTax):settings.feeTax;
   const feeOther = (p.feeOther!==''&&p.feeOther!=null&&!isNaN(p.feeOther))?Number(p.feeOther):settings.feeOther;
   const totalFee = (feeTax+feeOther)/100;
-  const actual = (p.actualPrice!=null&&p.actualPrice!==''&&!isNaN(p.actualPrice)&&Number(p.actualPrice)>0)?Number(p.actualPrice):p.price;
+  const actualInput = optionalFinite(p.actualPrice);
+  const giftMode = (p.salesMode==='gift'); /* 赠品：到手价留空/- 不回退控价（避免虚构正销售利润） */
+  const actual = actualInput !== null && actualInput >= 0
+    ? actualInput
+    : (giftMode ? 0 : Number(p.price));
   const daily = p.weekSales/7;
   const monthSales = daily*30;
   const isr = monthSales>0 ? p.endInv/monthSales : (p.endInv>0?Infinity:0);
@@ -425,17 +680,20 @@ function compute(p){
   const avgInv = (Number(p.beginInv)+Number(p.endInv))/2;
   const turnover = avgInv>0 ? p.ytdSales/avgInv : null;
   const unitProfit = actual*(1-totalFee)-p.cost;
-  const margin = actual>0 ? unitProfit/actual : 0;
+  const margin = actual>0 ? unitProfit/actual : null;
   const breakeven = p.cost/(1-totalFee);
   const denom = 1-totalFee-settings.targetMargin/100;
   const targetFloor = denom>0 ? p.cost/denom : null;
   const ytdGMV = actual*p.ytdSales, ytdProfit = unitProfit*p.ytdSales;
-  const pd = p.date ? parseDate(p.date) : null;
-  const dayOfYear = pd ? Math.ceil((pd - new Date(pd.getFullYear(), 0, 0)) / 86400000) : null;
+  const pdOrd = dateOrdinal(p.date);
+  const dayOfYear = pdOrd==null ? null : (()=> {
+    const y = Number(normalizeDate(p.date).slice(0,4));
+    return pdOrd - dateOrdinal(y+'-01-01') + 1;
+  })();
   const avgDailySales = (dayOfYear && dayOfYear > 0) ? p.ytdSales / dayOfYear : 0;
   const avgWeekSales = avgDailySales * 7;
 
-  const shelfLifeRaw = (p.shelfLife!=null&&p.shelfLife!==''&&!isNaN(p.shelfLife)&&Number(p.shelfLife)>0)?Number(p.shelfLife):null;
+  const shelfLifeRaw = optionalFinite(p.shelfLife);
   const shelfElapsed = shelfLifeRaw!=null ? daysElapsed(p.date) : 0;
   let shelfLife=null, shelfCover=null, expiryQty=null, expiryLoss=null, needDaily=null;
   if(shelfLifeRaw!=null){
@@ -455,9 +713,13 @@ function compute(p){
       else shelfCover = shelfLife/(p.endInv/daily);
     }
   }
+  const asOfOrd = dateOrdinal(getAsOfYmd());
   return {feeTax,feeOther,totalFee,actual,daily,isr,sellDays,turnover,unitProfit,margin,breakeven,targetFloor,ytdGMV,ytdProfit,
           shelfLife,shelfLifeRaw,shelfElapsed,shelfCover,expiryQty,expiryLoss,needDaily,
-          avgDailySales,avgWeekSales};
+          avgDailySales,avgWeekSales,
+          hasStock: Number(p.endInv) > 0,
+          dataAgeDays: pdOrd==null ? null : (asOfOrd==null ? null : asOfOrd - pdOrd),
+          actualPriceFallback: !(actualInput !== null && actualInput >= 0) && !giftMode};
 }
 
 /* 状态判定 */
@@ -477,6 +739,7 @@ function turnStatus(to){
 }
 function shelfStatus(m){
   if(m.shelfLife==null) return {t:'—',c:'slate',lv:0,none:true};
+  if(!m.hasStock) return {t:'无库存（不计效期风险）',c:'slate',lv:0};
   if(m.shelfLife<=0) return {t:'已过效期',c:'rose',lv:3};
   if(m.shelfCover<1) return {t:'效期报损风险',c:'rose',lv:3};
   if(m.shelfLife<settings.shelfWarnDays) return {t:'临期需关注',c:'amber',lv:2};
@@ -484,78 +747,369 @@ function shelfStatus(m){
   return {t:'效期安全',c:'emerald',lv:0};
 }
 
-/* 营销建议引擎 */
+/* ============ 统一利润状态（v1.10） ============
+   正常销售模式：单件贡献利润<0=亏损(lv3)；=0=保本(lv2)；利润率<目标=利润偏低(lv1)；达标=lv0。
+   零收入（margin=null）时利润率展示「—」，但 unitProfit=-cost 仍进入亏损判断。
+   赠品(salesMode=gift)=营销投入：不套用普通盈利健康判断，投入金额（成本+费用）仍真实展示、不隐藏。 */
+function profitStatus(p,m){
+  if((p&&p.salesMode)==='gift') return {t:'营销投入',c:'indigo',lv:0,gift:true};
+  if(m.unitProfit<0) return {t:'亏损',c:'rose',lv:3};
+  if(m.unitProfit===0) return {t:'保本',c:'amber',lv:2};
+  if(m.margin!=null && m.margin<settings.targetMargin/100) return {t:'利润偏低',c:'yellow',lv:1};
+  return {t:'利润达标',c:'emerald',lv:0};
+}
+
+/* ============ 人工经营策略（v1.10）：人工 > 自动；缺失默认 auto，兼容旧数据 ============ */
+const SALES_MODES=['auto','normal','promo','clearance','gift','discontinued'];
+const REP_POLICIES=['auto','hold','manual'];
+function productStrategy(p){
+  const sm=(p&&p.salesMode);
+  const pol=(p&&p.replenishmentPolicy);
+  return {
+    salesMode: SALES_MODES.includes(sm)?sm:'auto',
+    replenishmentPolicy: REP_POLICIES.includes(pol)?pol:'auto',
+    strategyReason: String((p&&p.strategyReason)||'')
+  };
+}
+/* 停售兼容：新字段 salesMode='discontinued' 与旧布尔 discontinued=true 等价 */
+function isDiscontinued(p){ return (p&&p.salesMode)==='discontinued' || (p&&p.discontinued)===true; }
+
+/* ============ 批次有效性识别（v1.10）：先分可售/已到期，再给建议 ============
+   有批次明细：按各批次 expiryDate 对照分析日拆分；无批次明细：按单批次近似（剩余效期<=0 → 全部到期）。
+   返回已到期/有效/效期未知件数，供 advise 互斥与 forecastSKU 暂停判断使用。 */
+function batchValidity(p,m){
+  const asOfOrd=dateOrdinal(getAsOfYmd());
+  const raw=Array.isArray(p&&p.batches)?p.batches:null;
+  if(raw&&raw.length){
+    let expiredQty=0,validQty=0,unknownQty=0;
+    raw.forEach(b=>{
+      const q=optionalFinite(b&&b.qty);
+      if(q==null||q<=0)return;
+      const eo=dateOrdinal(b&&b.expiryDate);
+      if(eo==null)unknownQty+=q;
+      else if(eo<=asOfOrd)expiredQty+=q;
+      else validQty+=q;
+    });
+    return {hasBatchInfo:true,expiredQty,validQty,unknownQty};
+  }
+  const inv=Math.max(0,Number(p&&p.endInv)||0);
+  if(m.shelfLife==null) return {hasBatchInfo:false,expiredQty:0,validQty:inv,unknownQty:inv>0?inv:0};
+  if(m.shelfLife<=0) return {hasBatchInfo:false,expiredQty:inv,validQty:0,unknownQty:0};
+  return {hasBatchInfo:false,expiredQty:0,validQty:inv,unknownQty:0};
+}
+
+/* ============ 数据校验（表单 / CSV / JSON / localStorage / SEED 共用入口） ============
+   规则：成本/库存/销量/价必须有限；库存与销量为非负整数；成本/价格非负；实际价允许0、
+   留空或"-"表示回退控价；效期允许0和负整数、空白=未知；费率有限非负且合计<100%；
+   数据日期须为真实日期或留空。无效数据不删除：由调用方隔离并提示修复、保留原始备份。 */
+function validateProduct(raw){
+  const errors = [];
+  const p = (raw && typeof raw === 'object') ? {...raw} : {};
+  p.name = String(p.name==null?'':p.name).trim();
+  p.sku  = String(p.sku==null?'':p.sku).trim();   /* SKU 按字符串保留（含前导0），仅去除首尾空白 */
+  p.cat  = String(p.cat==null?'':p.cat).trim() || '未分类';
+  if(!p.name) errors.push('产品名称必填');
+  if(!p.sku)  errors.push('SKU必填');
+  const numField=(key,label,{int=false,min=null,blank=0}={})=>{
+    const v=p[key];
+    if(v==null||String(v).trim()===''){ p[key]=blank; return; }
+    const n=Number(v);
+    if(!Number.isFinite(n)){ errors.push(label+'「'+v+'」不是有效数值'); return; }
+    if(int && !Number.isInteger(n)){ errors.push(label+'「'+v+'」需为整数'); return; }
+    if(min!=null && n<min){ errors.push(label+'「'+v+'」不能小于'+min); return; }
+    p[key]=n;
+  };
+  const wasBlank=key=>p[key]==null||String(p[key]).trim()==='';
+  const costBlank=wasBlank('cost'), weekBlank=wasBlank('weekSales'), endBlank=wasBlank('endInv');
+  numField('cost','成本',{min:0});
+  numField('price','控价',{min:0});
+  numField('weekSales','最近一周销售件数',{int:true,min:0});
+  numField('endInv','最新期末库存',{int:true,min:0});
+  /* 缺失标记：留空≠填0。留空按0参与测算，但页面/导出必须显示"缺失"，不得伪装成真实0 */
+  p.costMissing=costBlank; p.weekSalesMissing=weekBlank; p.endInvMissing=endBlank;
+  numField('beginInv','年初期初库存',{int:true,min:0});
+  numField('ytdSales','业务年累计销售件数',{int:true,min:0});
+  { /* 实际到手价：允许0；留空或"-"表示回退控价（保持业务口径） */
+    const v=p.actualPrice;
+    if(v==null||String(v).trim()===''||String(v).trim()==='-'){ p.actualPrice=''; }
+    else{ const n=Number(v); if(!Number.isFinite(n)||n<0) errors.push('实际到手价「'+v+'」无效（需≥0，留空或 - 表示回退控价）'); else p.actualPrice=n; }
+  }
+  { /* 效期：允许0和负整数；空白=未知（不做效期分析） */
+    const v=p.shelfLife;
+    if(v==null||String(v).trim()===''){ p.shelfLife=''; }
+    else{ const n=Number(v); if(!Number.isFinite(n)||!Number.isInteger(n)) errors.push('剩余效期「'+v+'」需为整数（可为0或负数）'); else p.shelfLife=n; }
+  }
+  let effTax=null, effOther=null;
+  for(const [key,label] of [['feeTax','税运仓储比例'],['feeOther','其他费用比例']]){
+    const v=p[key];
+    if(v==null||String(v).trim()===''){ p[key]=''; continue; }
+    const n=Number(v);
+    if(!Number.isFinite(n)||n<0){ errors.push(label+'「'+v+'」需为≥0的数值'); continue; }
+    p[key]=n;
+    if(key==='feeTax') effTax=n; else effOther=n;
+  }
+  { /* 总费率必须<100%：仅当产品显式录入至少一项费率时校验（默认费率由参数设置页把关，
+       避免用全局默认误伤历史数据）；否则利润率分母≤0 */
+    if(effTax!=null||effOther!=null){
+      const t = effTax==null ? Number(settings.feeTax) : effTax;
+      const o = effOther==null ? Number(settings.feeOther) : effOther;
+      if(Number.isFinite(t)&&Number.isFinite(o)&&t+o>=100) errors.push('费率合计 '+(t+o)+'% ≥100%，利润率分母≤0');
+    }
+  }
+  { /* 数据日期：留空=不做时效分析；非空必须是真实日期 */
+    const v=p.date;
+    if(v==null||String(v).trim()===''){ p.date=''; }
+    else{ const nd=normalizeDate(v); if(!nd) errors.push('数据日期「'+v+'」无效（需 YYYY-MM-DD 真实日期）'); else p.date=nd; }
+  }
+  { /* 经营策略与预测覆盖（可选，v1.10）：缺失默认 auto/空白，兼容旧数据，不改写原始业务数据 */
+    const sm=String(p.salesMode==null?'':p.salesMode).trim().toLowerCase();
+    p.salesMode=SALES_MODES.includes(sm)?sm:'auto';
+    const pol=String(p.replenishmentPolicy==null?'':p.replenishmentPolicy).trim().toLowerCase();
+    p.replenishmentPolicy=REP_POLICIES.includes(pol)?pol:'auto';
+    const fo=p.forecastDailyOverride;
+    if(fo==null||String(fo).trim()===''){ p.forecastDailyOverride=''; }
+    else{ const n=Number(fo); if(!Number.isFinite(n)||n<0) errors.push('预测日销覆盖「'+fo+'」需为≥0数值（留空=不覆盖；0=明确覆盖为零）'); else p.forecastDailyOverride=n; }
+    const rp=p.restoredSellingPrice;
+    if(rp==null||String(rp).trim()===''){ p.restoredSellingPrice=''; }
+    else{ const n=Number(rp); if(!Number.isFinite(n)||n<0) errors.push('恢复销售价「'+rp+'」需为≥0数值（留空=未提供可实现的恢复销售价）'); else p.restoredSellingPrice=n; }
+    p.strategyReason=String(p.strategyReason==null?'':p.strategyReason).trim();
+  }
+  { /* 高级选填字段（v1.11）：MOQ/箱规/逐SKU提前期/新货效期 空白=不约束；批次/在途明细为 JSON 数组，逐条校验，留空=无 */
+    const optInt=(key,label)=>{
+      const v=p[key];
+      if(v==null||String(v).trim()===''){ p[key]=''; return; }
+      const n=Number(v);
+      if(!Number.isFinite(n)||!Number.isInteger(n)||n<0){ errors.push(label+'「'+v+'」需为≥0整数（留空=不约束）'); return; }
+      p[key]=n;
+    };
+    optInt('moq','MOQ'); optInt('casePack','箱规'); optInt('leadTimeDays','采购提前期'); optInt('newBatchShelfLifeDays','新货效期');
+    /* 近期缺货确认：true/'true'/'1'/1/'是'/'yes' → true；其余 → false（未确认=原因未知，不自动推断业务原因） */
+    const so=p.stockoutConfirmed;
+    p.stockoutConfirmed=(so===true||so===1||['true','1','是','yes','y'].indexOf(String(so).trim().toLowerCase())>=0);
+    const normList=(key,label,dateKey,dateLabel,needDate,needExpiry)=>{
+      const v=p[key];
+      if(v==null||v===''){ p[key]=[]; return; }
+      let arr=v;
+      if(typeof v==='string'){ try{ arr=JSON.parse(v); }catch(e){ errors.push(label+' 不是合法 JSON 数组'); return; } }
+      if(!Array.isArray(arr)){ errors.push(label+' 需为 JSON 数组'); return; }
+      const out=[];
+      arr.forEach((b,i)=>{
+        if(!b||typeof b!=='object'){ errors.push(label+' 第'+(i+1)+'条不是对象'); return; }
+        const q=Number(b.qty);
+        if(!Number.isFinite(q)||!Number.isInteger(q)||q<=0){ errors.push(label+' 第'+(i+1)+'条数量「'+b.qty+'」需为正整数'); return; }
+        const rec={qty:q};
+        const dstr=String(b[dateKey]==null?'':b[dateKey]).trim();
+        const nd=normalizeDate(dstr);
+        if(needDate&&nd==null){ errors.push(label+' 第'+(i+1)+'条'+dateLabel+'「'+dstr+'」无效（需 YYYY-MM-DD 真实日期）'); return; }
+        if(nd)rec[dateKey]=nd;
+        const estr=String(b.expiryDate==null?'':b.expiryDate).trim();
+        const en=normalizeDate(estr);
+        if(estr&&en==null){ errors.push(label+' 第'+(i+1)+'条效期「'+estr+'」无效（需 YYYY-MM-DD 真实日期）'); return; }
+        if(en)rec.expiryDate=en;
+        if(needExpiry&&!en&&!needDate){ errors.push(label+' 第'+(i+1)+'条必须提供效期 expiryDate'); return; }
+        out.push(rec);
+      });
+      p[key]=out;
+    };
+    normList('batches','批次明细','expiryDate','效期',false,true);   /* 批次：qty+效期 */
+    normList('incoming','在途明细','arrivalDate','到货日期',true,false); /* 在途：qty+到货日期（效期可选） */
+  }
+  return {product:p, errors};
+}
+function normalizeProduct(raw){ return validateProduct(raw).product; }
+/* 目标利润底价不可达（分母≤0）时的统一提示文案 */
+function targetFloorHint(m){ return m.targetFloor==null ? '（目标不可达：费率+目标利润率≥100%）' : ''; }
+
+/* ============ 周销历史自动留存（v1.11 轻量模式） ============
+   · 触发点：保存产品 / CSV 导入确认写入 / 载入示例 / 恢复旧存档引导入（同 SKU+同日期=更新，绝不重复累计）；
+   · 持久化：随 LS_KEY 与 data.json 一起保存，刷新/同步后不丢失；
+   · 重叠防护：不同日期的「最近7天销量」可能重叠，分析时只采纳日期间隔≥7天的不重叠记录，
+     无法去重时退回单期估算并在标签提示（不直接相加）。 */
+function recordHistorySnapshot(p){
+  if(!p||p.sku==null)return;
+  const date=normalizeDate(p.date); if(!date)return;   /* 无数据日期无法归因到周，不记录 */
+  const week=Number(p.weekSales);
+  if(!Number.isFinite(week))return;
+  const sku=String(p.sku);
+  const list=salesHistory[sku]||(salesHistory[sku]=[]);
+  const rec={date, weekSales:week};
+  const ei=optionalFinite(p.endInv);      if(ei!=null)rec.endInv=ei;
+  const pr=optionalFinite(p.price);       if(pr!=null)rec.price=pr;
+  const ap=optionalFinite(p.actualPrice); if(ap!=null)rec.actualPrice=ap;
+  const co=optionalFinite(p.cost);        if(co!=null)rec.cost=co;
+  const i=list.findIndex(r=>r.date===date);
+  if(i>=0)list[i]=rec; else list.push(rec);   /* 同 SKU 同日期 → 更新而非累计 */
+}
+function getSkuHistory(sku){ return salesHistory[String(sku)]||[]; }
+function analyzeHistory(sku){
+  const list=(salesHistory[String(sku)]||[]).slice().sort((a,b)=>a.date<b.date?1:-1); /* 最新在前 */
+  const out={count:list.length,nonOverlap:0,weeklyAvg:null,from:null,to:null,latestDate:null,latestWeek:null,overlapSkipped:false};
+  if(!list.length)return out;
+  out.latestDate=list[0].date; out.latestWeek=list[0].weekSales;
+  let lastOrd=null, sum=0, n=0;
+  for(const r of list){
+    const ord=dateOrdinal(r.date); if(ord==null)continue;
+    if(lastOrd==null||lastOrd-ord>=7){ sum+=Number(r.weekSales)||0; n++; lastOrd=ord; }
+    else out.overlapSkipped=true;   /* 与已采纳记录重叠：跳过，不直接相加 */
+  }
+  out.nonOverlap=n;
+  if(n>=2){ out.weeklyAvg=sum/n; out.to=list[0].date; out.from=list[list.length-1].date; }
+  return out;
+}
+
+/* 营销建议引擎（v1.10 重构）
+   优先级：① 批次有效性（已到期库存→隔离/核实/报损，不追加促销/赠送建议；混合批次→到期批次隔离、有效批次照常分析）
+          → ② 经营模式与补货策略（人工 > 自动）→ ③ 利润/断货/积压/周转。
+   互斥规则：缺货且亏损 → 不直接建议按当前商业条件放量补货（示缺口+提示先确认价格/成本或人工战略例外）；
+            人工 hold/discontinued/manual → 不出「优先补货」；已到期库存 → 不出促销/去化建议；
+            level 取四维最大 → 「亏损」天然不与「维持现有健康节奏」并存。
+   清仓处置经济性：比较 清仓/退供/报废 三方案净回收；原采购成本为共同已发生成本，只在总额处展示、不重复扣减；
+            退供/处置数据未填时仅提示待补充，不编造数值、不做「必然优于报废」的绝对断言。 */
 function advise(p,m){
   const inv=invStatus(m.isr), turn=turnStatus(m.turnover), shelf=shelfStatus(m);
-  const level = Math.max(inv.lv, turn.lv, shelf.lv);
-  const tags = [inv, turn]; if(!shelf.none) tags.push(shelf);
-  let advice = [];
-  const disc = (fp)=> (p.price>0&&fp!=null)?(fp/p.price*10).toFixed(1)+'折':'—';
-  const fmtP = (v)=> v==null?'—':'¥'+v.toFixed(2);
+  const profit=profitStatus(p,m);
+  const level=Math.max(inv.lv,turn.lv,shelf.lv,profit.lv);
+  const tags=[inv,turn,profit]; if(!shelf.none) tags.push(shelf);
+  let advice=[];
+  const disc=(fp)=> (p.price>0&&fp!=null)?(fp/p.price*10).toFixed(1)+'折':'—';
+  const fmtP=(v)=> v==null?'—':'¥'+v.toFixed(2);
+  const strat=productStrategy(p);
+  const giftMode=profit.gift===true;
+  const bv=batchValidity(p,m);
+  /* 已到期库存（全部不可售）：有批次明细以批次拆分为准（混合批次≠整SKU到期）；
+     无批次明细按单批次近似（剩余效期<=0 → 全部到期） */
+  const allExpired=bv.hasBatchInfo ? (bv.expiredQty>0&&bv.validQty===0&&bv.unknownQty===0)
+                                   : (!shelf.none&&m.hasStock&&m.shelfLife<=0);
 
-  if(!shelf.none){
-    if(m.shelfLife<=0){
-      advice.push(`🔴 该批次<b>已超出效期</b>（数据日期至今已过 ${m.shelfElapsed} 天，超过录入的 ${m.shelfLifeRaw} 天效期），当前库存 <b>${fmt(p.endInv)}</b> 件基本全部面临报废，潜在报损 <b>¥${fmt(m.expiryLoss)}</b>（成本口径）。请立即核实实物批次并做<strong>下架 / 报损 / 退供处理</strong>，同步核减库存并更新数据。`);
-    } else if(m.shelfCover<1){
-      const ratio = m.daily>0 ? (m.needDaily/m.daily).toFixed(1) : '∞';
-      advice.push(`🔴 剩余效期仅 <b>${m.shelfLife}</b> 天，按当前日均 ${m.daily.toFixed(1)} 件，到期预计卖不完约 <b>${Math.round(m.expiryQty)}</b> 件，潜在报损 <b>¥${fmt(m.expiryLoss)}</b>（成本口径）。需把日均动销拉到 <b>${m.needDaily.toFixed(1)}</b> 件/天（约当前 ${ratio} 倍）才能到期前清完。建议<strong>立即临期清仓</strong>：因报损=全额亏损，清仓价可<strong>击穿保本价 ${fmtP(m.breakeven)}</strong>，只要能回收部分成本即优于报废；优先叠加渠道调拨、买赠、临期专区、直播秒杀。`);
-    } else if(shelf.lv===2){
-      advice.push(`🟠 剩余效期 ${m.shelfLife} 天，虽按当前动销可在到期前售罄（效期覆盖系数 ${m.shelfCover.toFixed(2)}），但时间窗偏紧。建议<strong>提前排一轮温和促销</strong>（目标底价 ${fmtP(m.targetFloor)} 约 ${disc(m.targetFloor)}）预留缓冲，避免临近到期被迫深度砍价。`);
-    } else if(shelf.lv===1){
-      advice.push(`🟡 效期覆盖系数 ${m.shelfCover.toFixed(2)}（安全线 ${settings.shelfCoverSafe}）略偏紧。保持动销监控，若两周内周转下滑再启动促销。`);
+  /* 0) 人工经营策略提示（人工策略 > 自动规则，展示覆盖原因） */
+  if(strat.salesMode!=='auto'||strat.replenishmentPolicy!=='auto'){
+    const parts=[];
+    if(strat.salesMode!=='auto') parts.push('经营模式='+strat.salesMode);
+    if(strat.replenishmentPolicy!=='auto') parts.push('补货策略='+strat.replenishmentPolicy);
+    advice.push(`🧭 人工策略（${parts.join(' · ')}）优先于自动规则${strat.strategyReason?('：'+escapeHtml(strat.strategyReason)):'（未填写策略原因，建议补充依据）'}`);
+  } else if(/派样|体验|试用|赠品/.test(String(p.name||''))){
+    advice.push('💡 产品名称含「派样/体验/试用/赠品」字样：如确属赠品/试用装请设置经营模式=gift 或 clearance（名称仅为提示，系统不会仅凭名称擅自更改经营模式）。');
+  }
+
+  /* 1) 批次有效性优先：已到期库存 → 隔离/核实/报损（不再追加促销或赠送建议） */
+  if(allExpired){
+    const expQty=bv.hasBatchInfo?bv.expiredQty:Number(p.endInv)||0;
+    const expLoss=bv.hasBatchInfo?bv.expiredQty*(Number(p.cost)||0):m.expiryLoss;
+    advice.push(`🔴 按录入效期及分析日期推算，该库存<b>已不可售</b>。请先做<strong>批次隔离 → 实物效期核实 → 报损/退供处理</strong>，同步核减库存并更新数据；已到期库存不再追加促销或赠送建议。当前涉及 <b>${fmt(expQty)}</b> 件，潜在报损 <b>¥${fmt(expLoss)}</b>（成本口径，含共同已发生采购成本）。处置前请比较三方案<strong>净回收</strong>（原采购成本为共同已发生成本，不重复扣减）：① 清仓销售净回收 = 实际可执行销售价 − 随销售新增费用；② 退供净回收 = 可退金额 − 退供成本；③ 报废净回收 = 残值 − 处置费用。退供/处置数据未填时先补充再比较，不预设「清仓必然优于报废」；若购买替代新货，采购成本属真实新增成本，需单独评估，不适用旧库存沉没成本逻辑。`);
+  }else{
+    /* 混合批次：到期批次隔离，有效批次单独分析（禁止「一批到期、整SKU停售」） */
+    if(bv.hasBatchInfo&&bv.expiredQty>0&&bv.validQty>0){
+      advice.push(`🟠 部分批次已到期（约 <b>${fmt(bv.expiredQty)}</b> 件）：该批次<strong>隔离/报损</strong>、勿与有效批次混售；有效批次（约 <b>${fmt(bv.validQty)}</b> 件）继续销售与补货分析，不因旧批次到期而整SKU永久停补。`);
+    }
+    if(!shelf.none && m.hasStock && !(bv.hasBatchInfo&&bv.expiredQty>0&&bv.validQty>0)){
+      if(m.shelfCover<1){
+        const ratio = m.daily>0 ? (m.needDaily/m.daily).toFixed(1) : '∞';
+        advice.push(`🔴 剩余效期仅 <b>${m.shelfLife}</b> 天，按当前日均 ${m.daily.toFixed(1)} 件，到期预计卖不完约 <b>${Math.round(m.expiryQty)}</b> 件，潜在报损 <b>¥${fmt(m.expiryLoss)}</b>（成本口径）。需把日均动销拉到 <b>${m.needDaily.toFixed(1)}</b> 件/天（约当前 ${ratio} 倍）才能到期前清完。临期去化前请比较三方案<strong>净回收</strong>（原采购成本为共同已发生成本，不重复扣减）：① 清仓销售净回收 = 实际可执行销售价 − 随销售新增费用（击穿保本价 ${fmtP(m.breakeven)} 的部分每多卖一件仍优于全额报损，但需以实际可执行价为准）；② 退供净回收 = 可退金额 − 退供成本；③ 报废净回收 = 残值 − 处置费用。退供/处置数据未填时先补充再比较，不编造数值、不做绝对断言；可叠加渠道调拨、买赠、临期专区、直播秒杀。`);
+      } else if(shelf.lv===2){
+        advice.push(`🟠 剩余效期 ${m.shelfLife} 天，虽按当前动销可在到期前售罄（效期覆盖系数 ${m.shelfCover.toFixed(2)}），但时间窗偏紧。建议<strong>提前排一轮温和促销</strong>（目标底价 ${fmtP(m.targetFloor)} 约 ${disc(m.targetFloor)}）预留缓冲，避免临近到期被迫深度砍价。`);
+      } else if(shelf.lv===1){
+        advice.push(`🟡 效期覆盖系数 ${m.shelfCover.toFixed(2)}（安全线 ${settings.shelfCoverSafe}）略偏紧。保持动销监控，若两周内周转下滑再启动促销。`);
+      }
     }
   }
 
+  /* 2) 断货与补货（互斥：缺货+亏损 / 人工暂停采购 → 不直接建议放量补货） */
+  const policyPause=(strat.replenishmentPolicy==='hold'||strat.replenishmentPolicy==='manual'||strat.salesMode==='discontinued');
   if(inv.lv===2 && inv.t==='断货风险'){
-    advice.push(`⚠️ 可售天数约 ${isFinite(m.sellDays)?Math.round(m.sellDays)+'天':'—'}，库存紧张。建议<strong>优先补货</strong>，暂缓一切促销以免加速断货；若为爆品可小幅提价平衡供需。`);
-  }
-  if(inv.lv===3 || (inv.lv===1)){
-    if(m.margin>=settings.targetMargin/100){
-      advice.push(`📦 库存${inv.t}，但利润率${(m.margin*100).toFixed(1)}%有空间。<strong>建议促销去化</strong>：保住目标利润(${settings.targetMargin}%)的最低到手价 ${fmtP(m.targetFloor)}（约${disc(m.targetFloor)}）；需快速清仓的极限保本价 ${fmtP(m.breakeven)}（约${disc(m.breakeven)}）。`);
-    } else if(m.margin>0){
-      advice.push(`📦 库存${inv.t}且利润偏薄(${(m.margin*100).toFixed(1)}%)。促销空间有限，最低仅可至保本价 ${fmtP(m.breakeven)}（约${disc(m.breakeven)}）。建议<strong>捆绑搭售、满赠引流</strong>而非直接降价，并收紧补货。`);
+    if(profit.lv===3 && !giftMode){
+      advice.push(`⚠️ 可售天数约 ${isFinite(m.sellDays)?Math.round(m.sellDays)+'天':'—'}，存在需求缺口；但当前单件贡献利润为负（${fmtP(m.unitProfit)}/件）。<strong>不建议按当前商业条件直接放量补货</strong>：需求缺口在补货计划中如实列示，请先确认并修正价格/成本，或作为人工战略例外处理（补货策略设为 manual 并填写依据）。`);
+    } else if(policyPause){
+      advice.push(`⚠️ 可售天数约 ${isFinite(m.sellDays)?Math.round(m.sellDays)+'天':'—'}，存在需求缺口（补货计划中如实列示）；当前人工策略暂停新增采购，恢复采购请更新策略。`);
     } else {
+      advice.push(`⚠️ 可售天数约 ${isFinite(m.sellDays)?Math.round(m.sellDays)+'天':'—'}，库存紧张。建议<strong>优先补货</strong>，暂缓一切促销以免加速断货；若为爆品可小幅提价平衡供需。`);
+    }
+  }
+
+  /* 3) 赠品模式：营销投入如实展示，不套用普通盈利健康判断 */
+  if(giftMode){
+    const invest=Math.max(0,-m.unitProfit)*Math.max(0,Number(p.ytdSales)||0);
+    advice.push(`🎁 赠品/营销投入模式：不按普通销售盈利评估，单件投入 = 成本 ${fmtP(p.cost)} + 随销费用，年累计投入约 <b>¥${fmt(invest)}</b>（如实计入，不隐藏成本）。到手价为 0 或留空时<strong>不回退控价</strong>、不生成虚构正销售利润；不按普通商业销量自动补货，营销配额可经「预测日销覆盖」或人工基准登记。`);
+  }
+
+  /* 4) 积压去化（已到期库存不追加促销/赠送建议，见 ① 的互斥） */
+  if(!allExpired && (inv.lv===3 || (inv.lv===1))){
+    if(m.margin!=null && m.margin>=settings.targetMargin/100){
+      advice.push(`📦 库存${inv.t}，但利润率${fmtMarginPct(m.margin)}有空间。<strong>建议促销去化</strong>：保住目标利润(${settings.targetMargin}%)的最低到手价 ${fmtP(m.targetFloor)}（约${disc(m.targetFloor)}）；快速去化的极限保本价 ${fmtP(m.breakeven)}（约${disc(m.breakeven)}）。`);
+    } else if(m.margin!=null && m.margin>0){
+      advice.push(`📦 库存${inv.t}且利润偏薄(${fmtMarginPct(m.margin)})。促销空间有限，最低仅可至保本价 ${fmtP(m.breakeven)}（约${disc(m.breakeven)}）。建议<strong>捆绑搭售、满赠引流</strong>而非直接降价，并收紧补货。`);
+    } else if(!giftMode){
       advice.push(`🔴 库存${inv.t}且当前已亏损。建议<strong>清仓止损</strong>或渠道调拨，停止补货，重新评估该SKU定位。`);
     }
   }
+
+  /* 5) 利润状态（正常销售模式；赠品见 ③） */
+  if(!giftMode){
+    if(profit.lv===3){
+      advice.push(`🔴 单件贡献利润为负（到手价 ${fmtP(m.actual)} − 成本 ${fmtP(p.cost)} − 费用 = ${fmtP(m.unitProfit)}/件），每售一件亏损一件。建议核实价格与成本、收紧促销与补货，或评估渠道调拨/汰换。`);
+    } else if(profit.lv===2){
+      advice.push(`🟠 单件贡献利润为 0（保本），抗波动能力不足：建议优化费用或温和提价，促销下限守住保本价 ${fmtP(m.breakeven)}。`);
+    } else if(profit.lv===1){
+      advice.push(`🟡 利润率 ${fmtMarginPct(m.margin)} 低于目标 ${settings.targetMargin}%（贡献口径目标，非完整财务净利润率）：促销空间以目标利润底价 ${fmtP(m.targetFloor)} 为护栏。`);
+    }
+  }
+
   if(turn.lv>=1 && inv.lv<=0){
-    advice.push(`🐢 库存表面健康但滚动周转${turn.t}(${m.turnover?m.turnover.toFixed(2):'—'})，存在慢动销风险。建议加强内容曝光/关联推荐，观察2周动销变化再决定是否促销。`);
+    advice.push(`🐢 库存表面健康但年累计周转${turn.t}(${m.turnover==null?'—':m.turnover.toFixed(2)})，存在慢动销风险。建议加强内容曝光/关联推荐，观察2周动销变化再决定是否促销。`);
+  }
+  if(m.targetFloor==null){
+    advice.push('⚠️ 当前「费率合计 + 目标利润率」≥100%，目标利润底价分母≤0：<strong>目标无法达到</strong>。请下调目标利润率或渠道费率后再使用促销价格护栏。');
   }
   if(level===0 && advice.length===0){
-    advice.push(`✅ 库销、周转${shelf.none?'':'与效期'}均健康，利润率${(m.margin*100).toFixed(1)}%。<strong>维持现有节奏</strong>，可按目标利润底价 ${fmtP(m.targetFloor)} 作为大促时的价格护栏。`);
+    advice.push(`✅ 库销、周转${shelf.none?'':'与效期'}均健康，利润率${fmtMarginPct(m.margin)}达标。<strong>维持现有节奏</strong>，可按目标利润底价 ${fmtP(m.targetFloor)} 作为大促时的价格护栏。`);
   }
-  return {level,tags,advice,shelf,inv,turn};
+  return {level,tags,advice,shelf,inv,turn,profit};
 }
 
 /* ============ 渲染 ============ */
-const badge=(c,t)=>`<span class="inline-block px-2 py-0.5 rounded text-xs bg-${c}-100 text-${c}-700">${t}</span>`;
-const fmt=(v,d=0)=> (v==null||!isFinite(v))?'∞':Number(v).toLocaleString('zh-CN',{maximumFractionDigits:d});
+/* HTML 文本/属性上下文编码器：仅用于元素文本与属性值插值；
+   不能替代 JavaScript 上下文编码——因此所有 onclick="...'${sku}'..." 拼接已彻底移除，
+   改为 data-sku/data-act 属性 + 事件委托 / addEventListener 闭包。 */
+function escapeHtml(s){
+  return String(s==null?'':s).replace(/[&<>"']/g, ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+}
+/* 动态 badge 颜色改为显式完整类名映射（兼容 Tailwind 预编译/生产化扫描，不再拼 bg-${c}-100） */
+const BADGE_CLASS = {
+  rose:'bg-rose-100 text-rose-700', amber:'bg-amber-100 text-amber-700',
+  yellow:'bg-yellow-100 text-yellow-700', emerald:'bg-emerald-100 text-emerald-700',
+  slate:'bg-slate-100 text-slate-700', indigo:'bg-indigo-100 text-indigo-700'
+};
+const badge=(c,t)=>`<span class="inline-block px-2 py-0.5 rounded text-xs ${BADGE_CLASS[c]||BADGE_CLASS.slate}">${t}</span>`;
+/* 数值显示：null/undefined/NaN => '—'；Infinity => '∞'；-Infinity => '-∞'；0 => '0'（真实 Infinity 保持参与比较，不转成 1e15） */
+const fmt=(v,d=0)=> v==null?'—':(v===Infinity?'∞':(v===-Infinity?'-∞':(Number.isNaN(Number(v))?'—':Number(v).toLocaleString('zh-CN',{maximumFractionDigits:d}))));
 
 function render(){
-  const countEl = document.getElementById('countLabel');
-  if(countEl) countEl.textContent = products.length;
+  document.getElementById('countLabel').textContent = products.length;
   try{ renderOverview(); }catch(e){ console.error('renderOverview 失败:',e); }
   try{ renderInputList(); }catch(e){ console.error('renderInputList 失败:',e); }
   try{ renderDashboard(); }catch(e){ console.error('renderDashboard 失败:',e); }
   try{ renderAlerts(); }catch(e){ console.error('renderAlerts 失败:',e); }
   try{ renderReplenish(); }catch(e){ console.error('renderReplenish 失败:',e); }
-  persist();
+  try{ renderDataQualityBar(); }catch(e){ console.error('renderDataQualityBar 失败:',e); }
+  /* 注意：渲染（含切 Tab、筛选、画图）不是数据修改行为，不再触发 persist/markDirty */
 }
 
 function textMatch(field,expr){ if(!expr) return true; return String(field).toLowerCase().includes(expr.toLowerCase()); }
 function matchNum(v,expr){
   if(!expr) return true;
-  const val = (v===Infinity)?1e15:(v==null?NaN:Number(v));
+  const val = (v==null)?NaN:Number(v); /* 真实 Infinity 保留参与比较，不转换为 1e15 */
   const e = expr.replace(/\s/g,'');
   let m;
-  if(m=e.match(/^(-?\d*\.?\d+)-(-?\d*\.?\d+)$/)) return !isNaN(val)&&val>=+m[1]&&val<=+m[2];
+  if(m=e.match(/^(-?\d*\.?\d+)-(-?\d*\.?\d+)$/)) return !Number.isNaN(val)&&val>=+m[1]&&val<=+m[2];
   if(m=e.match(/^(>=|<=|>|<|=)(-?\d*\.?\d+)$/)){
-    if(isNaN(val)) return false;
+    if(Number.isNaN(val)) return false;
     const n=+m[2];
     switch(m[1]){case'>':return val>n;case'<':return val<n;case'>=':return val>=n;case'<=':return val<=n;default:return Math.abs(val-n)<1e-6;}
   }
-  if(m=e.match(/^(-?\d*\.?\d+)$/)) return (!isNaN(val)&&Math.abs(val-+m[1])<1e-6) || String(v).includes(e);
-  return true;
+  /* 纯数字表达式：数值相等；输入 1 不匹配 10/21/100（已删除 String(v).includes 回退） */
+  if(m=e.match(/^(-?\d*\.?\d+)$/)) return !Number.isNaN(val)&&Math.abs(val-+m[1])<1e-6;
+  /* 无法识别的表达式：给出提示并按「不匹配」处理，绝不静默匹配全部 */
+  filterExprError = true;
+  return false;
 }
 function getOverviewFilters(){
   const g=id=>{const el=document.getElementById(id);return el?el.value.trim():'';};
@@ -570,35 +1124,44 @@ function clearOverviewFilters(){
   renderOverview();
 }
 
-function renderOverview(){
-  const tb=document.getElementById('overviewBody'); tb.innerHTML='';
-  const ovc=document.getElementById('ovCount');
-  const COLS=19;
-  if(!products.length){tb.innerHTML=`<tr><td colspan="${COLS}" class="p-6 text-center text-slate-400">暂无数据，请到「数据录入」添加或载入示例</td></tr>`;if(ovc)ovc.textContent='';return;}
+/* 共享筛选：renderOverview 与「导出筛选结果CSV」使用同一份行集，保证导出与页面显示一致 */
+function getFilteredOverviewRows(){
+  filterExprError = false;
   const f=getOverviewFilters();
-  let shown=0;
+  const rows=[];
   products.forEach(p=>{
-    const m=compute(p); const inv=invStatus(m.isr), turn=turnStatus(m.turnover), shelf=shelfStatus(m);
-    const statusText=inv.t+' '+turn.t+' '+(shelf.none?'':shelf.t);
+    const m=compute(p); const inv=invStatus(m.isr), turn=turnStatus(m.turnover), shelf=shelfStatus(m), profit=profitStatus(p,m);
+    const statusText=inv.t+' '+turn.t+' '+(shelf.none?'':shelf.t)+' '+profit.t;
     const pass =
       textMatch(p.name,f.name)&&textMatch(p.sku,f.sku)&&textMatch(p.cat,f.cat)&&
       matchNum(p.cost,f.cost)&&matchNum(p.price,f.price)&&matchNum(m.actual,f.actual)&&
-      matchNum(m.unitProfit,f.profit)&&matchNum(m.margin*100,f.margin)&&matchNum(m.breakeven,f.breakeven)&&matchNum(m.ytdProfit,f.ytdProfit)&&matchNum(m.daily,f.daily)&&
+      matchNum(m.unitProfit,f.profit)&&matchNum(m.margin==null?NaN:m.margin*100,f.margin)&&matchNum(m.breakeven,f.breakeven)&&matchNum(m.ytdProfit,f.ytdProfit)&&matchNum(m.daily,f.daily)&&
       matchNum(p.endInv,f.endInv)&&matchNum(m.isr,f.isr)&&matchNum(m.sellDays,f.sellDays)&&
       matchNum(m.shelfLife,f.shelf)&&matchNum(m.expiryLoss,f.loss)&&
       matchNum(m.turnover,f.turnover)&&textMatch(statusText,f.status);
     if(!pass) return;
-    shown++;
-    const idx = shown;
+    rows.push({p,m,inv,turn,shelf,profit});
+  });
+  return rows;
+}
+
+function renderOverview(){
+  const tb=document.getElementById('overviewBody'); if(!tb) return;
+  const ovc=document.getElementById('ovCount');
+  const COLS=19;
+  if(!products.length){tb.innerHTML=`<tr><td colspan="${COLS}" class="p-6 text-center text-slate-400">暂无数据，请到「数据录入」添加或载入示例</td></tr>`;if(ovc)ovc.textContent='';return;}
+  const rows=getFilteredOverviewRows();
+  const html=rows.map(({p,m,inv,turn,shelf,profit},idx)=>{
     const shelfCell = m.shelfLife==null ? '<span class="text-slate-300">—</span>'
       : `<span class="${shelf.lv>=2?'text-rose-600 font-semibold':''}" title="录入${m.shelfLifeRaw}天 / 已过${m.shelfElapsed}天">${m.shelfLife}天</span>`;
     const lossCell = (m.expiryLoss&&m.expiryLoss>0) ? `<span class="text-amber-600 font-medium">¥${fmt(m.expiryLoss)}</span>` : '<span class="text-slate-300">—</span>';
-    tb.innerHTML+=`<tr class="border-t hover:bg-slate-50 cursor-pointer" onclick="gotoAlert('${p.sku}')">
-      <td class="p-2 text-center text-slate-400">${idx}</td><td class="p-2 font-medium">${p.name}</td><td class="p-2 text-slate-400">${p.sku}</td><td class="p-2">${p.cat}</td>
-      <td class="p-2 text-right">${fmt(p.cost,2)}</td><td class="p-2 text-right">${fmt(p.price,2)}</td>
+    /* 外部文本一律 escapeHtml 编码；SKU 不再拼进 onclick，改用 data-sku + 事件委托 */
+    return `<tr class="border-t hover:bg-slate-50 cursor-pointer" data-sku="${escapeHtml(p.sku)}">
+      <td class="p-2 text-center text-slate-400">${idx+1}</td><td class="p-2 font-medium">${escapeHtml(p.name)}</td><td class="p-2 text-slate-400">${escapeHtml(p.sku)}</td><td class="p-2">${escapeHtml(p.cat)}</td>
+      <td class="p-2 text-right">${p.costMissing?'<span class="text-amber-600" title="成本缺失：按0参与测算，采购金额无法估算">缺失</span>':fmt(p.cost,2)}</td><td class="p-2 text-right">${fmt(p.price,2)}</td>
       <td class="p-2 text-right font-medium">${fmt(m.actual,2)}</td>
       <td class="p-2 text-right ${m.unitProfit<0?'text-rose-600':'text-emerald-600'}">${fmt(m.unitProfit,2)}</td>
-      <td class="p-2 text-right ${m.margin<0?'text-rose-600':''}">${(m.margin*100).toFixed(1)}%</td>
+      <td class="p-2 text-right ${m.margin!=null&&m.margin<0?'text-rose-600':''}">${fmtMarginPct(m.margin)}</td>
       <td class="p-2 text-right text-rose-600 font-semibold">¥${fmt(m.breakeven,2)}</td>
       <td class="p-2 text-right ${m.ytdProfit<0?'text-rose-600':'text-emerald-600'}">¥${fmt(m.ytdProfit)}</td>
       <td class="p-2 text-right">${fmt(m.daily,1)}</td><td class="p-2 text-right">${fmt(p.endInv)}</td>
@@ -606,48 +1169,69 @@ function renderOverview(){
       <td class="p-2 text-right">${isFinite(m.sellDays)?fmt(m.sellDays)+'天':'∞'}</td>
       <td class="p-2 text-right">${shelfCell}</td>
       <td class="p-2 text-right">${lossCell}</td>
-      <td class="p-2 text-right font-semibold">${m.turnover?m.turnover.toFixed(2):'—'}</td>
-      <td class="p-2">${badge(inv.c,inv.t)} ${badge(turn.c,turn.t)}${shelf.none?'':' '+badge(shelf.c,shelf.t)}</td>
+      <td class="p-2 text-right font-semibold">${m.turnover==null?'—':m.turnover.toFixed(2)}</td>
+      <td class="p-2">${badge(inv.c,inv.t)} ${badge(turn.c,turn.t)}${shelf.none?'':' '+badge(shelf.c,shelf.t)} ${badge(profit.c,profit.t)}</td>
     </tr>`;
   });
-  if(shown===0) tb.innerHTML=`<tr><td colspan="${COLS}" class="p-6 text-center text-slate-400">无符合筛选条件的产品</td></tr>`;
-  if(ovc) ovc.textContent=`显示 ${shown} / ${products.length} 条` + (shown<products.length?'（已筛选）':'');
+  tb.innerHTML = html.length ? html.join('') : `<tr><td colspan="${COLS}" class="p-6 text-center text-slate-400">无符合筛选条件的产品</td></tr>`;
+  if(!overviewDelegated){
+    /* 事件委托：读取 dataset.sku（属性经 HTML 编码解码后为原始字符串，单双引号安全） */
+    tb.addEventListener('click',e=>{
+      const tr=e.target&&e.target.closest?e.target.closest('tr[data-sku]'):null;
+      if(tr) gotoAlert(tr.dataset.sku);
+    });
+    overviewDelegated=true;
+  }
+  if(ovc) ovc.textContent=`显示 ${rows.length} / ${products.length} 条` + (rows.length<products.length?'（已筛选）':'') + (filterExprError?' ⚠️ 存在无法识别的筛选表达式（已按不匹配处理）':'');
 }
 
 function renderInputList(){
-  const tb=document.getElementById('inputBody'); tb.innerHTML='';
+  const tb=document.getElementById('inputBody'); if(!tb) return;
   if(!products.length){tb.innerHTML='<tr><td colspan="12" class="p-4 text-center text-slate-400">暂无数据</td></tr>';return;}
-  products.forEach((p,i)=>{
-    const idx=i+1;
+  const html=products.map((p,i)=>{
     const m=compute(p);
     const shelfTxt = m.shelfLife!=null
       ? `${m.shelfLife}天<span class="text-slate-400">（录入${m.shelfLifeRaw}）</span>`
       : '—';
-    tb.innerHTML+=`<tr class="border-t">
-      <td class="p-2 text-center text-slate-400">${idx}</td><td class="p-2 font-medium">${p.name}</td><td class="p-2 text-slate-400">${p.sku}</td><td class="p-2">${p.cat}</td>
-      <td class="p-2 text-right">${fmt(p.cost,2)}</td><td class="p-2 text-right">${fmt(p.price,2)}</td>
+    /* 外部文本一律 escapeHtml；编辑/删除不再拼 onclick 字符串，改用 data-act/data-sku + 事件委托 */
+    return `<tr class="border-t">
+      <td class="p-2 text-center text-slate-400">${i+1}</td><td class="p-2 font-medium">${escapeHtml(p.name)}</td><td class="p-2 text-slate-400">${escapeHtml(p.sku)}</td><td class="p-2">${escapeHtml(p.cat)}</td>
+      <td class="p-2 text-right">${p.costMissing?'<span class="text-amber-600" title="成本缺失：按0参与测算">缺失</span>':fmt(p.cost,2)}</td><td class="p-2 text-right">${fmt(p.price,2)}</td>
       <td class="p-2 text-right">${fmt(m.actual,2)}</td>
-      <td class="p-2 text-right">${fmt(p.weekSales)}</td><td class="p-2 text-right">${fmt(p.endInv)}</td>
+      <td class="p-2 text-right">${p.weekSalesMissing?'<span class="text-amber-600" title="周销量缺失：按0测算">缺失</span>':fmt(p.weekSales)}</td>
+      <td class="p-2 text-right">${p.endInvMissing?'<span class="text-amber-600" title="库存缺失：按0测算">缺失</span>':fmt(p.endInv)}</td>
       <td class="p-2 text-right ${m.shelfLife!=null&&m.shelfLife<=settings.shelfWarnDays?'text-rose-600 font-semibold':''}">${shelfTxt}</td>
-      <td class="p-2 text-slate-500">${p.date||'—'}</td>
-      <td class="p-2"><button onclick="editProduct('${p.sku}')" class="text-indigo-600 hover:underline">编辑</button>
-      <button onclick="delProduct('${p.sku}')" class="text-rose-600 hover:underline ml-2">删除</button></td>
+      <td class="p-2 text-slate-500">${escapeHtml(p.date)||'—'}</td>
+      <td class="p-2"><button data-act="edit" data-sku="${escapeHtml(p.sku)}" class="text-indigo-600 hover:underline">编辑</button>
+      <button data-act="del" data-sku="${escapeHtml(p.sku)}" class="text-rose-600 hover:underline ml-2">删除</button></td>
     </tr>`;
   });
+  tb.innerHTML=html.join('');
+  if(!inputDelegated){
+    tb.addEventListener('click',e=>{
+      const btn=e.target&&e.target.closest?e.target.closest('button[data-act]'):null;
+      if(!btn) return;
+      const sku=btn.dataset.sku;
+      if(btn.dataset.act==='edit') editProduct(sku);
+      else if(btn.dataset.act==='del') delProduct(sku);
+    });
+    inputDelegated=true;
+  }
 }
 
 function renderDashboard(){
   let gmv=0,profit=0,alerts=0,expiryLossTotal=0;
-  const catMap={}; const health={'健康':0,'库存偏高':0,'积压严重':0,'积压(无动销)':0,'断货风险':0};
+  const catMap=new Map(); const health={'健康':0,'库存偏高':0,'积压严重':0,'积压(无动销)':0,'断货风险':0};
   const mixLabels=[],mixIsr=[],mixTo=[];
   products.forEach(p=>{
     const m=compute(p); gmv+=m.ytdGMV; profit+=m.ytdProfit;
-    const inv=invStatus(m.isr),turn=turnStatus(m.turnover),shelf=shelfStatus(m);
-    if(Math.max(inv.lv,turn.lv,shelf.lv)>=2) alerts++;
+    const inv=invStatus(m.isr),turn=turnStatus(m.turnover),shelf=shelfStatus(m),ps=profitStatus(p,m);
+    if(Math.max(inv.lv,turn.lv,shelf.lv,ps.lv)>=2) alerts++; /* 同一SKU四维取最大，只计一次 */
     if(m.expiryLoss) expiryLossTotal+=m.expiryLoss;
     if(health[inv.t]!==undefined) health[inv.t]++;
-    catMap[p.cat]=catMap[p.cat]||{gmv:0,profit:0}; catMap[p.cat].gmv+=m.ytdGMV; catMap[p.cat].profit+=m.ytdProfit;
-    mixLabels.push(p.name); mixIsr.push(isFinite(m.isr)?+m.isr.toFixed(2):settings.isrHigh*1.5); mixTo.push(m.turnover?+m.turnover.toFixed(2):0);
+    if(!catMap.has(p.cat)) catMap.set(p.cat,{gmv:0,profit:0}); /* Map 聚合，避免特殊品类键触发原型/查找异常 */
+    const agg=catMap.get(p.cat); agg.gmv+=m.ytdGMV; agg.profit+=m.ytdProfit;
+    mixLabels.push(p.name); mixIsr.push(isFinite(m.isr)?+m.isr.toFixed(2):settings.isrHigh*1.5); mixTo.push(m.turnover==null?0:+m.turnover.toFixed(2));
   });
   document.getElementById('kpi-gmv').textContent='¥'+fmt(gmv);
   document.getElementById('kpi-profit').textContent='¥'+fmt(profit);
@@ -655,16 +1239,18 @@ function renderDashboard(){
   document.getElementById('kpi-alert').textContent=alerts;
   document.getElementById('kpi-expiry').textContent='¥'+fmt(expiryLossTotal);
 
-  const cats=Object.keys(catMap);
+  const cats=[...catMap.keys()];
   drawChart('chartCategory','bar',{labels:cats,datasets:[
-    {label:'累计GMV',data:cats.map(c=>+catMap[c].gmv.toFixed(0)),backgroundColor:'#a5b4fc'},
-    {label:'累计利润',data:cats.map(c=>+catMap[c].profit.toFixed(0)),backgroundColor:'#6366f1'}
+    {label:'累计GMV（估算）',data:cats.map(c=>+catMap.get(c).gmv.toFixed(0)),backgroundColor:'#a5b4fc'},
+    {label:'累计贡献利润（估算）',data:cats.map(c=>+catMap.get(c).profit.toFixed(0)),backgroundColor:'#6366f1'}
   ]});
 
+  /* 库存健康度颜色按状态映射（labels 过滤后颜色跟随状态，不再按固定数组下标赋色） */
+  const HEALTH_PALETTE={'健康':'#34d399','库存偏高':'#fbbf24','积压严重':'#f43f5e','积压(无动销)':'#9f1239','断货风险':'#f59e0b'};
   const hLabels=Object.keys(health).filter(k=>health[k]>0);
   currentHealthLabels=hLabels;
   drawChart('chartHealth','doughnut',{labels:hLabels,datasets:[{data:hLabels.map(k=>health[k]),
-    backgroundColor:['#34d399','#fbbf24','#f43f5e','#9f1239','#f59e0b']}]},{
+    backgroundColor:hLabels.map(k=>HEALTH_PALETTE[k]||'#94a3b8')}]},{
       cutout:'55%',
       onClick:(evt,els)=>{
         if(els&&els.length){
@@ -678,8 +1264,8 @@ function renderDashboard(){
 
   drawChart('chartMix','bar',{labels:mixLabels,datasets:[
     {label:'库销比',data:mixIsr,backgroundColor:'#a5b4fc'},
-    {label:'滚动周转',data:mixTo,type:'line',borderColor:'#f43f5e',backgroundColor:'#f43f5e',pointRadius:4,yAxisID:'y1'}
-  ]},{scales:{y:{beginAtZero:true,title:{display:true,text:'库销比'}},y1:{beginAtZero:true,position:'right',title:{display:true,text:'滚动周转'},grid:{drawOnChartArea:false}}}});
+    {label:'年累计周转率(估算)',data:mixTo,type:'line',borderColor:'#f43f5e',backgroundColor:'#f43f5e',pointRadius:4,yAxisID:'y1'}
+  ]},{scales:{y:{beginAtZero:true,title:{display:true,text:'库销比'}},y1:{beginAtZero:true,position:'right',title:{display:true,text:'年累计周转率(估算)'},grid:{drawOnChartArea:false}}}});
 
   const X_BREAK = 3100, X_COMPRESS = 100, OUT_OF_STOCK = 20;
   const tx = v => v <= X_BREAK ? v : X_BREAK + (v - X_BREAK) / X_COMPRESS;
@@ -707,11 +1293,18 @@ function renderDashboard(){
     meta.data.forEach((pt,i)=>{
       const d = chart.data.datasets[0].data[i];
       const rOut = pt.options.radius || d.r;
-      const rIn = Math.min(rOut, Math.sqrt(Math.max(0,d.weekSales)) * 2);
+      /* 内核按比例计算：rIn = rOut × √(min(1, 近期周销/年累计均周销))，
+         修复旧版「按近期绝对值开根号再截断」导致近期远低于均值时内核仍填满的问题 */
+      const avg = Math.max(0, Number(d.m.avgWeekSales) || 0);
+      const recent = Math.max(0, Number(d.weekSales) || 0);
+      const ratio = avg > 0 ? recent / avg : 0;
+      const rIn = rOut * Math.sqrt(Math.min(1, ratio));
       c.save();
-      c.beginPath(); c.arc(pt.x, pt.y, Math.max(1.5, rIn), 0, Math.PI*2);
-      c.globalAlpha = 0.85; c.fillStyle = d.bc; c.fill();
-      if(d.weekSales > d.m.avgWeekSales){
+      if(rIn > 0){ /* 仅当 rIn>0 才画实心内核；最近周销0不画假内核 */
+        c.beginPath(); c.arc(pt.x, pt.y, Math.max(1.5, rIn), 0, Math.PI*2);
+        c.globalAlpha = 0.85; c.fillStyle = d.bc; c.fill();
+      }
+      if(recent > avg){ /* 近期高于年均（含年均=0 的新增动销）保留虚线外环 */
         c.beginPath(); c.arc(pt.x, pt.y, rOut + 2.5, 0, Math.PI*2);
         c.setLineDash([3,3]); c.lineWidth = 1.5; c.globalAlpha = 1; c.strokeStyle = d.bc; c.stroke();
       }
@@ -728,11 +1321,15 @@ function renderDashboard(){
     maintainAspectRatio:false,
     scales:{
       x:{
-        title:{display:true,text:'期末库存（件，3100 以上压缩等距）'},beginAtZero:true,
+        title:{display:true,text:'期末库存（件；≤3100 每100一格，3100以上每10000原始件一格压缩等距，断点=3100）'},beginAtZero:true,
         afterBuildTicks(axis){
+          /* 低段 0-3000 每100；高段按数据最大值动态生成：13100、23100、33100……（每10000原始件一个等距步长） */
           const ticks=[];
           for(let v=0; v<=3000; v+=100) ticks.push({value:v});
-          [10000,20000].forEach(v=>ticks.push({value:tx(v)}));
+          const maxRaw = bubbleData.length ? Math.max(...bubbleData.map(d=>d.inv)) : 0;
+          if(maxRaw > X_BREAK){
+            for(let raw=X_BREAK+10000; raw<=maxRaw+10000; raw+=10000) ticks.push({value:tx(raw)});
+          }
           axis.ticks = ticks;
         },
         ticks:{callback:function(v){ return v<=X_BREAK ? v : Math.round(X_BREAK+(v-X_BREAK)*X_COMPRESS).toLocaleString(); }}
@@ -748,13 +1345,22 @@ function renderDashboard(){
           label:function(ctx){
             const d=ctx.raw;
             const m=d.m;
-            const diff = m.avgWeekSales>0 ? ((d.weekSales - m.avgWeekSales)/m.avgWeekSales*100).toFixed(1) : 0;
-            const trend = diff>=0 ? '↑+'+diff+'%' : '↓'+diff+'%';
+            const avg = Math.max(0, Number(m.avgWeekSales) || 0);
+            const recent = Math.max(0, Number(d.weekSales) || 0);
+            let trend;
+            if(avg > 0){
+              const diff = ((recent - avg)/avg*100).toFixed(1);
+              trend = (diff>=0?'↑+':'↓')+diff+'%';
+            }else if(recent > 0){
+              trend = '新增动销，无同比基准'; /* 年均=0 且近期>0：不显示「增长0%」 */
+            }else{
+              trend = '无动销';
+            }
             return [
-              d.name + ' (' + d.sku + ')' + (d.inv < OUT_OF_STOCK ? '【无库存】' : ''),
+              d.name + ' (' + d.sku + ')' + (d.inv < OUT_OF_STOCK ? '【图中置灰】' : ''),
               '到手价: ¥' + m.actual.toFixed(2) + ' | 保本极限: ¥' + m.breakeven.toFixed(2) + ' | 差距: ¥' + (m.actual-m.breakeven).toFixed(2),
-              '库存: ' + d.inv + '件' + (d.inv < OUT_OF_STOCK ? '（<20件，按无库存处理）' : '') + ' | 最近周销: ' + d.weekSales + ' | 综合周销: ' + m.avgWeekSales.toFixed(1) + ' ' + trend,
-              '利润率: ' + (m.margin*100).toFixed(1) + '% | 库销比: ' + (isFinite(m.isr)?m.isr.toFixed(2):'∞')
+              '真实库存: ' + d.inv + '件' + (d.inv < OUT_OF_STOCK ? '（<20件仅图中置灰，为可视化近似，实际库存仍全部参与核算）' : '') + ' | 最近周销: ' + d.weekSales + ' | 年累计均周销: ' + m.avgWeekSales.toFixed(1) + ' ' + trend,
+              '利润率: ' + fmtMarginPct(m.margin) + ' | 库销比: ' + (isFinite(m.isr)?m.isr.toFixed(2):'∞')
             ];
           }
         }
@@ -770,10 +1376,44 @@ function renderDashboard(){
   },[salesComparePlugin]);
 }
 
+/* 图表库加载失败时的可见提示（绝不空白装作正常） */
+function showChartError(id){
+  try{
+    const c=document.getElementById(id); if(!c||!c.parentNode) return;
+    let e=document.getElementById(id+'-err');
+    if(!e){
+      e=document.createElement('div');
+      e.id=id+'-err';
+      e.className='text-xs text-rose-600 bg-rose-50 rounded-lg p-2 mb-2';
+      e.textContent='⚠️ 图表库（Chart.js）加载失败，图表无法渲染；请检查网络后刷新。数据表格与KPI不受影响。';
+      c.parentNode.insertBefore(e, c);
+    }
+  }catch(_){}
+}
 function drawChart(id,type,data,extra={},extraPlugins=[]){
   const ctx=document.getElementById(id); if(!ctx)return;
-  if(typeof Chart==='undefined'){ return; }
-  if(charts[id]) charts[id].destroy();
+  if(typeof Chart==='undefined'){ showChartError(id); return; }
+  /* 图表类型与插件结构未变化时：更新数据并 update()，不 destroy 重建；
+     结构签名（类型+插件ID序列）变化时才销毁重建 */
+  const sig=type+'|'+(extraPlugins||[]).map(p=>p&&p.id).join(',');
+  const prev=charts[id];
+  if(prev && prev.__sig===sig){
+    prev.data=data;
+    /* 不替换整个 options 对象：Chart.js options 内含 _scriptable resolver，
+       展开复制会导致 Recursion detected。直接浅合并可安全覆盖的属性。 */
+    if(extra){
+      for(const k of Object.keys(extra)){
+        if(k==='scales'||k==='plugins'){
+          prev.options[k]={...(prev.options[k]||{}),...extra[k]};
+        }else{
+          prev.options[k]=extra[k];
+        }
+      }
+    }
+    prev.update();
+    return;
+  }
+  if(prev) prev.destroy();
   const opts={responsive:true,plugins:{legend:{labels:{boxWidth:12,font:{size:11}}}}};
   const inlinePlugins=[].concat(extraPlugins);
   if(type==='doughnut'||type==='pie'){
@@ -801,44 +1441,117 @@ function drawChart(id,type,data,extra={},extraPlugins=[]){
       c.restore();
     }});
   }
-  charts[id]=new Chart(ctx,{type,data,options:{...opts,...extra},plugins:inlinePlugins});
+  const chart=new Chart(ctx,{type,data,options:{...opts,...extra},plugins:inlinePlugins});
+  chart.__sig=sig;
+  charts[id]=chart;
+  /* 结构重建成功后，清除可能残留的失败提示 */
+  try{ const e=document.getElementById(id+'-err'); if(e&&e.remove) e.remove(); }catch(_){}
 }
 
 function renderAlerts(){
-  const c=document.getElementById('alertsContainer'); c.innerHTML='';
-  if(!products.length){c.innerHTML='<div class="bg-white rounded-xl p-6 text-center text-slate-400">暂无数据</div>';return;}
+  const c=document.getElementById('alertsContainer'); if(!c) return;
+  if(!products.length){c.innerHTML='<div class="bg-white rounded-xl p-6 text-center text-slate-400">暂无数据</div>';alertSkuMap=Object.create(null);return;}
   const scoredList=products.map(p=>{const m=compute(p);const a=advise(p,m);return {p,m,a};})
     .sort((x,y)=>y.a.level-x.a.level);
   const levelBar={3:'border-rose-400',2:'border-amber-400',1:'border-yellow-300',0:'border-emerald-300'};
-  scoredList.forEach(({p,m,a})=>{
+  alertSkuMap=Object.create(null); /* sku -> 安全内部卡片ID：DOM 定位用映射，不假设 SKU 是安全 CSS 选择器/元素ID */
+  const cards=scoredList.map(({p,m,a},cardIdx)=>{
     const fmtP=(v)=> v==null?'—':'¥'+v.toFixed(2);
     const disc=(fp)=> (p.price>0&&fp!=null)?(fp/p.price*10).toFixed(1)+'折':'—';
+    const cardId='alert-card-'+cardIdx;
+    alertSkuMap[String(p.sku)]=cardId;
     const shelfMetric = m.shelfLife!=null
       ? `<div>剩余效期 <b class="${a.shelf.lv>=2?'text-rose-600':'text-slate-800'}">${m.shelfLife}天</b><span class="text-slate-400"> (录入${m.shelfLifeRaw}/已过${m.shelfElapsed})</span></div>`
       : `<div>剩余效期 <b class="text-slate-300">—</b></div>`;
-    c.innerHTML+=`<div id="alert-${p.sku}" class="alert-card bg-white rounded-xl shadow-sm p-4 border-l-4 ${levelBar[a.level]} transition">
+    /* 外部文本（产品名/SKU/品类）一律 escapeHtml；卡片ID使用内部序号，不拼接 SKU */
+    return `<div id="${cardId}" class="alert-card bg-white rounded-xl shadow-sm p-4 border-l-4 ${levelBar[a.level]} transition">
       <div class="flex flex-wrap justify-between items-center gap-2 mb-2">
-        <div class="font-semibold">${p.name} <span class="text-xs text-slate-400">${p.sku} · ${p.cat}</span></div>
+        <div class="font-semibold">${escapeHtml(p.name)} <span class="text-xs text-slate-400">${escapeHtml(p.sku)} · ${escapeHtml(p.cat)}</span></div>
         <div class="flex gap-1 flex-wrap">${a.tags.map(t=>badge(t.c,t.t)).join('')}</div>
       </div>
-      <div class="grid grid-cols-2 sm:grid-cols-6 gap-2 text-xs text-slate-500 mb-3">
+      <div class="grid grid-cols-2 sm:grid-cols-4 xl:grid-cols-7 gap-2 text-xs text-slate-500 mb-3">
         <div>库销比 <b class="text-slate-800">${fmt(m.isr,2)}</b></div>
         <div>可售天数 <b class="text-slate-800">${isFinite(m.sellDays)?fmt(m.sellDays)+'天':'∞'}</b></div>
         ${shelfMetric}
-        <div>滚动周转 <b class="text-slate-800">${m.turnover?m.turnover.toFixed(2):'—'}</b></div>
-        <div>利润率 <b class="text-slate-800">${(m.margin*100).toFixed(1)}%</b></div>
+        <div>年累计周转率(估算) <b class="text-slate-800">${m.turnover==null?'—':m.turnover.toFixed(2)}</b></div>
+        <div>利润率 <b class="text-slate-800">${fmtMarginPct(m.margin)}</b></div>
         <div>单件利润 <b class="text-slate-800">${fmt(m.unitProfit,2)}</b></div>
+        <div>利润状态 ${badge(a.profit.c,a.profit.t)}</div>
       </div>
       <div class="space-y-1 text-sm text-slate-700 mb-3">${a.advice.map(x=>`<p>${x}</p>`).join('')}</div>
       <div class="bg-slate-50 rounded-lg p-3 text-xs grid grid-cols-1 sm:grid-cols-4 gap-2">
         <div>🏷 控价：<b>${fmtP(p.price)}</b></div>
         <div>💰 当前到手价：<b>${fmtP(m.actual)}</b></div>
-        <div>🎯 目标利润底价：<b class="text-indigo-600">${fmtP(m.targetFloor)}</b>（${disc(m.targetFloor)}）</div>
+        <div>🎯 目标利润底价：<b class="text-indigo-600">${fmtP(m.targetFloor)}</b>（${m.targetFloor==null?'目标不可达':disc(m.targetFloor)}${targetFloorHint(m)}）</div>
         <div>🩸 保本极限底价：<b class="text-rose-600">${fmtP(m.breakeven)}</b>（${disc(m.breakeven)}）</div>
       </div>
       ${(m.expiryLoss&&m.expiryLoss>0)?`<div class="mt-2 text-xs bg-rose-50 text-rose-700 rounded-lg p-2">⏳ 效期测算：预计报损约 <b>${Math.round(m.expiryQty)}</b> 件 / <b>¥${fmt(m.expiryLoss)}</b>${isFinite(m.needDaily)?`，清完所需日均 <b>${m.needDaily.toFixed(1)}</b> 件`:'（已过效期）'}</div>`:''}
     </div>`;
   });
+  c.innerHTML=cards.join('');
+}
+
+/* ============ 数据质量提示 ============ */
+function dataQualityInfo(){
+  const asOf=getAsOfYmd();
+  const zone=settings.businessTimeZone||'Asia/Shanghai';
+  const warnDays=finiteOr(settings.dataFreshWarnDays,7);
+  const blockDays=finiteOr(settings.dataFreshBlockDays,14);
+  const asOfOrd=dateOrdinal(asOf);
+  let minOrd=null,maxOrd=null,noDate=0,staleCnt=0,fallbackCnt=0,maxAge=null,fallbackList=[];
+  products.forEach(p=>{
+    const ord=dateOrdinal(p.date);
+    if(ord==null){noDate++;return;}
+    if(minOrd==null||ord<minOrd)minOrd=ord;
+    if(maxOrd==null||ord>maxOrd)maxOrd=ord;
+    const age=asOfOrd==null?null:(asOfOrd-ord);
+    if(age!=null){
+      if(age>warnDays)staleCnt++;
+      if(maxAge==null||age>maxAge)maxAge=age;
+    }
+    if(compute(p).actualPriceFallback){fallbackCnt++;fallbackList.push({sku:String(p.sku),name:String(p.name||'')});}
+  });
+  const stale=maxAge!=null&&maxAge>blockDays;
+  const aged=maxAge!=null&&maxAge>warnDays;
+  return {asOf,zone,warnDays,blockDays,minOrd,maxOrd,noDate,staleCnt,fallbackCnt,maxAge,stale,aged,fallbackList,quarantined:quarantinedProducts.length};
+}
+
+function renderDataQualityBar(){
+  const info=dataQualityInfo();
+  const range=info.maxOrd==null?'无有效日期':(ordToYmd(info.minOrd)+' ~ '+ordToYmd(info.maxOrd));
+  const staleTag=info.stale
+    ?`<span class="text-rose-600 font-semibold">⚠️ 基于旧快照的情景测算（最新数据距今 ${info.maxAge} 天，超过阻断阈值 ${info.blockDays} 天），补货与效期结果仅供参考</span>`
+    :(info.aged
+      ?`<span class="text-amber-600">数据快照偏旧（最新数据距今 ${info.maxAge} 天，超过预警阈值 ${info.warnDays} 天）</span>`
+      :`<span class="text-emerald-600">数据新鲜度正常</span>`);
+  window._fbList=info.fallbackList||[];
+  const fbHtml=info.fallbackCnt>0
+    ?`<span class="flex flex-wrap items-center gap-1">💰 实际价回退控价 <b>${info.fallbackCnt}</b> 条：${window._fbList.map((f,i)=>`<button type="button" onclick="jumpToSkuIdx(${i})" class="px-1.5 py-0.5 bg-amber-50 border border-amber-300 text-amber-700 rounded hover:bg-amber-100" title="点击定位到该SKU（数据总览）">[${escapeHtml(String(f.sku))}] ${escapeHtml(String(f.name))}</button>`).join('')}</span>`
+    :`<span>💰 实际价回退控价 <b>0</b> 条</span>`;
+  const html=`<div class="bg-white rounded-xl shadow-sm p-3 text-xs text-slate-600 flex flex-wrap gap-x-4 gap-y-1 items-center">
+    <span>📅 分析日期 <b>${info.asOf}</b></span>
+    <span>🌐 业务时区 <b>${info.zone}</b></span>
+    <span>📊 数据日期范围 <b>${range}</b></span>
+    <span>⏳ 过期快照 <b>${info.staleCnt}</b> 条（&gt;${info.warnDays}天）</span>
+    <span>🚫 无有效日期 <b>${info.noDate}</b> 条</span>
+    ${fbHtml}
+    ${info.quarantined?`<span class="text-rose-600 font-semibold">🧯 已隔离无效数据 <b>${info.quarantined}</b> 条（未参与统计/KPI，原始记录已备份，请修复后重新导入）</span>`:''}
+    ${staleTag}
+  </div>`;
+  const d1=document.getElementById('dqBarDashboard'); if(d1) d1.innerHTML=html;
+  const d2=document.getElementById('dqBarReplenish'); if(d2) d2.innerHTML=html;
+}
+
+/* 数据质量条：点击『回退控价』SKU 芯片 -> 跳转数据总览并自动筛选定位 */
+function jumpToSkuIdx(i){
+  const f=(window._fbList||[])[i]; if(!f)return;
+  jumpToSku(String(f.sku));
+}
+function jumpToSku(sku){
+  switchTab('overview');
+  clearOverviewFilters();
+  const el=document.getElementById('flt_sku');
+  if(el){el.value=sku;renderOverview();setTimeout(()=>el.scrollIntoView({behavior:'smooth',block:'start'}),50);}
 }
 
 /* ============ 补货计划模块 ============ */
@@ -850,52 +1563,189 @@ function getSeasonArr(cat){
   return settings.repSeason;
 }
 function getForecastMonths(){
-  const now=new Date(); const y0=now.getFullYear(), mo0=now.getMonth();
+  const now=getAsOfDate(); const y0=now.getFullYear(), mo0=now.getMonth();
   const arr=[];
   for(let i=1;i<=6;i++){
     const d=new Date(y0,mo0+i,1);
     const y=d.getFullYear(), m=d.getMonth()+1;
-    arr.push({y,m,label:String(y).slice(2)+'年'+m+'月',coef:(settings.repSeason[m-1]||1),dim:new Date(y,m,0).getDate()});
+    arr.push({y,m,label:String(y).slice(2)+'年'+m+'月',coef:seasonCoef(settings.repSeason,m),dim:new Date(y,m,0).getDate()});
   }
   return arr;
 }
 
+/* ============ 预测时间轴 / 批次模拟辅助（v4 定向重构） ============
+   统一约定：
+   · 分析日按「日初库存、包含当天需求」处理；
+   · 内部模拟时间轴 = 分析日 → 当月底（过渡期）→ 未来6个完整月，KPI 报表仍只展示未来6个月；
+   · 数据日期→分析日之间不编造进销存：默认「分析日起始库存沿用录入快照」情景，
+     数据超过新鲜度阈值时在 note 中给出低可信提示；
+   · 所有日期遍历基于 ordinal（UTC），不受夏令时影响；
+   · expiryDate <= 当日 即不可售；未知效期批次排在已知效期批次之后（保留报损风险提示）；
+   · 逐日守恒：期初 + 到货 - 销售 - 到期剔除 = 期末；需求 = 销售 + 未满足需求。 */
+function monthStartOrd(y,m){ return Date.UTC(y,m-1,1)/86400000; }
+function ordMonth(o){ const dt=new Date(o*86400000); return {y:dt.getUTCFullYear(),m:dt.getUTCMonth()+1}; }
+function monthDim(y,m){ return monthStartOrd(y,m+1)-monthStartOrd(y,m); }
+function coefSumDaily(season,fromOrd,toOrd){
+  let s=0;
+  for(let o=fromOrd;o<=toOrd;o++) s+=seasonCoef(season,ordMonth(o).m);
+  return s;
+}
+/* 初始批次：优先使用 p.batches；缺失时由 endInv + 剩余效期生成单批次近似（标记），
+   剩余效期未知时 expiryOrd=null（效期未知，不得显示「已通过效期安全校验」）。
+   批次合计与 endInv 不一致时以批次合计为模拟初始库存口径并标记。 */
+function normalizeBatchList(p,m){
+  const raw=Array.isArray(p.batches)?p.batches:null;
+  let batches=[],virtual=false,expiryUnknown=false,mismatch=false;
+  if(raw&&raw.length){
+    raw.forEach(b=>{
+      const q=optionalFinite(b&&b.qty);
+      if(q==null||q<=0)return;
+      const eo=dateOrdinal(b.expiryDate);
+      batches.push({qty:q,expiryOrd:eo,src:'batch'});
+      if(eo==null)expiryUnknown=true;
+    });
+  }
+  if(!batches.length){
+    virtual=true;
+    const inv=Math.max(0,Number(p.endInv)||0);
+    if(m.shelfLifeRaw!=null&&m.shelfLife!=null){
+      batches=[{qty:inv,expiryOrd:dateOrdinal(getAsOfYmd())+m.shelfLife,src:'virtual'}];
+      /* 剩余效期<=0 → expiryOrd<=分析日，模拟首日即到期剔除 */
+    }else{
+      batches=[{qty:inv,expiryOrd:null,src:'virtual'}];
+      if(inv>0)expiryUnknown=true;
+    }
+  }else{
+    const sum=batches.reduce((a,b)=>a+b.qty,0);
+    if(Math.abs(sum-(Number(p.endInv)||0))>1e-9)mismatch=true;
+  }
+  return {batches,virtual,expiryUnknown,mismatch};
+}
+function normalizeIncomingList(p){
+  const raw=Array.isArray(p.incoming)?p.incoming:null;
+  const list=[];
+  if(raw)raw.forEach(a=>{
+    const q=optionalFinite(a&&a.qty),ao=dateOrdinal(a&&a.arrivalDate);
+    if(q==null||q<=0||ao==null)return;
+    list.push({ord:ao,qty:q,expiryOrd:dateOrdinal(a.expiryDate)});
+  });
+  return list;
+}
+/* 逐日库存模拟：过期隔离 → 当日有效到货入库（已到期到货直接计报损、不入可售）→
+   最近到期优先消耗（未知效期最后）→ 缺口计入 unmetDemand。 */
+function simulateInventory(opts){
+  const {startOrd,endOrd,batches,arrivals,demandFn}=opts;
+  const arr=(arrivals||[]).slice().sort((a,b)=>a.ord-b.ord);
+  let predictedDemand=0,fulfilledSales=0,unmetDemand=0,expiryQty=0,firstStockoutOrd=null;
+  const daily=[];
+  for(let o=startOrd;o<=endOrd;o++){
+    let beginInv=0; for(const b of batches)beginInv+=b.qty;
+    let expiredToday=0;
+    for(const b of batches){ if(b.qty>0&&b.expiryOrd!=null&&b.expiryOrd<=o){ expiredToday+=b.qty; b.qty=0; } }
+    expiryQty+=expiredToday;
+    let arrivedToday=0,expiredArrival=0;
+    for(const a of arr){
+      if(a.ord!==o)continue;
+      if(a.expiryOrd!=null&&a.expiryOrd<=o){ expiredArrival+=a.qty; }
+      else{ batches.push({qty:a.qty,expiryOrd:a.expiryOrd,src:'arrival'}); arrivedToday+=a.qty; }
+    }
+    expiryQty+=expiredArrival;
+    const d=Math.max(0,demandFn(o));
+    predictedDemand+=d;
+    let need=d,got=0;
+    if(need>0){
+      batches.filter(b=>b.qty>0)
+        .sort((a,b)=>((a.expiryOrd==null?Infinity:a.expiryOrd)-(b.expiryOrd==null?Infinity:b.expiryOrd)))
+        .forEach(b=>{ if(need<=1e-12)return; const take=Math.min(b.qty,need); b.qty-=take; got+=take; need-=take; });
+    }
+    fulfilledSales+=got;
+    const unmet=Math.max(0,d-got);
+    if(unmet>0){ unmetDemand+=unmet; if(firstStockoutOrd==null)firstStockoutOrd=o; }
+    let endInv=0; for(const b of batches)endInv+=b.qty;
+    daily.push({ord:o,ymd:ordToYmd(o),beginInv,arrivedToday,expiredToday,expiredArrival,demand:d,fulfilled:got,unmet,endInv});
+  }
+  let endingSellableInv=0; for(const b of batches)endingSellableInv+=b.qty;
+  const cost=Number(opts.cost)||0;
+  return {predictedDemand,fulfilledSales,unmetDemand,expiryQty,expiryLoss:expiryQty*cost,
+          endingSellableInv,firstStockoutOrd,firstStockoutDate:firstStockoutOrd==null?null:ordToYmd(firstStockoutOrd),daily};
+}
+
 function forecastSKU(p){
   const m=compute(p);
-  const now=new Date(); const curMonth=now.getMonth()+1;
+  const asOfYmd=getAsOfYmd();
+  const asOfOrd=dateOrdinal(asOfYmd);
   const season=getSeasonArr(p.cat);
-  const coefOf=(mon)=>season[((mon-1)%12+12)%12]||1;
-
-  const recentDaily=(Number(p.weekSales)||0)/7;
-  const avgDaily=m.avgDailySales||0;
-  let sum=0; for(let k=1;k<=curMonth;k++) sum+=coefOf(k);
-  const avgCoefElapsed=curMonth>0?sum/curMonth:1;
-  const recentBase=coefOf(curMonth)>0?recentDaily/coefOf(curMonth):recentDaily;
-  const avgBase=avgCoefElapsed>0?avgDaily/avgCoefElapsed:avgDaily;
+  const coefOf=(mon)=>seasonCoef(season,((mon-1)%12+12)%12+1);
   const w=settings.repRecentWeight;
+  const weekSales=Number(p.weekSales)||0, ytdSales=Number(p.ytdSales)||0;
+  const dataOrd=dateOrdinal(p.date);
 
-  // —— 清仓 SKU 判定：综合到手价 ≤ 保本极限底价 × 阈值% ——
-  const clearThresh=(settings.repClearanceThreshold>0?settings.repClearanceThreshold:110)/100;
-  const isClearance=(m.breakeven>0 && m.actual>0 && m.actual <= m.breakeven*clearThresh);
+  /* —— 一、历史基准：一律以 p.date（数据日期）为截止日，逐日累加所属品类月份季节系数 ——
+     全年：avgBase = ytdSales / effectiveYtdDays（当年1月1日→数据日期逐日系数和）；
+     近期：recentBase = weekSales / effectiveRecentDays（截至数据日期的最近7个日历日，支持跨月/跨年）；
+     分母为0且销量>0 → 数据/系数冲突；分母为0且销量为0 → 无可用信息；绝不把分母静默当1。 */
+  let effYtdDays=null,avgBase=null,avgConflict=false;
+  if(dataOrd!=null){
+    const y=Number(normalizeDate(p.date).slice(0,4));
+    effYtdDays=coefSumDaily(season,dateOrdinal(y+'-01-01'),dataOrd);
+    if(effYtdDays>0)avgBase=ytdSales/effYtdDays;
+    else if(ytdSales>0)avgConflict=true;
+  }
+  let effRecentDays=null,recentBase=null,recentConflict=false;
+  if(dataOrd!=null){
+    effRecentDays=coefSumDaily(season,dataOrd-6,dataOrd);
+    if(effRecentDays>0)recentBase=weekSales/effRecentDays; /* weekSales=0 → recentBase=0（零销量信号） */
+    else if(weekSales>0)recentConflict=true;
+  }
 
-  // —— 基准日销：清仓回归 优先，其次近期暴增/骤降抑制 ——
-  let baseDaily, anomaly=null, spikeRatio=null, clearance=false;
-  if(isClearance){
-    // 清仓期高动销不可采信：回到起量前的常销均值 = 全年去季节化均销 × 回归系数
-    clearance=true; anomaly='clearance';
-    const revert=(settings.repClearanceRevertRatio>0?settings.repClearanceRevertRatio:0.5);
-    const stableBase = avgBase>0 ? avgBase : recentBase;
-    baseDaily = Math.max(0, stableBase*revert);
-  } else if(avgBase>0 && recentBase>0){
-    spikeRatio = recentBase/avgBase;
+  // —— 疑似清仓识别：自动规则仅作疑似标记（待确认），人工策略 > 自动规则 ——
+  const clearThresh=finiteOr(settings.repClearanceThreshold,110)/100;
+  const autoSuspected=(m.breakeven>0 && m.actual>0 && m.actual <= m.breakeven*clearThresh);
+  const strat=productStrategy(p);
+  const giftMode=(strat.salesMode==='gift');
+  let clearance=false, suspectedClearance=false, clearanceConfirmed=false, clearanceSource=null;
+  if(autoSuspected){
+    if(strat.salesMode==='clearance'){ clearance=true; clearanceConfirmed=true; clearanceSource='manual'; }
+    else if(strat.salesMode==='auto'){ clearance=true; suspectedClearance=true; clearanceSource='auto_suspected'; }
+    /* normal：人工 normal 覆盖自动疑似清仓（不回归）；gift/discontinued 不做清仓回归 */
+  }
+
+  /* —— 二、基准日销：人工预测覆盖 > 赠品配额/疑似清仓回归 > 人工基准 > 近期/全年混合（含暴增/骤降抑制） ——
+     近期零销量（recentBase===0）不回退完整全年基准：有确认断货历史→人工基准入口/保守比例；
+     无证据→(1-repRecentWeight)×全年基准，标记「需求下降/断货原因未确认」。 */
+  let baseDaily=0, anomaly=null, spikeRatio=null, baseSource='none';
+  const notes=[];
+  const overrideVal=optionalFinite(p.forecastDailyOverride);
+  if(overrideVal!=null){
+    /* 人工预测日销覆盖：优先级最高；空白=不覆盖；0=明确覆盖为零 */
+    baseDaily=Math.max(0,overrideVal); baseSource='override';
+    notes.push('人工预测日销覆盖：'+baseDaily.toFixed(1)+' 件/日（forecastDailyOverride'+(p.strategyReason?('；依据：'+p.strategyReason):'；未填写依据，请补充确认')+'）');
+  } else if(giftMode){
+    /* 赠品：不按普通商业销量自动补货；仅采信人工营销配额 */
+    if(finiteOr(p.manualBaseDaily,0)>0){
+      baseDaily=Math.max(0,Number(p.manualBaseDaily)); baseSource='gift_quota';
+      notes.push('赠品模式：不按普通商业销量自动补货；采用人工营销配额 '+baseDaily.toFixed(1)+' 件/日'+(p.baseOverrideReason?('（依据：'+p.baseOverrideReason+'）'):''));
+    }else{
+      baseDaily=0; baseSource='gift'; anomaly='gift';
+      notes.push('赠品模式：未登记人工营销配额，需求基准按 0 处理（不按普通商业销量自动补货）');
+    }
+  } else if(clearance){
+    anomaly='clearance'; baseSource='clearance';
+    const revert=finiteOr(settings.repClearanceRevertRatio,0.5);
+    const stableBase=(avgBase!=null&&avgBase>0) ? avgBase : recentBase;
+    baseDaily = stableBase!=null ? Math.max(0, stableBase*revert) : 0;
+  } else if(finiteOr(p.manualBaseDaily,0)>0){
+    baseDaily=Math.max(0,Number(p.manualBaseDaily)); baseSource='manual';
+    notes.push('人工基准覆盖：'+baseDaily.toFixed(1)+' 件/日'+(p.baseOverrideReason?('（依据：'+p.baseOverrideReason+'）'):'（未填写依据，请补充确认）'));
+  } else if(recentBase!=null&&recentBase>0 && avgBase!=null&&avgBase>0){
+    spikeRatio = recentBase/avgBase; baseSource='blend';
     const blended = w*recentBase + (1-w)*avgBase;
     const SPIKE_UP = 1.5, DIP_DOWN = 0.5;
     const sens = settings.repSpikeSensitivity>0 ? settings.repSpikeSensitivity : 2;
     if(spikeRatio > SPIKE_UP){
       const surge = spikeRatio - 1;
       const trust = sens/(sens+surge);
-      const guardedBase = avgBase*(1 + surge*trust);
-      baseDaily = Math.min(blended, guardedBase);
+      baseDaily = Math.min(blended, avgBase*(1 + surge*trust));
       anomaly = 'spike';
     } else if(spikeRatio < DIP_DOWN){
       baseDaily = Math.min(blended, recentBase*0.6 + avgBase*0.4);
@@ -903,46 +1753,203 @@ function forecastSKU(p){
     } else {
       baseDaily = blended;
     }
-  } else if(recentBase>0){
-    baseDaily = recentBase;
+  } else if(recentBase!=null&&recentBase>0){
+    baseDaily = recentBase; baseSource='recent';
+  } else if(recentBase===0){
+    /* 近期7天有效系数>0 且实销为0 → 近期零销量 */
+    if(avgBase!=null&&avgBase>0){
+      baseDaily=(1-w)*avgBase; anomaly='recentzero';
+      if(p.stockoutConfirmed===true){
+        baseSource='stockout_fallback';
+        notes.push('有确认断货历史：缺货期零销量不计为需求归零，按全年基准×'+(1-w).toFixed(2)+'保守估计，请人工确认或覆盖基准（manualBaseDaily）');
+      }else{
+        baseSource='recent_zero_fallback';
+        notes.push('近期零销量，需求下降/断货原因未确认：不直接回退完整全年基准，按全年基准×'+(1-w).toFixed(2)+'保守估计');
+      }
+    }else{ baseDaily=0; anomaly='nobase'; }
+  } else if(recentConflict||avgConflict){
+    baseDaily=(avgBase!=null&&avgBase>0)?avgBase:0;
+    anomaly='nobase';
+    notes.push('📉 有效系数天数为0：'+[(recentConflict?'近期7天有销量但系数和为0（数据/系数冲突）':''),(avgConflict?'全年有销量但系数和为0（数据/系数冲突）':'')].filter(Boolean).join('；')+'，请检查季节系数设置');
+    baseSource=(avgBase!=null&&avgBase>0)?'avg_conflict':'none';
+  } else if(avgBase!=null&&avgBase>0){
+    baseDaily = avgBase; baseSource='avg';
+    if(recentBase==null) notes.push('近期7天有效系数为0且无销量，近期无可用信息，基准回退全年口径');
   } else {
-    baseDaily = avgBase;
+    baseDaily = 0; anomaly='nobase';
+    if(ytdSales>0||weekSales>0) notes.push('动销基准不可估算（有效系数天数为0），已按0处理；请检查季节系数设置');
   }
   baseDaily=Math.max(0,baseDaily);
 
-  const y0=now.getFullYear(),mo0=now.getMonth();
-  const mn=[];
-  for(let i=1;i<=7;i++){
-    const d=new Date(y0,mo0+i,1);
-    const yy=d.getFullYear(),mm=d.getMonth()+1;
-    const dim=new Date(yy,mm,0).getDate();
-    const coef=coefOf(mm);
-    mn.push({y:yy,m:mm,dim,coef,label:String(yy).slice(2)+'年'+mm+'月',demand:baseDaily*dim*coef});
+  /* —— 三、统一时间轴：分析日（日初库存、含当天需求）→ 当月底过渡期 → 未来6个完整月 —— */
+  const curM=ordMonth(asOfOrd);
+  const transitionEndOrd=monthStartOrd(curM.y,curM.m+1)-1;
+  const transitionDays=transitionEndOrd-asOfOrd+1;
+  const horizonMonths=[];
+  for(let i=1;i<=6;i++){
+    const so=monthStartOrd(curM.y,curM.m+i), mo=ordMonth(so);
+    const dim=monthDim(mo.y,mo.m), coef=coefOf(mo.m);
+    horizonMonths.push({y:mo.y,m:mo.m,ordStart:so,ordEnd:monthStartOrd(mo.y,mo.m+1)-1,dim,coef,
+      label:String(mo.y).slice(2)+'年'+mo.m+'月',demand:baseDaily*dim*coef}); /* 系数为0 → 当月需求严格为0 */
   }
+  const horizonEndOrd=horizonMonths[5].ordEnd;
+  const demandFn=(o)=>{ const mo=ordMonth(o); return baseDaily*coefOf(mo.m); };
+
+  /* —— 四、批次与在途（每场景独立复制，不共享可变库存数组） —— */
+  const bl=normalizeBatchList(p,m);
+  const incoming=normalizeIncomingList(p);
+  const hasIncoming=incoming.length>0;
+  const initialBatches=()=>bl.batches.map(b=>({qty:b.qty,expiryOrd:b.expiryOrd,src:b.src}));
+
+  /* —— 五、采购约束参数（可选字段） —— */
+  const leadTimeRaw=optionalFinite(p.leadTimeDays);
+  const leadTimeDays=leadTimeRaw!=null?Math.max(0,Math.round(leadTimeRaw)):null;
+  const moq=Math.max(0,Math.round(optionalFinite(p.moq)!=null?optionalFinite(p.moq):0));
+  const casePack=Math.max(0,Math.round(optionalFinite(p.casePack)!=null?optionalFinite(p.casePack):0));
+  const newShelfRaw=optionalFinite(p.newBatchShelfLifeDays);
+  const newShelfDays=newShelfRaw!=null?Math.max(0,Math.round(newShelfRaw)):null;
 
   const shelfDays=m.shelfLife;
-  const shelfMonths=shelfDays!=null?shelfDays/30:Infinity;
   const normMonthly=baseDaily*30;
   const invMonths=normMonthly>0?p.endInv/normMonthly:(p.endInv>0?Infinity:0);
-
   let curExpiryQty=0;
   if(shelfDays!=null){
     curExpiryQty = baseDaily>0 ? Math.max(0, p.endInv - baseDaily*shelfDays) : p.endInv;
   }
 
-  let suspended=false, note='';
-  if(shelfDays!=null&&shelfDays<=0){
-    suspended=true; note='已过效期，暂停补货，立即报损 / 下架处理';
-  }else if(curExpiryQty>normMonthly&&normMonthly>0){
-    suspended=true; note='库存临期严重（预计报损约'+Math.round(curExpiryQty)+'件），暂停补货，优先清仓 / 调拨';
-  }else if(baseDaily<=0){
-    suspended=true; note='近一年及近期均无动销，暂不补货，评估是否汰换';
+  /* 暂停新增采购：人工策略 > 自动规则。hold 暂停采购但仍测算需求/缺口/库存风险；
+     manual 展示人工数量/基准及依据；discontinued 停止新增采购建议（在库品处理与到期规则分开判断）；
+     gift 不按普通商业销量自动补货；旧批次到期不再自动暂停整SKU（混合批次时有效批次照常分析补货）。 */
+  const bv=batchValidity(p,m);
+  let suspended=false, suspensionReason=null;
+  if(isDiscontinued(p)){ suspended=true; suspensionReason='discontinued'; }
+  else if(strat.replenishmentPolicy==='hold'){ suspended=true; suspensionReason='hold'; }
+  else if(strat.replenishmentPolicy==='manual'){ suspended=true; suspensionReason='manual'; }
+  else if(giftMode){ suspended=true; suspensionReason='gift'; }
+  else if(baseSource==='override'&&baseDaily<=0){ suspended=true; suspensionReason='override_zero'; }
+  else if(baseDaily<=0){ suspended=true; suspensionReason='nosales'; }
+  else if(curExpiryQty>normMonthly&&normMonthly>0 && !(bv.hasBatchInfo&&bv.validQty>0)){ suspended=true; suspensionReason='expiry_heavy'; }
+
+  /* —— 六、三场景模拟（相同需求假设，仅补货行为不同） ——
+     B0：不新增任何到货；B1：仅接收已确认在途（仅存在 incoming 时显示）；A：B1 + 建议采购到货 */
+  const cost=Number(p.cost)||0;
+  const b0=simulateInventory({startOrd:asOfOrd,endOrd:horizonEndOrd,batches:initialBatches(),arrivals:[],demandFn,cost});
+  const b1=simulateInventory({startOrd:asOfOrd,endOrd:horizonEndOrd,batches:initialBatches(),arrivals:incoming,demandFn,cost});
+
+  /* A 场景月度计划：过渡期期末可售库存（B1 口径）作为第1个月期初；
+     目标库存安全月数以「新批次效期」封顶——旧批次剩余效期不再限制新补货；
+     未提供新货效期 → 不沿用旧批次效期，理论量标记「未做新货效期校验」。 */
+  const safety=settings.repSafetyMonths;
+  const orders=[];
+  const rows=[];
+  const flags=[];
+  let moqBumped=false, caseRounded=false;
+  let planInv=b1.daily[transitionDays-1].endInv;
+  for(let i=0;i<6;i++){
+    const cm=horizonMonths[i];
+    const demand=cm.demand;
+    const arrInMonth=incoming.filter(a=>a.ord>=cm.ordStart&&a.ord<=cm.ordEnd).reduce((s,a)=>s+a.qty,0);
+    let coverMonths=safety;
+    if(newShelfDays!=null){
+      if(newShelfDays<=0)coverMonths=0;
+      else coverMonths=Math.min(coverMonths,Math.max(0.3,newShelfDays/30));
+    }
+    const nxt=horizonMonths[i+1]||cm;
+    const targetEnd=nxt.demand*coverMonths;
+    const need=demand+targetEnd-(planInv+arrInMonth);
+    let orderQty=0,arrivalQty=0,orderOrd=null,arrivalOrd=cm.ordStart;
+    if(!suspended&&need>0){
+      arrivalQty=Math.ceil(need-1e-9);
+      orderQty=arrivalQty;
+      if(casePack>0){ const rq=Math.ceil(orderQty/casePack)*casePack; if(rq!==orderQty)caseRounded=true; orderQty=rq; }
+      if(moq>0&&orderQty>0&&orderQty<moq){ orderQty=moq; moqBumped=true; }
+      arrivalQty=orderQty;
+      if(leadTimeDays!=null&&leadTimeDays>0){
+        orderOrd=cm.ordStart-leadTimeDays;
+        if(orderOrd<asOfOrd){ orderOrd=asOfOrd; flags.push('orderDelay'); } /* 下单被推迟→到货顺延，按实际到货日模拟，不暗藏在首月 */
+        arrivalOrd=orderOrd+leadTimeDays; /* 提前期>0：下单当日绝不可售 */
+      }else{
+        orderOrd=cm.ordStart;
+        if(orderQty>0)flags.push('instantTheory'); /* 即时到货理论补足量，不能直接视为采购下单计划 */
+      }
+      if(newShelfDays==null)flags.push('newShelfUnknown');
+      orders.push({ord:arrivalOrd,qty:arrivalQty,expiryOrd:newShelfDays!=null?arrivalOrd+newShelfDays:null,
+        orderOrd,orderQty});
+    }
+    rows.push({label:cm.label,coef:cm.coef,m:cm.m,demand,replenish:orderQty,orderQty,arrivalQty,
+      orderDate:orderQty>0?ordToYmd(orderOrd):null,arrivalDate:orderQty>0?ordToYmd(arrivalOrd):null,
+      beginInv:planInv,endInv:null,targetEnd,moqBumped,caseRounded});
+    planInv=Math.max(0,planInv+orderQty+arrInMonth-demand);
+  }
+  const a=simulateInventory({startOrd:asOfOrd,endOrd:horizonEndOrd,batches:initialBatches(),arrivals:incoming.concat(orders),demandFn,cost});
+  rows.forEach((r,i)=>{ /* 回填 A 场景逐日模拟的月边界真实期初/期末 */
+    const cm=horizonMonths[i];
+    r.beginInv=a.daily[cm.ordStart-asOfOrd].beginInv;
+    r.endInv=a.daily[cm.ordEnd-asOfOrd].endInv;
+  });
+  const totalRep=rows.reduce((s,r)=>s+r.replenish,0);
+  const totalOrderQty=rows.reduce((s,r)=>s+r.orderQty,0);
+  const totalRepCost=totalRep*cost;
+
+  /* 过渡期（分析日→当月底）指标：单独列示，不计入「下月起6个月」KPI */
+  let transitionDemand=0,transitionUnmet=0,transitionExpiry=0,aTransitionUnmet=0;
+  for(let j=0;j<transitionDays;j++){
+    transitionDemand+=b0.daily[j].demand;
+    transitionUnmet+=b0.daily[j].unmet;
+    transitionExpiry+=b0.daily[j].expiredToday+b0.daily[j].expiredArrival;
+    aTransitionUnmet+=a.daily[j].unmet;
+  }
+  /* 过渡期紧急补货（单独列出，不混入首月计划） */
+  let transitionEmergencyQty=0;
+  if(!suspended&&aTransitionUnmet>0.5){
+    transitionEmergencyQty=casePack>0?Math.ceil(aTransitionUnmet/casePack)*casePack:Math.ceil(aTransitionUnmet-1e-9);
+  }
+
+  /* —— 七、损失价格口径：默认当前有效实际价的正单位贡献利润（主KPI）；
+     恢复销售价情景：restoredSellingPrice（人工填写的可实现恢复销售价）优先，单列；
+     仅触发疑似/确认清仓且未填恢复销售价时，可用控价作「按控价假设」参考情景（未必能成交，不计入主KPI）；
+     gift/discontinued 不生成普通零售控价机会损失；不与默认口径混加。 ——
+     grossLoss（旧字段）= 不补货场景B0、未来6个月有效库存模拟缺口 × 默认正单位贡献利润；
+     lostUnits（旧字段）= B0 未来6个月未满足需求（不含过渡期缺口）。 */
+  const unitGPForLoss=m.unitProfit;
+  let restoredPriceInfo=null;
+  if(!giftMode){
+    const rsp=optionalFinite(p.restoredSellingPrice);
+    if(rsp!=null&&rsp>0) restoredPriceInfo={price:rsp,label:'恢复销售价情景'};
+    else if(clearance&&!isDiscontinued(p)&&Number(p.price)>0) restoredPriceInfo={price:Number(p.price),label:'按控价假设情景（未必能成交）'};
+  }
+  let lostUnits=0;
+  for(let j=transitionDays;j<b0.daily.length;j++)lostUnits+=b0.daily[j].unmet;
+  const grossLoss = (!giftMode&&lostUnits>0) ? lostUnits * Math.max(0, unitGPForLoss) : 0;
+  const restoredPrice = restoredPriceInfo ? restoredPriceInfo.price : m.actual; /* 兼容旧字段：未提供情景时=当前实际价 */
+  const unitGPRestored = restoredPriceInfo ? restoredPriceInfo.price*(1-m.totalFee) - cost : null;
+  const grossLossRestored = (restoredPriceInfo&&lostUnits>0) ? lostUnits * Math.max(0, unitGPRestored) : 0;
+  const avoidableLostUnits=Math.max(0,b0.unmetDemand-a.unmetDemand); /* ≠ B0总缺口：有缺口≠补货必有收益 */
+
+  /* —— 备注组装 —— */
+  let note='';
+  if(suspended){
+    note = suspensionReason==='discontinued' ? '人工确认停售/停产（discontinued）：停止新增采购建议；有效在库商品是否继续处理，请结合效期与销售策略单独判断（与到期规则分开）'
+      : suspensionReason==='hold' ? '人工策略 hold：暂停新增采购；需求、缺口与现有库存风险仍照常测算，恢复采购请更新策略'
+      : suspensionReason==='manual' ? '人工补货策略（manual）：不生成模型自动采购建议；人工数量/基准及依据见备注'+(p.strategyReason?('（依据：'+p.strategyReason+'）'):'（未填写依据）')
+      : suspensionReason==='gift' ? '赠品：不按普通商业销量自动补货；营销配额可经「预测日销覆盖」或人工基准登记'
+      : suspensionReason==='override_zero' ? '人工预测日销覆盖为 0：按无需求处理，不生成补货建议'
+      : suspensionReason==='expiry_heavy' ? '库存临期严重（预计报损约'+Math.round(curExpiryQty)+'件），暂停补货，优先清仓 / 调拨'
+      : '近一年及近期均无动销，暂不补货，评估是否汰换';
   }else if(isFinite(invMonths)&&invMonths>6){
     note='当前库存约可覆盖 '+invMonths.toFixed(1)+' 个月，短期无需补货';
   }
-
+  if(shelfDays!=null&&shelfDays<=0&&(Number(p.endInv)>0)){
+    const t='当前批次已到效期：模拟中已逐日到期剔除，未来6个月补货计划不再因此被整体暂停';
+    note=note?(note+'；'+t):t;
+  }
   if(anomaly==='clearance'){
-    const extra='🏷️ 综合到手价 ¥'+m.actual.toFixed(2)+' ≤ 保本底价 ¥'+m.breakeven.toFixed(2)+'×'+settings.repClearanceThreshold+'%，判定为清仓期动销，补货已回归起量前均值（全年均销×回归系数'+settings.repClearanceRevertRatio+'），不采信清仓高动销';
+    const extra=clearanceConfirmed
+      ? '🏷️ 人工确认清仓（经营模式=clearance）：综合到手价 ¥'+m.actual.toFixed(2)+' ≤ 保本底价 ¥'+m.breakeven.toFixed(2)+'×'+settings.repClearanceThreshold+'%，补货基准已回归起量前均值（全年均销×回归系数'+settings.repClearanceRevertRatio+'），不采信清仓高动销'
+      : '🏷️ 疑似清仓（待确认）：综合到手价 ¥'+m.actual.toFixed(2)+' ≤ 保本底价 ¥'+m.breakeven.toFixed(2)+'×'+settings.repClearanceThreshold+'%，为保守起见补货基准已回归起量前均值（全年均销×回归系数'+settings.repClearanceRevertRatio+'），不采信疑似清仓期的高动销；若属正常低价策略，请设置经营模式=normal 并填写原因';
+    note = note ? (note+'；'+extra) : extra;
+  } else if(anomaly==='gift'){
+    const extra='🎁 赠品模式：不按普通商业销量自动补货，不按控价折算机会损失';
     note = note ? (note+'；'+extra) : extra;
   } else if(anomaly==='spike'){
     const extra='⚡近期约为全年常销的 '+spikeRatio.toFixed(1)+' 倍，判定短期暴增，补货量已按「向常销回归」抑制';
@@ -950,48 +1957,158 @@ function forecastSKU(p){
   } else if(anomaly==='dip'){
     const extra='🔻近期约为全年常销的 '+(spikeRatio*100).toFixed(0)+'%（明显偏低），已保守下调补货';
     note = note ? (note+'；'+extra) : extra;
+  } else if(anomaly==='nobase'){
+    const extra='📉 动销基准不可估算（业务月份季节系数为0或有效系数不足），已按0处理；请检查该月季节系数设置';
+    note = note ? (note+'；'+extra) : extra;
   }
-
-  const safety=settings.repSafetyMonths;
-  let inv=Number(p.endInv)||0;
-  const rows=[];
-  for(let i=0;i<6;i++){
-    const cur=mn[i], nxt=mn[i+1];
-    const demand=cur.demand;
-    let coverMonths=safety;
-    if(isFinite(shelfMonths)) coverMonths=Math.min(coverMonths, Math.max(0.3, shelfMonths*0.5));
-    const targetEnd=nxt.demand*coverMonths;
-    let replenish=0, endInv;
-    if(suspended){
-      replenish=0; endInv=Math.max(0, inv-demand);
-    }else{
-      replenish=Math.max(0, demand+targetEnd-inv);
-      replenish=Math.ceil(replenish);          // 补货件数向上取整，无小数、且不缺货
-      endInv=inv+replenish-demand; if(endInv<0) endInv=0;
-    }
-    rows.push({label:cur.label,coef:cur.coef,m:cur.m,demand,replenish,beginInv:inv,endInv,targetEnd});
-    inv=endInv;
+  if(autoSuspected&&strat.salesMode==='normal'){
+    const t='人工 normal 覆盖自动疑似清仓：按正常需求预测，未做清仓回归'+(p.strategyReason?('（原因：'+p.strategyReason+'）'):'（未填写原因）');
+    note=note?(note+'；'+t):t;
   }
-  const totalRep=rows.reduce((a,r)=>a+r.replenish,0);
-  const totalRepCost=totalRep*(Number(p.cost)||0);
+  if(strat.salesMode==='promo'){
+    const t='🎯 临时促销确认（promo）：近期销量可能含促销因素，需求参考照常测算、不下调，请人工关注促销结束后的动销变化';
+    note=note?(note+'；'+t):t;
+  }
+  if(bv.hasBatchInfo&&bv.expiredQty>0){
+    const t='存在已到期批次（约'+fmt(bv.expiredQty,0)+'件）：模拟首日已到期剔除，按隔离/报损处理；'+(bv.validQty>0?('有效批次（约'+fmt(bv.validQty,0)+'件）照常参与销售与补货分析，不因旧批次到期整SKU停补'):'无可售有效批次');
+    note=note?(note+'；'+t):t;
+  }
+  if(restoredPriceInfo){
+    const t='恢复价格情景（单列，未计入主KPI）：'+restoredPriceInfo.label+' ¥'+restoredPriceInfo.price.toFixed(2)+'，单位贡献利润 ¥'+unitGPRestored.toFixed(2)+' → 情景缺口 ¥'+fmt(grossLossRestored);
+    note=note?(note+'；'+t):t;
+  }
+  if(bl.virtual&&(Number(p.endInv)>0)){
+    const t='未提供批次明细：由期末库存+剩余效期生成「单批次近似」';
+    note=note?(note+'；'+t):t;
+  }
+  if(bl.expiryUnknown){
+    const t='存在效期未知批次：排在已知效期批次之后消耗，保留报损风险提示（不得视为已通过效期安全校验）';
+    note=note?(note+'；'+t):t;
+  }
+  if(bl.mismatch){
+    const t='批次数量合计与期末库存快照不一致：模拟以批次合计为初始库存口径';
+    note=note?(note+'；'+t):t;
+  }
+  if(flags.indexOf('instantTheory')>=0){
+    const t='未设置采购提前期：补货量为「即时到货理论补足量」，不能直接视为采购下单计划';
+    note=note?(note+'；'+t):t;
+  }
+  if(flags.indexOf('newShelfUnknown')>=0){
+    const t='未提供新批次效期：未沿用旧批次剩余效期，补货量未做新货效期校验（理论量）';
+    note=note?(note+'；'+t):t;
+  }
+  if(flags.indexOf('orderDelay')>=0){
+    const t='存在提前期导致的延迟到货（下单日晚于分析日，或到货晚于次月初）：已按实际到货时点模拟';
+    note=note?(note+'；'+t):t;
+  }
+  if(caseRounded){
+    const t='已按箱规向上取整';
+    note=note?(note+'；'+t):t;
+  }
+  if(moqBumped){
+    const t='MOQ 将下单量提升至起订量：可能带来到期/资金压力，需人工决策，不能视为该订单必然安全';
+    note=note?(note+'；'+t):t;
+  }
+  if(transitionUnmet>0.5){
+    const t='过渡期（分析日→当月底）不补货缺口约 '+Math.round(transitionUnmet)+' 件：单独列示，不计入下月起6个月KPI';
+    note=note?(note+'；'+t):t;
+  }
+  if(transitionEmergencyQty>0){
+    const t='过渡期建议紧急补货 '+transitionEmergencyQty+' 件：单独列出，未计入月度补货计划';
+    note=note?(note+'；'+t):t;
+  }
+  if(m.dataAgeDays!=null&&m.dataAgeDays>finiteOr(settings.dataFreshBlockDays,14)){
+    const t='数据快照距今 '+m.dataAgeDays+' 天（超过阻断阈值）：低可信情景测算，确认库存仍有效或更新数据后方可作为正式计划';
+    note=note?(note+'；'+t):t;
+  }
+  notes.forEach(t=>{ note=note?(note+'；'+t):t; });
 
-  /* ===== 断货毛利损失（场景B：不补货，未来6个月累计缺口 × 单位毛利） =====
-     · 动销沿用 baseDaily × 当月天数 × 品类大促系数（即 rows.demand）
-     · 单位毛利默认综合到手价口径 m.unitProfit；清仓SKU用控价还原（不采信清仓低价，控价为0时回退综合到手价）
-     · 仅取正毛利（负毛利视为断货止损、不计损失）                                */
-  const restoredPrice = clearance ? ((Number(p.price)>0) ? Number(p.price) : m.actual) : m.actual;
-  const unitGPForLoss = restoredPrice*(1-m.totalFee) - (Number(p.cost)||0);
-  let availLeft = Number(p.endInv)||0;
-  let lostUnits = 0;
-  rows.forEach(r=>{
-    const d = r.demand;
-    if(availLeft >= d){ availLeft -= d; }
-    else { lostUnits += (d - availLeft); availLeft = 0; }
-  });
-  const grossLoss = lostUnits>0 ? lostUnits * Math.max(0, unitGPForLoss) : 0;
+  /* —— 八、轻量补货参考（v1.11 默认模式）：透明口径，页面 / 导出 / 表格共用同一结果 ——
+     覆盖期 = 提前期 + 检查周期；预计需求 = 基准日销 × 覆盖期 × 备货偏好系数；
+     建议补货参考量 = max(0, 预计需求 − 可售库存 − 期内已登记在途)；
+     提前期未知 → 覆盖期仅按检查周期，标注"未覆盖等待到货期间的需求"，且不出最晚下单日。 */
+  const liteCheckDays=Math.max(1,Math.round(finiteOr(settings.repCheckDays,7)));
+  const liteGlobalLead=optionalFinite(settings.repLeadDays);
+  const liteLeadKnown=leadTimeDays!=null;
+  const liteLeadDays=liteLeadKnown?leadTimeDays:(liteGlobalLead!=null?Math.max(0,Math.round(liteGlobalLead)):null);
+  const liteLeadSource=liteLeadKnown?'sku':(liteLeadDays!=null?'global':'unknown');
+  const liteCoverage=(liteLeadDays!=null?liteLeadDays:0)+liteCheckDays;
+  const biasKey=['conservative','balanced','generous'].indexOf(settings.repBias)>=0?settings.repBias:'balanced';
+  const biasFactor={conservative:0.85,balanced:1,generous:1.15}[biasKey];
+  const liteDemand=baseDaily*liteCoverage*biasFactor;
+  /* 可售库存 = 期末库存 − 已到期批次；与批次到期剔除不重复计算（已到期库存不抵扣后续需求） */
+  const usableInv=Math.max(0,(Number(p.endInv)||0)-Math.min(Number(p.endInv)||0,bv.expiredQty||0));
+  const liteIncomingOrd=asOfOrd+liteCoverage;
+  const liteIncomingQty=incoming.filter(a=>a.ord<=liteIncomingOrd).reduce((s,a)=>s+a.qty,0);   /* 覆盖期之后到货的不抵扣本期需求 */
+  const liteIncomingAfter=incoming.filter(a=>a.ord>liteIncomingOrd).reduce((s,a)=>s+a.qty,0);
+  const liteRefQty=Math.max(0,Math.ceil(liteDemand-usableInv-liteIncomingQty-1e-9));
+  /* 可执行下单量：填写 MOQ/箱规才算，否则为 null（参考量≠可直接下单量） */
+  let liteExecQty=null;
+  if((moq>0||casePack>0)&&liteRefQty>0){
+    let q=liteRefQty;
+    if(casePack>0)q=Math.ceil(q/casePack)*casePack;
+    if(moq>0&&q<moq)q=moq;
+    liteExecQty=q;
+  }
+  /* 最晚下单日：仅提前期已知时输出 */
+  const liteLatestOrder=liteLeadDays!=null?ordToYmd(Math.max(asOfOrd,asOfOrd+liteCoverage-liteLeadDays)):null;
+  /* 在途不能掩盖到货前断货：总量够但撑不到首批到货 → 单独提醒 */
+  let liteStockoutBeforeArrival=null;
+  if(incoming.length&&baseDaily>0){
+    const firstArrOrd=Math.min.apply(null,incoming.map(a=>a.ord));
+    const coverDays=usableInv/baseDaily;
+    if(coverDays<firstArrOrd-asOfOrd)liteStockoutBeforeArrival={days:Math.max(1,Math.ceil(firstArrOrd-asOfOrd-coverDays))};
+  }
+  /* 信息缺口标签：只展示实际存在的缺口，随数据完善自动消失 */
+  const hist=analyzeHistory(p.sku);
+  const infoGaps=[];
+  if(!incoming.length)infoGaps.push('未登记在途，按0估算');
+  if(moq<=0&&casePack<=0)infoGaps.push('未考虑MOQ/箱规，参考量≠可直接下单量');
+  if(liteLeadSource==='global')infoGaps.push('提前期为默认假设');
+  if(liteLeadSource==='unknown')infoGaps.push('提前期未知：未覆盖等待到货期间的需求，且无最晚下单日');
+  if(newShelfDays==null)infoGaps.push('新货效期未知');
+  if(hist.nonOverlap<=1)infoGaps.push('仅有一周销量（短期外推）');
+  if(p.costMissing)infoGaps.push('成本缺失：采购金额无法估算');
+  if(p.weekSalesMissing)infoGaps.push('周销量缺失，按0测算');
+  if(p.endInvMissing)infoGaps.push('库存缺失，按0测算');
+  if(bl.expiryUnknown)infoGaps.push('存在效期未知批次（不输出精确报损量）');
+  if(biasKey!=='balanced')infoGaps.push('备货偏好='+({conservative:'偏保守（少备货）',generous:'偏充足（减少缺货）'})[biasKey]);
+  if(hist.overlapSkipped)infoGaps.push('存在重叠7天销量，已按不重叠周取均');
+  const lite={
+    leadDays:liteLeadDays,leadSource:liteLeadSource,checkDays:liteCheckDays,
+    coverageDays:liteCoverage,bias:biasKey,biasFactor:biasFactor,
+    demand:liteDemand,usableInv:usableInv,incomingQty:liteIncomingQty,incomingAfterQty:liteIncomingAfter,
+    refQty:liteRefQty,execQty:liteExecQty,latestOrderDate:liteLatestOrder,
+    stockoutBeforeArrival:liteStockoutBeforeArrival,infoGaps:infoGaps,history:hist,
+    costEstimable:!p.costMissing,
+    repCost:p.costMissing?null:liteRefQty*cost   /* 成本缺失 → 无法估算，不当成0 */
+  };
 
-  return {p,m,baseDaily,rows,curExpiryQty,suspended,note,shelfDays,totalRep,totalRepCost,invMonths,anomaly,spikeRatio,clearance,
-          lostUnits,grossLoss,unitGPForLoss,restoredPrice};
+  return {p,m,baseDaily,rows,curExpiryQty,suspended,suspensionReason,note,shelfDays,totalRep,totalRepCost,invMonths,anomaly,spikeRatio,clearance,
+          lostUnits,grossLoss,unitGPForLoss,restoredPrice,
+          /* v1.10 策略字段：疑似/确认清仓区分 + 恢复价格情景 + 人工策略 */
+          suspectedClearance,clearanceConfirmed,clearanceSource,restoredPriceInfo,strategy:strat,
+          batchExpiredQty:bv.expiredQty,batchValidQty:bv.validQty,batchHasInfo:bv.hasBatchInfo,
+          /* v4 新增字段（允许新增；旧字段含义见上方注释） */
+          avgBase,recentBase,effYtdDays,effRecentDays,baseSource,
+          transitionDays,transitionDemand,transitionUnmet,transitionExpiry,transitionEmergencyQty,
+          predictedDemand:b0.predictedDemand,fulfilledSales:b0.fulfilledSales,unmetDemand:b0.unmetDemand,
+          expiryQty:b0.expiryQty,expiryLoss:b0.expiryLoss,endingSellableInv:b0.endingSellableInv,
+          firstStockoutDate:b0.firstStockoutDate,
+          scenarioB0:{predictedDemand:b0.predictedDemand,fulfilledSales:b0.fulfilledSales,unmetDemand:b0.unmetDemand,
+            expiryQty:b0.expiryQty,expiryLoss:b0.expiryLoss,endingSellableInv:b0.endingSellableInv,firstStockoutDate:b0.firstStockoutDate},
+          scenarioB1:hasIncoming?{predictedDemand:b1.predictedDemand,fulfilledSales:b1.fulfilledSales,unmetDemand:b1.unmetDemand,
+            expiryQty:b1.expiryQty,expiryLoss:b1.expiryLoss,endingSellableInv:b1.endingSellableInv,firstStockoutDate:b1.firstStockoutDate}:null,
+          scenarioA:{predictedDemand:a.predictedDemand,fulfilledSales:a.fulfilledSales,unmetDemand:a.unmetDemand,
+            expiryQty:a.expiryQty,expiryLoss:a.expiryLoss,endingSellableInv:a.endingSellableInv,firstStockoutDate:a.firstStockoutDate,
+            orders:orders.map(o=>({orderDate:ordToYmd(o.orderOrd),arrivalDate:ordToYmd(o.ord),orderQty:o.orderQty,arrivalQty:o.qty}))},
+          avoidableLostUnits,totalOrderQty,orderPlan:orders.map(o=>({orderDate:ordToYmd(o.orderOrd),arrivalDate:ordToYmd(o.ord),orderQty:o.orderQty,arrivalQty:o.qty})),
+          leadTimeDays,moq,casePack,newShelfDays,
+          batchVirtual:bl.virtual,batchExpiryUnknown:bl.expiryUnknown,batchMismatch:bl.mismatch,
+          instantTheory:flags.indexOf('instantTheory')>=0,newShelfUnknown:flags.indexOf('newShelfUnknown')>=0,
+          unitGPRestored,grossLossRestored,
+          /* v1.11 轻量模式：透明参考口径 + 信息缺口标签 + 周销历史（页面/导出共用） */
+          lite};
 }
 
 function seasonArrFor(target){
@@ -1002,7 +2119,7 @@ function seasonArrFor(target){
 }
 function commitCoefGrid(){
   const arr=[];
-  document.querySelectorAll('.rep-coef').forEach(el=>{const i=+el.dataset.idx;const v=+el.value;arr[i]=isNaN(v)?1:Math.max(0,v);});
+  document.querySelectorAll('.rep-coef').forEach(el=>{const i=+el.dataset.idx;const v=+el.value;arr[i]=(!Number.isFinite(v))?1:Math.max(0,v);}); /* 12项均须有限且>=0 */
   if(arr.length===12 && arr.every(x=>x!=null)){
     if(!repCoefTarget){ settings.repSeason=arr; }
     else { (settings.repSeasonByCat||(settings.repSeasonByCat={}))[repCoefTarget]=arr; }
@@ -1027,10 +2144,19 @@ function switchCoefTarget(){
 function refreshCoefTargetOptions(){
   const sel=document.getElementById('rep_coefTarget'); if(!sel) return;
   const cats=[...new Set(products.map(p=>p.cat))];
-  sel.innerHTML='<option value="">通用默认（未单独设置的品类）</option>'+cats.map(c=>{
+  /* 品类来自用户输入：用 createElement + textContent/value 构建选项，不再拼 innerHTML */
+  sel.textContent='';
+  const opt0=document.createElement('option');
+  opt0.value=''; opt0.textContent='通用默认（未单独设置的品类）';
+  sel.appendChild(opt0);
+  cats.forEach(c=>{
     const has=settings.repSeasonByCat&&settings.repSeasonByCat[c];
-    return `<option value="${c}" ${c===repCoefTarget?'selected':''}>${c}${has?' ✓已定制':''}</option>`;
-  }).join('');
+    const o=document.createElement('option');
+    o.value=c;
+    o.textContent=c+(has?' ✓已定制':'');
+    if(c===repCoefTarget) o.selected=true;
+    sel.appendChild(o);
+  });
 }
 function loadRepParams(){
   const rw=document.getElementById('rep_recentWeight'); if(rw) rw.value=settings.repRecentWeight;
@@ -1038,8 +2164,27 @@ function loadRepParams(){
   const ss=document.getElementById('rep_spikeSens'); if(ss) ss.value=settings.repSpikeSensitivity;
   const ct=document.getElementById('rep_clearThresh'); if(ct) ct.value=settings.repClearanceThreshold;
   const cr=document.getElementById('rep_clearRevert'); if(cr) cr.value=settings.repClearanceRevertRatio;
+  /* 轻量模式三个核心选项（测算假设默认值可见可改） */
+  const ld=document.getElementById('rep_leadDays'); if(ld) ld.value=settings.repLeadDays==null?'':settings.repLeadDays;
+  const cd=document.getElementById('rep_checkDays'); if(cd) cd.value=settings.repCheckDays==null?'':settings.repCheckDays;
+  const bs=document.getElementById('rep_bias'); if(bs) bs.value=['conservative','balanced','generous'].indexOf(settings.repBias)>=0?settings.repBias:'balanced';
   refreshCoefTargetOptions();
   renderCoefGrid();
+}
+/* 轻量模式设置保存：仅三项核心选项；留空提前期=未知（不输出最晚下单日） */
+function saveLiteParams(){
+  const ldv=document.getElementById('rep_leadDays').value.trim();
+  const cdv=document.getElementById('rep_checkDays').value.trim();
+  const bsv=document.getElementById('rep_bias').value;
+  if(ldv==='') settings.repLeadDays=null;                       /* 留空=提前期未知 */
+  else{ const n=Number(ldv); if(!Number.isFinite(n)||n<0){ toast('❌ 到货天数需为≥0数值或留空（留空=提前期未知），未保存'); return; } settings.repLeadDays=Math.round(n); }
+  const cn=Number(cdv);
+  if(cdv===''||!Number.isFinite(cn)||cn<1){ toast('❌ 检查周期需为≥1的天数，未保存'); return; }
+  settings.repCheckDays=Math.round(cn);
+  settings.repBias=['conservative','balanced','generous'].indexOf(bsv)>=0?bsv:'balanced';
+  repCache=null;
+  if(markDirty()) toast('轻量设置已保存并重算'); else toast('⚠️ 未成功保存：浏览器存储不可用，设置仅本次生效');
+  loadRepParams(); renderReplenish();
 }
 function saveRepParams(){
   const rw=+document.getElementById('rep_recentWeight').value;
@@ -1053,59 +2198,111 @@ function saveRepParams(){
   settings.repClearanceThreshold=isNaN(ctv)?110:Math.max(0,ctv);
   settings.repClearanceRevertRatio=isNaN(crv)?0.5:Math.min(1,Math.max(0,crv));
   commitCoefGrid();
-  persist(); loadRepParams(); renderReplenish(); toast('补货参数已保存并重算');
+  if(markDirty()) toast('补货参数已保存并重算'); else toast('⚠️ 未成功保存：浏览器存储不可用，参数仅本次生效');
+  loadRepParams(); renderReplenish();
 }
 function resetCatCoef(){
   if(!repCoefTarget){ toast('当前为通用默认，无法重置'); return; }
   if(settings.repSeasonByCat && settings.repSeasonByCat[repCoefTarget]) delete settings.repSeasonByCat[repCoefTarget];
   refreshCoefTargetOptions(); renderCoefGrid();
-  persist(); renderReplenish(); toast('该品类已重置为继承通用默认');
+  if(markDirty()) toast('该品类已重置为继承通用默认'); else toast('⚠️ 未成功保存：浏览器存储不可用，重置仅本次生效');
+  renderReplenish();
 }
 
-function repSearch(v){ repFilter.q=v; renderReplenish(); }
-function repCatChange(v){ repFilter.cat=v; renderReplenish(); }
-function repToggleNeed(el){ repFilter.onlyNeed=el.checked; renderReplenish(); }
+/* 补货测算缓存键：必须包含 dataRevision、参数版本与分析日期，任一变化即重算 */
+function repCacheKey(){
+  return [
+    dataRevision, getAsOfYmd(),
+    settings.feeTax, settings.feeOther, settings.targetMargin,
+    settings.repRecentWeight, settings.repSafetyMonths, settings.repSpikeSensitivity,
+    settings.repClearanceThreshold, settings.repClearanceRevertRatio,
+    settings.repLeadDays, settings.repCheckDays, settings.repBias,
+    JSON.stringify(settings.repSeason||[]), JSON.stringify(settings.repSeasonByCat||{})
+  ].join('|');
+}
+/* 共享筛选：renderReplenishTable 与「导出筛选结果」使用同一份行集 */
+function getFilteredReplenishRows(forecasts){
+  const q=repFilter.q.toLowerCase(), cat=repFilter.cat;
+  return forecasts.filter(f=>
+    (!q || String(f.p.name).toLowerCase().includes(q) || String(f.p.sku).toLowerCase().includes(q)) &&
+    (!cat || f.p.cat===cat) &&
+    (!repFilter.onlyNeed || f.totalRep>0)
+  ).sort((a,b)=>b.totalRep-a.totalRep);
+}
+/* 取测算结果：命中缓存直接复用，否则现场计算（导出与渲染同一口径） */
+function getReplenishCache(){
+  if(repCache && repCache.key===repCacheKey()) return repCache;
+  const months=getForecastMonths();
+  const forecasts=products.map(forecastSKU);
+  const monTotals=months.map(()=>({rep:0,demand:0,cost:0}));
+  forecasts.forEach(f=>f.rows.forEach((r,i)=>{monTotals[i].rep+=r.replenish;monTotals[i].demand+=r.demand;monTotals[i].cost+=r.replenish*(Number(f.p.cost)||0);}));
+  repCache={
+    key:repCacheKey(), months, forecasts, monTotals,
+    totalUnits:monTotals.reduce((a,x)=>a+x.rep,0),
+    totalCost:monTotals.reduce((a,x)=>a+x.cost,0),
+    needCnt:forecasts.filter(f=>f.totalRep>0).length,
+    suspCnt:forecasts.filter(f=>f.suspended).length,
+    clearCnt:forecasts.filter(f=>f.clearance).length,
+    totalGrossLoss:forecasts.reduce((a,f)=>a+(f.grossLoss||0),0),
+    totalGrossLossRestored:forecasts.reduce((a,f)=>a+(f.grossLossRestored||0),0),
+    totalTransitionUnmet:forecasts.reduce((a,f)=>a+(f.transitionUnmet||0),0),
+    totalAvoidable:forecasts.reduce((a,f)=>a+(f.avoidableLostUnits||0),0),
+    totalB0ExpiryLoss:forecasts.reduce((a,f)=>a+((f.scenarioB0&&f.scenarioB0.expiryLoss)||0),0),
+    /* 成本全部缺失时预算显示"无法估算"（缺失≠0） */
+    costEstimable:forecasts.some(f=>!f.p.costMissing)
+  };
+  return repCache;
+}
+
+function repSearch(v){ repFilter.q=v; renderReplenishTable(); }  /* 筛选只重绘表格，不重算全部SKU/重建图表 */
+function repCatChange(v){ repFilter.cat=v; renderReplenishTable(); }
+function repToggleNeed(el){ repFilter.onlyNeed=el.checked; renderReplenishTable(); }
 
 function renderReplenish(){
   const wrap=document.getElementById('repTableWrap'); if(!wrap) return;
   const kpiBox=document.getElementById('repKpis');
-  const months=getForecastMonths();
   if(!products.length){
     if(kpiBox) kpiBox.innerHTML='';
+    const liteBox=document.getElementById('repLiteWrap'); if(liteBox) liteBox.innerHTML='';
     wrap.innerHTML='<div class="p-6 text-center text-slate-400">暂无数据，请先在「数据录入」添加或载入数据</div>';
     if(charts['chartReplenish']){ charts['chartReplenish'].destroy(); delete charts['chartReplenish']; }
+    repCache=null;
     return;
   }
-  const forecasts=products.map(forecastSKU);
+  const cache=getReplenishCache();
+  const months=cache.months;
 
   const catSel=document.getElementById('rep_cat');
   if(catSel){
     const cats=[...new Set(products.map(p=>p.cat))];
     const cur=repFilter.cat;
-    catSel.innerHTML='<option value="">全部品类</option>'+cats.map(c=>`<option ${c===cur?'selected':''}>${c}</option>`).join('');
+    /* 品类选项用 DOM 构建，避免把外部文本拼进 innerHTML */
+    catSel.textContent='';
+    const opt0=document.createElement('option');
+    opt0.value=''; opt0.textContent='全部品类';
+    catSel.appendChild(opt0);
+    cats.forEach(c=>{
+      const o=document.createElement('option');
+      o.value=c; o.textContent=c;
+      if(c===cur) o.selected=true;
+      catSel.appendChild(o);
+    });
   }
 
-  const monTotals=months.map(()=>({rep:0,demand:0,cost:0}));
-  forecasts.forEach(f=>f.rows.forEach((r,i)=>{monTotals[i].rep+=r.replenish;monTotals[i].demand+=r.demand;monTotals[i].cost+=r.replenish*(Number(f.p.cost)||0);}));
-  const totalUnits=monTotals.reduce((a,x)=>a+x.rep,0);
-  const totalCost=monTotals.reduce((a,x)=>a+x.cost,0);
-  const needCnt=forecasts.filter(f=>f.totalRep>0).length;
-  const suspCnt=forecasts.filter(f=>f.suspended).length;
-  const clearCnt=forecasts.filter(f=>f.clearance).length;
-  const totalGrossLoss=forecasts.reduce((a,f)=>a+(f.grossLoss||0),0);
-
   if(kpiBox) kpiBox.innerHTML=`
-    <div class="bg-white rounded-xl shadow-sm p-4"><div class="text-xs text-slate-400">6个月建议补货总件数</div><div class="text-lg sm:text-2xl font-bold text-indigo-600 mt-1">${fmt(totalUnits)}</div></div>
-    <div class="bg-white rounded-xl shadow-sm p-4"><div class="text-xs text-slate-400">6个月补货预算(成本)</div><div class="text-lg sm:text-2xl font-bold text-emerald-600 mt-1">¥${fmt(totalCost)}</div></div>
-    <div class="bg-white rounded-xl shadow-sm p-4"><div class="text-xs text-slate-400">6个月预计断货毛利损失(不补货)</div><div class="text-lg sm:text-2xl font-bold text-rose-600 mt-1">¥${fmt(totalGrossLoss)}</div></div>
-    <div class="bg-white rounded-xl shadow-sm p-4"><div class="text-xs text-slate-400">需补货 SKU 数</div><div class="text-lg sm:text-2xl font-bold text-slate-900 mt-1">${needCnt}</div></div>
-    <div class="bg-white rounded-xl shadow-sm p-4"><div class="text-xs text-slate-400">🏷️清仓回归 SKU 数</div><div class="text-lg sm:text-2xl font-bold text-sky-600 mt-1">${clearCnt}</div></div>
-    <div class="bg-white rounded-xl shadow-sm p-4"><div class="text-xs text-slate-400">暂停补货 SKU 数(临期/滞销)</div><div class="text-lg sm:text-2xl font-bold text-rose-600 mt-1">${suspCnt}</div></div>`;
+    <div class="bg-white rounded-xl shadow-sm p-4"><div class="text-xs text-slate-400">6个月建议补货总件数</div><div class="text-lg sm:text-2xl font-bold text-indigo-600 mt-1">${fmt(cache.totalUnits)}</div></div>
+    <div class="bg-white rounded-xl shadow-sm p-4"><div class="text-xs text-slate-400">6个月补货预算(成本)</div><div class="text-lg sm:text-2xl font-bold text-emerald-600 mt-1">${cache.costEstimable?('¥'+fmt(cache.totalCost)):'无法估算'}</div></div>
+    <div class="bg-white rounded-xl shadow-sm p-4"><div class="text-xs text-slate-400">6个月不补货贡献利润缺口（情景估算）</div><div class="text-lg sm:text-2xl font-bold text-rose-600 mt-1">¥${fmt(cache.totalGrossLoss)}</div></div>
+    <div class="bg-white rounded-xl shadow-sm p-4"><div class="text-xs text-slate-400">过渡期断货缺口(不补货·不计入6个月)</div><div class="text-lg sm:text-2xl font-bold text-orange-500 mt-1">${fmt(cache.totalTransitionUnmet)}</div></div>
+    <div class="bg-white rounded-xl shadow-sm p-4"><div class="text-xs text-slate-400">补货可回补缺口(件)</div><div class="text-lg sm:text-2xl font-bold text-teal-600 mt-1">${fmt(cache.totalAvoidable)}</div></div>
+    <div class="bg-white rounded-xl shadow-sm p-4"><div class="text-xs text-slate-400">需补货 SKU 数</div><div class="text-lg sm:text-2xl font-bold text-slate-900 mt-1">${cache.needCnt}</div></div>
+    <div class="bg-white rounded-xl shadow-sm p-4"><div class="text-xs text-slate-400">🏷️疑似/确认清仓 SKU 数</div><div class="text-lg sm:text-2xl font-bold text-sky-600 mt-1">${cache.clearCnt}</div></div>
+    <div class="bg-white rounded-xl shadow-sm p-4"><div class="text-xs text-slate-400">暂停补货 SKU 数(策略/临期/滞销)</div><div class="text-lg sm:text-2xl font-bold text-rose-600 mt-1">${cache.suspCnt}</div></div>`;
 
   drawChart('chartReplenish','bar',{labels:months.map(x=>x.label),datasets:[
-    {label:'建议补货(件)',data:monTotals.map(x=>+x.rep.toFixed(0)),backgroundColor:months.map(x=>x.coef>=1.8?'#f43f5e':(x.coef>=1.2?'#f59e0b':'#6366f1'))},
-    {label:'预计销量(件)',data:monTotals.map(x=>+x.demand.toFixed(0)),backgroundColor:'#c7d2fe'},
-    {label:'补货成本(万元)',data:monTotals.map(x=>+(x.cost/10000).toFixed(1)),type:'line',borderColor:'#10b981',backgroundColor:'#10b981',pointRadius:4,yAxisID:'y1'}
+    {label:'建议补货(件)',data:cache.monTotals.map(x=>+x.rep.toFixed(0)),backgroundColor:months.map(x=>x.coef>=1.8?'#f43f5e':(x.coef>=1.2?'#f59e0b':'#6366f1'))},
+    {label:'预计销量(件)',data:cache.monTotals.map(x=>+x.demand.toFixed(0)),backgroundColor:'#c7d2fe'},
+    {label:'补货成本(万元)',data:cache.monTotals.map(x=>+(x.cost/10000).toFixed(1)),type:'line',borderColor:'#10b981',backgroundColor:'#10b981',pointRadius:4,yAxisID:'y1'}
   ]},{
     scales:{
       y:{beginAtZero:true,title:{display:true,text:'件数'}},
@@ -1114,13 +2311,73 @@ function renderReplenish(){
     plugins:{legend:{labels:{boxWidth:12,font:{size:11}}}}
   },[repWhiteBg]);
 
-  const q=repFilter.q.toLowerCase(), cat=repFilter.cat;
-  let list=forecasts.filter(f=>
-    (!q || f.p.name.toLowerCase().includes(q) || String(f.p.sku).toLowerCase().includes(q)) &&
-    (!cat || f.p.cat===cat) &&
-    (!repFilter.onlyNeed || f.totalRep>0)
-  );
-  list.sort((a,b)=>b.totalRep-a.totalRep);
+  renderReplenishTable();
+  renderReplenishLite();
+}
+
+/* 轻量补货参考表（v1.11 默认模式）：与导出共用 cache.forecasts → f.lite 同一口径 */
+function renderReplenishLite(){
+  const box=document.getElementById('repLiteWrap'); if(!box)return;
+  if(!products.length){ box.innerHTML=''; return; }
+  const cache=repCache;
+  if(!cache || cache.key!==repCacheKey()) return;   /* 缓存由 renderReplenish 建立，此处只重绘 */
+  const list=getFilteredReplenishRows(cache.forecasts);
+  const gapCls='inline-block px-1.5 py-0.5 rounded text-[10px] bg-slate-100 text-slate-500 mr-1 mb-1';
+  const alertCls='inline-block px-1.5 py-0.5 rounded text-[10px] mr-1 mb-1';
+  let html=`<div class="bg-white rounded-xl shadow-sm p-4 overflow-x-auto scrollbar-thin">
+    <div class="flex flex-wrap justify-between items-center gap-2 mb-3">
+      <h3 class="text-sm font-semibold">轻量补货参考（默认模式 · 近期覆盖期，非六个月总量）</h3>
+      <span class="text-xs text-slate-400">覆盖期 = 提前期 + 检查周期；建议补货参考量 = max(0, 预计需求 − 可售库存 − 期内已登记在途)</span>
+    </div>
+    <table class="w-full text-xs sm:text-sm border-collapse"><thead>
+    <tr class="bg-slate-50 text-slate-500 text-left">
+      <th class="p-2">#</th><th class="p-2">产品</th><th class="p-2">SKU</th>
+      <th class="p-2 text-right">覆盖期</th><th class="p-2 text-right">预计需求</th>
+      <th class="p-2 text-right">当前可售库存</th><th class="p-2 text-right">期内已登记在途</th>
+      <th class="p-2 text-right">建议补货参考量</th><th class="p-2 text-right">可执行下单量</th>
+      <th class="p-2">最晚下单日</th><th class="p-2">主要提醒 / 信息缺口</th>
+    </tr></thead><tbody>`;
+  if(!list.length){
+    html+=`<tr><td colspan="11" class="p-6 text-center text-slate-400">无符合条件的产品</td></tr>`;
+  }else{
+    list.forEach((f,idx)=>{
+      const L=f.lite||{};
+      const gaps=(L.infoGaps||[]).map(g=>`<span class="${gapCls}">${escapeHtml(g)}</span>`).join('');
+      const alerts=[];
+      if(L.stockoutBeforeArrival)alerts.push(`<span class="${alertCls} bg-rose-100 text-rose-700">⚠️ 在途到货前约 ${L.stockoutBeforeArrival.days} 天断货</span>`);
+      if(f.suspended)alerts.push(`<span class="${alertCls} bg-rose-50 text-rose-600">🚫 暂停补货（${escapeHtml(f.suspensionReason||'')}）</span>`);
+      if(f.suspectedClearance)alerts.push(`<span class="${alertCls} bg-sky-100 text-sky-700">🏷️ 疑似清仓待确认</span>`);
+      if(f.clearanceConfirmed)alerts.push(`<span class="${alertCls} bg-sky-100 text-sky-700">🏷️ 确认清仓</span>`);
+      if(f.anomaly==='recentzero'||f.anomaly==='dip')alerts.push(`<span class="${alertCls} bg-amber-100 text-amber-700">⭕ 近期低/零销量${f.p.stockoutConfirmed?'（已确认缺货，不等于低需求）':'，原因未知'}</span>`);
+      if(f.anomaly==='spike')alerts.push(`<span class="${alertCls} bg-amber-50 text-amber-700">⚡ 近期暴增，已抑制</span>`);
+      if(L.history&&L.history.nonOverlap>=2)alerts.push(`<span class="${alertCls} bg-indigo-50 text-indigo-600" title="预测与实际对比，仅列数字、非准确率统计">📊 近${L.history.nonOverlap}期不重叠周均 ${fmt(L.history.weeklyAvg,1)} 件（${escapeHtml(L.history.from||'')}~${escapeHtml(L.history.to||'')}）</span>`);
+      const covTxt=L.leadDays!=null?`${L.coverageDays}天（提前${L.leadDays}+检查${L.checkDays}）`:`${L.coverageDays}天（仅检查周期）`;
+      html+=`<tr class="border-t hover:bg-slate-50">
+        <td class="p-2 text-center text-slate-400">${idx+1}</td>
+        <td class="p-2 font-medium">${escapeHtml(f.p.name)}</td>
+        <td class="p-2 text-slate-400">${escapeHtml(f.p.sku)}</td>
+        <td class="p-2 text-right">${covTxt}${L.bias&&L.bias!=='balanced'?`<div class="text-[10px] text-slate-400">偏好×${L.biasFactor}</div>`:''}</td>
+        <td class="p-2 text-right">${f.p.weekSalesMissing?'<span class="text-amber-600">缺失(按0)</span>':fmt(L.demand,0)}</td>
+        <td class="p-2 text-right">${f.p.endInvMissing?'<span class="text-amber-600">缺失(按0)</span>':fmt(L.usableInv)}</td>
+        <td class="p-2 text-right">${L.incomingQty>0?fmt(L.incomingQty):'<span class="text-slate-300">0</span>'}${L.incomingAfterQty>0?`<div class="text-[10px] text-slate-400">期后到货 ${fmt(L.incomingAfterQty)}（不抵扣本期）</div>`:''}</td>
+        <td class="p-2 text-right font-semibold ${L.refQty>0?'text-indigo-700':'text-slate-300'}" title="建议补货参考量≠可直接下单量（见信息缺口标签）">${L.refQty>0?fmt(L.refQty):'—'}</td>
+        <td class="p-2 text-right ${L.execQty!=null?'text-emerald-600 font-medium':'text-slate-300'}" title="${L.execQty==null?'未填 MOQ/箱规：无采购约束修正，参考量不可直接下单':'已按 MOQ/箱规向上修正'}">${L.execQty!=null?fmt(L.execQty):'—'}</td>
+        <td class="p-2">${L.latestOrderDate?escapeHtml(L.latestOrderDate):'<span class="text-slate-300">未知</span>'}</td>
+        <td class="p-2" style="max-width:280px">${alerts.join('')}${gaps}</td>
+      </tr>`;
+    });
+  }
+  html+='</tbody></table></div>';
+  box.innerHTML=html;
+}
+
+function renderReplenishTable(){
+  const wrap=document.getElementById('repTableWrap'); if(!wrap) return;
+  if(!products.length){ wrap.innerHTML='<div class="p-6 text-center text-slate-400">暂无数据，请先在「数据录入」添加或载入数据</div>'; return; }
+  const cache=repCache;
+  if(!cache || cache.key!==repCacheKey()){ renderReplenish(); return; }
+  const months=cache.months;
+  const list=getFilteredReplenishRows(cache.forecasts);
 
   const monthHead=months.map(x=>{
     const tag=x.m===6?' 618':(x.m===11?' 双11':'');
@@ -1128,12 +2385,15 @@ function renderReplenish(){
     return `<th class="p-2 text-right ${cls}">${x.label}${tag}</th>`;
   }).join('');
 
-  let html=`<table class="w-full text-xs sm:text-sm border-collapse"><thead>
+  const staleMark = dataQualityInfo().stale
+    ? `<div class="mb-2 text-xs bg-rose-50 text-rose-700 rounded-lg p-2">⚠️ <b>基于旧快照的情景测算</b>：数据快照已超过阻断阈值，以下补货结果仅供参考，不作为执行依据。</div>`
+    : '';
+  let html=staleMark+`<table class="w-full text-xs sm:text-sm border-collapse"><thead>
     <tr class="bg-slate-50 text-slate-500 text-left">
       <th class="p-2">#</th><th class="p-2">产品</th><th class="p-2">SKU</th><th class="p-2">品类</th>
       <th class="p-2 text-right">基准日销</th><th class="p-2 text-right">当前库存</th><th class="p-2 text-right">剩余效期</th>
       ${monthHead}
-      <th class="p-2 text-right">合计补货</th><th class="p-2 text-right">补货成本</th><th class="p-2 text-right">断货毛利损失</th><th class="p-2">备注</th>
+      <th class="p-2 text-right">合计补货</th><th class="p-2 text-right">补货成本</th><th class="p-2 text-right">不补货贡献利润缺口(估算)</th><th class="p-2">备注</th>
     </tr></thead><tbody>`;
   if(!list.length){
     html+=`<tr><td colspan="${11+months.length}" class="p-6 text-center text-slate-400">无符合条件的产品</td></tr>`;
@@ -1141,9 +2401,11 @@ function renderReplenish(){
     list.forEach((f,idx)=>{
       let flag='';
       if(f.suspended) flag='🚫 ';
-      else if(f.clearance) flag='🏷️ ';
+      else if(f.clearance) flag=f.clearanceConfirmed?'🏷️ ':'🏷️~ '; /* ~ = 疑似清仓，待确认（备注中有说明） */
       else if(f.anomaly==='spike') flag='⚡ ';
       else if(f.anomaly==='dip') flag='🔻 ';
+      else if(f.anomaly==='recentzero') flag='⭕ ';
+      else if(f.anomaly==='nobase') flag='📉 ';
       const rowBg=f.suspended?'bg-rose-50':(f.clearance?'bg-sky-50':(f.anomaly==='spike'?'bg-amber-50':''));
       const cells=f.rows.map(r=>{
         const strong=r.replenish>0;
@@ -1152,20 +2414,21 @@ function renderReplenish(){
           <br><span class="text-slate-400" style="font-size:10px">需${fmt(r.demand,0)}</span></td>`;
       }).join('');
       const shelfTxt=f.shelfDays!=null?(f.shelfDays<=0?'<span class="text-rose-600 font-semibold">已过期</span>':f.shelfDays+'天'):'—';
-      const lossTitle=`缺口 ${fmt(f.lostUnits,0)} 件 × 单位毛利 ¥${f.unitGPForLoss.toFixed(2)}${f.clearance?'（清仓控价还原¥'+f.restoredPrice.toFixed(2)+'）':''}${f.unitGPForLoss<=0?'（单位毛利≤0，断货不计损失）':''}`;
+      const lossTitle=`B0不补货·未来6个月有效库存模拟缺口 ${fmt(f.lostUnits,0)} 件 × 默认单位贡献利润（当前有效实际价口径）¥${f.unitGPForLoss.toFixed(2)}${f.unitGPForLoss<=0?'（单位贡献利润≤0，断货不计缺口）':''}${f.restoredPriceInfo?`；${f.restoredPriceInfo.label} ¥${f.restoredPriceInfo.price.toFixed(2)}/件 → ¥${fmt(f.grossLossRestored)}（单列，未计入上方默认口径）`:''}${f.firstStockoutDate?`；首断货 ${f.firstStockoutDate}`:''}${f.transitionUnmet>0.5?`；过渡期另缺口 ${fmt(f.transitionUnmet,0)} 件（不计入本列）`:''}`;
+      /* 外部文本（产品名/SKU/品类）一律 escapeHtml */
       html+=`<tr class="border-t hover:bg-slate-50 ${rowBg}">
         <td class="p-2 text-center text-slate-400">${idx+1}</td>
-        <td class="p-2 font-medium">${flag}${f.p.name}</td>
-        <td class="p-2 text-slate-400">${f.p.sku}</td>
-        <td class="p-2">${f.p.cat}</td>
+        <td class="p-2 font-medium">${flag}${escapeHtml(f.p.name)}</td>
+        <td class="p-2 text-slate-400">${escapeHtml(f.p.sku)}</td>
+        <td class="p-2">${escapeHtml(f.p.cat)}</td>
         <td class="p-2 text-right">${f.baseDaily.toFixed(1)}</td>
         <td class="p-2 text-right">${fmt(f.p.endInv)}</td>
         <td class="p-2 text-right">${shelfTxt}</td>
         ${cells}
         <td class="p-2 text-right font-semibold ${f.totalRep>0?'text-indigo-700':'text-slate-300'}">${f.totalRep>0?fmt(f.totalRep,0):'—'}</td>
-        <td class="p-2 text-right ${f.totalRepCost>0?'text-emerald-600':'text-slate-300'}">${f.totalRepCost>0?'¥'+fmt(f.totalRepCost):'—'}</td>
+        <td class="p-2 text-right ${f.totalRepCost>0?'text-emerald-600':'text-slate-300'}" title="${f.p.costMissing?'成本缺失：采购金额无法估算（缺失≠0）':''}">${f.p.costMissing&&f.totalRep>0?'无法估算':(f.totalRepCost>0?'¥'+fmt(f.totalRepCost):'—')}</td>
         <td class="p-2 text-right ${f.grossLoss>0?'text-rose-600 font-medium':'text-slate-300'}" title="${lossTitle}">${f.grossLoss>0?'¥'+fmt(f.grossLoss):'—'}</td>
-        <td class="p-2 ${f.suspended?'text-rose-600':(f.clearance?'text-sky-700':'text-slate-500')}" style="white-space:normal;min-width:160px">${f.note||''}</td>
+        <td class="p-2 ${f.suspended?'text-rose-600':(f.clearance?'text-sky-700':'text-slate-500')}" style="white-space:nowrap;max-width:110px;overflow:hidden;text-overflow:ellipsis" title="${escapeHtml(f.note||'')}">${escapeHtml(f.note||'')}</td>
       </tr>`;
     });
   }
@@ -1183,26 +2446,61 @@ function downloadReplenishChart(){
   }catch(e){ toast('下载失败：'+e.message); }
 }
 
-function csvSafe(s){ s=String(s==null?'':s); return /[",\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s; }
-function exportReplenishCSV(){
+/* ============ CSV 编码（统一出口） ============
+   numCell：数值字段经验证后按数值输出（合法负利润保持数值，不转文本）；空/非有限值输出空串。
+   csvCell：文本字段统一走 CSV 引号规则 + 公式注入防护（= + @ 开头的单元格加 ' 前缀）。
+   注意：安全前缀会影响文本的 CSV 往返（再导入时该字段以 ' 开头）；JSON 备份/export 保持原始值不变，
+   绝不以保护为名悄悄改掉 JSON 里的原始数据。 */
+function numCell(v){
+  if(v==null||String(v).trim()==='') return '';
+  const n=Number(v);
+  return Number.isFinite(n)?String(n):'';
+}
+function csvCell(s){
+  s=String(s==null?'':s);
+  s=s.replace(/^(=|\+|@)/,"'$1");
+  return /[",\n\r]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s;
+}
+/* 兼容旧调用名的别名（行为已升级为含注入防护的完整编码） */
+function csvSafe(s){ return csvCell(s); }
+
+function exportReplenishCSV(scope){
+  scope = (scope==='filtered')?'filtered':'all'; /* 导出范围与按钮名称一致 */
   if(!products.length){ toast('无数据可导出'); return; }
-  const months=getForecastMonths();
-  const head=['产品名称','SKU','品类','基准日销','当前库存','剩余效期天数','清仓SKU'];
+  const cache=getReplenishCache();
+  const months=cache.months;
+  const forecasts = (scope==='filtered') ? getFilteredReplenishRows(cache.forecasts) : cache.forecasts;
+  const head=['产品名称','SKU','品类','经营模式','补货策略','基准日销','当前库存','剩余效期天数','疑似/确认清仓'];
   months.forEach(x=>{ head.push(x.label+'建议补货'); head.push(x.label+'预计销量'); });
-  head.push('合计补货','补货成本','断货缺口件数','单位毛利(损失口径)','断货毛利损失','备注');
-  const rows=[head.map(csvSafe).join(',')];
-  products.map(forecastSKU).forEach(f=>{
-    const r=[csvSafe(f.p.name),csvSafe(f.p.sku),csvSafe(f.p.cat),f.baseDaily.toFixed(2),(Number(f.p.endInv)||0),(f.shelfDays!=null?f.shelfDays:''),(f.clearance?'是':'')];
-    f.rows.forEach(x=>{ r.push(Math.round(x.replenish)); r.push(Math.round(x.demand)); });
-    r.push(Math.round(f.totalRep), f.totalRepCost.toFixed(2), Math.round(f.lostUnits), f.unitGPForLoss.toFixed(2), Math.round(f.grossLoss), csvSafe(f.note||''));
+  head.push('合计补货','补货成本','断货缺口件数','单位贡献利润(缺口口径)','不补货贡献利润缺口(情景估算)',
+    '恢复价格情景单价','恢复价格情景说明','恢复价格情景缺口','避免断货件数(补货可回补)','过渡期缺口件数(不补货)','过渡期紧急补货建议','首断货日期',
+    '预计到期剔除件数(不补货)','到期报损成本(不补货)','建议下单量合计',
+    '轻量覆盖期(天)','轻量覆盖期口径','轻量预计需求','轻量可售库存','轻量期内已登记在途','轻量建议补货参考量','轻量可执行下单量','轻量最晚下单日','信息缺口标签',
+    '备注');
+  const rows=[head.map(csvCell).join(',')];
+  if(dataQualityInfo().stale){
+    rows.unshift(csvCell('⚠️ 基于旧快照的情景测算（分析日期 '+getAsOfYmd()+'，数据已超过阻断阈值，仅供参考）'));
+  }
+  forecasts.forEach(f=>{
+    const strat=productStrategy(f.p);
+    const L=f.lite||{};
+    const liteLeadTxt=L.leadSource==='sku'?'SKU单独提前期':(L.leadSource==='global'?'全局默认假设':'未知');
+    const r=[csvCell(f.p.name),csvCell(f.p.sku),csvCell(f.p.cat),csvCell(strat.salesMode),csvCell(strat.replenishmentPolicy),numCell(f.baseDaily.toFixed(2)),numCell(f.p.endInvMissing?'':(Number(f.p.endInv)||0)),numCell(f.shelfDays),f.clearance?(f.clearanceConfirmed?'确认':'疑似'):''];
+    f.rows.forEach(x=>{ r.push(numCell(Math.round(x.replenish))); r.push(numCell(Math.round(x.demand))); });
+    r.push(numCell(Math.round(f.totalRep)), numCell(f.p.costMissing?'':f.totalRepCost.toFixed(2)), numCell(Math.round(f.lostUnits)), numCell(f.unitGPForLoss.toFixed(2)), numCell(Math.round(f.grossLoss)),
+      numCell(f.restoredPriceInfo?f.restoredPriceInfo.price.toFixed(2):''), csvCell(f.restoredPriceInfo?f.restoredPriceInfo.label:''), numCell(Math.round(f.grossLossRestored)), numCell(Math.round(f.avoidableLostUnits)), numCell(Math.round(f.transitionUnmet)), numCell(f.transitionEmergencyQty||0),
+      csvCell(f.firstStockoutDate||''), numCell(Math.round(f.expiryQty)), numCell(Math.round(f.expiryLoss)), numCell(f.totalOrderQty),
+      numCell(L.coverageDays), csvCell(liteLeadTxt), numCell(Math.round(L.demand||0)), numCell(L.usableInv), numCell(L.incomingQty),
+      numCell(L.refQty), numCell(L.execQty==null?'':L.execQty), csvCell(L.latestOrderDate||''), csvCell((L.infoGaps||[]).join('；')),
+      csvCell(f.note||''));
     rows.push(r.join(','));
   });
-  downloadFile('\ufeff'+rows.join('\n'),'补货计划_未来6个月.csv');
-  toast('补货计划CSV 已导出');
+  downloadFile('\ufeff'+rows.join('\n'),'补货计划_未来6个月'+(scope==='filtered'?'_筛选结果':'_全部')+'.csv');
+  toast('补货计划CSV 已导出（'+(scope==='filtered'?'筛选结果 '+forecasts.length+' 条':'全部 '+forecasts.length+' 条')+'）');
 }
 
 /* ============ 清单弹窗 & 联动 ============ */
-function scoreProduct(p){const m=compute(p);const inv=invStatus(m.isr);const turn=turnStatus(m.turnover);const shelf=shelfStatus(m);return {p,m,inv,turn,shelf,level:Math.max(inv.lv,turn.lv,shelf.lv)};}
+function scoreProduct(p){const m=compute(p);const inv=invStatus(m.isr);const turn=turnStatus(m.turnover);const shelf=shelfStatus(m);const profit=profitStatus(p,m);return {p,m,inv,turn,shelf,profit,level:Math.max(inv.lv,turn.lv,shelf.lv,profit.lv)};}
 function getWarningList(){ return products.map(scoreProduct).filter(x=>x.level>=2).sort((a,b)=>b.level-a.level); }
 function getProductsByStatus(status){ return products.map(scoreProduct).filter(x=>x.inv.t===status).sort((a,b)=>b.level-a.level); }
 function getExpiryRiskList(){ return products.map(scoreProduct).filter(x=>!x.shelf.none && x.shelf.lv>=2).sort((a,b)=>(b.m.expiryLoss||0)-(a.m.expiryLoss||0)); }
@@ -1213,24 +2511,52 @@ function showExpiryList(){ const list=getExpiryRiskList(); openProductList(`效�
 function openProductList(title,list){
   document.getElementById('listModalTitle').textContent=title;
   const body=document.getElementById('listModalBody');
+  body.textContent='';
   if(!list.length){
-    body.innerHTML='<div class="p-6 text-center text-slate-400">暂无符合条件的产品 🎉</div>';
+    const empty=document.createElement('div');
+    empty.className='p-6 text-center text-slate-400';
+    empty.textContent='暂无符合条件的产品 🎉';
+    body.appendChild(empty);
   }else{
-    body.innerHTML=list.map(({p,m,inv,turn,shelf})=>{
+    /* 产品名/SKU/品类为外部文本：整卡用 createElement + textContent 构建，
+       SKU 不再拼进 onclick 字符串，点击行为用 addEventListener 闭包绑定 */
+    list.forEach(({p,m,inv,turn,shelf,profit})=>{
       const shelfBadge = shelf.none?'':badge(shelf.c,shelf.t);
       const lossLine = (m.expiryLoss&&m.expiryLoss>0)? ` · 预计报损¥${fmt(m.expiryLoss)}`:'';
       const shelfLine = m.shelfLife!=null? ` · 效期${m.shelfLife}天`:'';
-      return `<button onclick="gotoAlert('${p.sku}')" class="w-full text-left border rounded-lg p-3 mb-2 hover:bg-indigo-50 hover:border-indigo-300 transition flex justify-between items-center gap-3">
-        <div class="min-w-0">
-          <div class="font-medium text-sm truncate">${p.name} <span class="text-xs text-slate-400">${p.sku} · ${p.cat}</span></div>
-          <div class="text-xs text-slate-500 mt-1">库销比 <b>${fmt(m.isr,2)}</b> · 可售 ${isFinite(m.sellDays)?fmt(m.sellDays)+'天':'∞'}${shelfLine} · 周转 ${m.turnover?m.turnover.toFixed(2):'—'}${lossLine}</div>
-        </div>
-        <div class="flex flex-col items-end gap-1 shrink-0">
-          <div class="flex gap-1 flex-wrap justify-end">${badge(inv.c,inv.t)}${badge(turn.c,turn.t)}${shelfBadge}</div>
-          <span class="text-xs text-indigo-500">查看建议 →</span>
-        </div>
-      </button>`;
-    }).join('');
+      const profitLine = ` · 单件利润¥${fmt(m.unitProfit,2)}`;
+      const btn=document.createElement('button');
+      btn.className='w-full text-left border rounded-lg p-3 mb-2 hover:bg-indigo-50 hover:border-indigo-300 transition flex justify-between items-center gap-3';
+      btn.addEventListener('click',()=>gotoAlert(p.sku));
+
+      const left=document.createElement('div');
+      left.className='min-w-0';
+      const l1=document.createElement('div');
+      l1.className='font-medium text-sm truncate';
+      const l1name=document.createElement('span');
+      l1name.textContent=p.name;
+      const l1meta=document.createElement('span');
+      l1meta.className='text-xs text-slate-400';
+      l1meta.textContent=' '+p.sku+' · '+p.cat;
+      l1.appendChild(l1name); l1.appendChild(l1meta);
+      const l2=document.createElement('div');
+      l2.className='text-xs text-slate-500 mt-1';
+      l2.textContent='库销比 '+fmt(m.isr,2)+' · 可售 '+(isFinite(m.sellDays)?fmt(m.sellDays)+'天':'∞')+shelfLine+' · 周转 '+(m.turnover==null?'—':m.turnover.toFixed(2))+profitLine+lossLine;
+      left.appendChild(l1); left.appendChild(l2);
+
+      const right=document.createElement('div');
+      right.className='flex flex-col items-end gap-1 shrink-0';
+      const tags=document.createElement('div');
+      tags.className='flex gap-1 flex-wrap justify-end';
+      tags.innerHTML=badge(inv.c,inv.t)+badge(turn.c,turn.t)+shelfBadge+badge(profit.c,profit.t); /* 内部状态常量，非外部文本 */
+      const go=document.createElement('span');
+      go.className='text-xs text-indigo-500';
+      go.textContent='查看建议 →';
+      right.appendChild(tags); right.appendChild(go);
+
+      btn.appendChild(left); btn.appendChild(right);
+      body.appendChild(btn);
+    });
   }
   document.getElementById('listModal').classList.remove('hidden');
 }
@@ -1239,7 +2565,10 @@ function gotoAlert(sku){
   closeListModal();
   switchTab('alerts');
   setTimeout(()=>{
-    const el=document.getElementById('alert-'+sku);
+    /* DOM 定位走安全内部ID映射（alertSkuMap），不假设 SKU 是安全选择器；
+       兼容旧数据：映射缺失时回退到全等查找 */
+    const id=alertSkuMap[String(sku)];
+    const el=id?document.getElementById(id):null;
     if(el){
       el.scrollIntoView({behavior:'smooth',block:'center'});
       el.classList.add('ring-2','ring-indigo-400','bg-indigo-50');
@@ -1251,35 +2580,93 @@ function gotoAlert(sku){
 /* ============ 增删改 ============ */
 function saveProduct(){
   const g=id=>document.getElementById(id).value.trim();
-  const sku=g('f_sku'), name=g('f_name');
-  if(!sku||!name){toast('产品名称与SKU编码必填');return;}
-  const obj={name,sku,cat:g('f_cat')||'未分类',
-    cost:+g('f_cost')||0, price:+g('f_price')||0, actualPrice:g('f_actprice'),
-    weekSales:+g('f_week')||0, endInv:+g('f_endinv')||0,
-    beginInv:+g('f_begininv')||0, ytdSales:+g('f_ytd')||0,
+  const rawDate=g('f_date');
+  const normDate=normalizeDate(rawDate);
+  if(rawDate && !normDate){ toast('数据日期「'+rawDate+'」无效（需 YYYY-MM-DD 真实日期），已置空，请修正后重新保存'); }
+  else if(normDate && dateOrdinal(normDate)>dateOrdinal(getAsOfYmd())){ toast('提示：数据日期 '+normDate+' 晚于当前分析日期 '+getAsOfYmd()+'，请确认是否为未来数据'); }
+  else if(!normDate){ toast('提示：未填写有效数据日期，时效/动销天数分析将不可用'); }
+  /* 统一走 validateProduct：非法数值直接拒绝并提示，绝不吞成 0 */
+  const r=validateProduct({name:g('f_name'),sku:g('f_sku'),cat:g('f_cat')||'未分类',
+    cost:g('f_cost'),price:g('f_price'),actualPrice:g('f_actprice'),
+    weekSales:g('f_week'),endInv:g('f_endinv'),
+    beginInv:g('f_begininv'),ytdSales:g('f_ytd'),
     shelfLife:g('f_shelf'),
-    date:g('f_date'), feeTax:g('f_ftax'), feeOther:g('f_fother')};
-  const i=products.findIndex(x=>x.sku===sku);
-  if(i>=0) products[i]=obj; else products.push(obj);
-  resetForm(); render(); toast('已保存');
+    date:normDate,feeTax:g('f_ftax'),feeOther:g('f_fother'),
+    salesMode:g('f_salesmode'),replenishmentPolicy:g('f_reppolicy'),
+    forecastDailyOverride:g('f_fdaily'),restoredSellingPrice:g('f_rsp'),strategyReason:g('f_sreason'),
+    stockoutConfirmed:document.getElementById('f_stockout').checked,
+    moq:g('f_moq'),casePack:g('f_case'),leadTimeDays:g('f_leadtime'),newBatchShelfLifeDays:g('f_newshelf'),
+    batches:g('f_batches'),incoming:g('f_incoming')});
+  if(r.errors.length){ toast('保存被拒绝：'+r.errors.join('；')); return; }
+  const obj=r.product;
+  const i=products.findIndex(x=>x.sku===obj.sku);
+  const isUpdate=i>=0;
+  if(isUpdate) products[i]=obj; else products.push(obj);
+  recordHistorySnapshot(obj);   /* 周销历史自动留存：同 SKU+同日期=更新，不重复累计 */
+  repCache=null;
+  resetForm(); render();
+  if(markDirty()) toast(isUpdate?'已更新（原SKU记录被覆盖）':'已保存'); else toast('⚠️ 未成功保存：浏览器存储不可用或被禁用，修改仅在内存中生效，刷新后可能丢失');
 }
 function editProduct(sku){
   const p=products.find(x=>x.sku===sku); if(!p)return;
   const s=(id,v)=>document.getElementById(id).value=v??'';
-  s('f_name',p.name);s('f_sku',p.sku);s('f_cat',p.cat);s('f_cost',p.cost);s('f_price',p.price);
-  s('f_actprice',p.actualPrice);s('f_week',p.weekSales);s('f_endinv',p.endInv);
+  s('f_name',p.name);s('f_sku',p.sku);s('f_cat',p.cat);s('f_cost',p.costMissing?'':p.cost);s('f_price',p.price);
+  s('f_actprice',p.actualPrice);s('f_week',p.weekSalesMissing?'':p.weekSales);s('f_endinv',p.endInvMissing?'':p.endInv);
   s('f_begininv',p.beginInv);s('f_ytd',p.ytdSales);s('f_shelf',p.shelfLife);
-  s('f_date',p.date);s('f_ftax',p.feeTax);s('f_fother',p.feeOther);
+  s('f_date',normalizeDate(p.date));s('f_ftax',p.feeTax);s('f_fother',p.feeOther);
+  s('f_salesmode',p.salesMode||'auto');s('f_reppolicy',p.replenishmentPolicy||'auto');
+  s('f_fdaily',p.forecastDailyOverride);s('f_rsp',p.restoredSellingPrice);s('f_sreason',p.strategyReason);
+  document.getElementById('f_stockout').checked=p.stockoutConfirmed===true;
+  s('f_moq',p.moq);s('f_case',p.casePack);s('f_leadtime',p.leadTimeDays);s('f_newshelf',p.newBatchShelfLifeDays);
+  s('f_batches',(Array.isArray(p.batches)&&p.batches.length)?JSON.stringify(p.batches):'');
+  s('f_incoming',(Array.isArray(p.incoming)&&p.incoming.length)?JSON.stringify(p.incoming):'');
   document.getElementById('formTitle').textContent='编辑：'+p.name;
   switchTab('input'); setScrollTop(0);
 }
-function delProduct(sku){ if(!confirm('确认删除该产品？'))return; products=products.filter(x=>x.sku!==sku); render(); toast('已删除'); }
-function resetForm(){ ['f_name','f_sku','f_cat','f_cost','f_price','f_actprice','f_week','f_endinv','f_begininv','f_ytd','f_shelf','f_date','f_ftax','f_fother'].forEach(id=>document.getElementById(id).value=''); document.getElementById('formTitle').textContent='手动添加 / 编辑产品'; }
+function delProduct(sku){ if(!confirm('确认删除该产品？'))return; products=products.filter(x=>x.sku!==sku); repCache=null; render(); if(markDirty()) toast('已删除'); else toast('⚠️ 未成功保存：删除仅在内存中生效'); }
+function resetForm(){ ['f_name','f_sku','f_cat','f_cost','f_price','f_actprice','f_week','f_endinv','f_begininv','f_ytd','f_shelf','f_date','f_ftax','f_fother','f_fdaily','f_rsp','f_sreason','f_moq','f_case','f_leadtime','f_newshelf','f_batches','f_incoming'].forEach(id=>document.getElementById(id).value=''); document.getElementById('f_salesmode').value='auto'; document.getElementById('f_reppolicy').value='auto'; document.getElementById('f_stockout').checked=false; document.getElementById('formTitle').textContent='手动添加 / 编辑产品'; }
+function backupLocal(reason){
+  if(!storageOK()) return false;
+  try{
+    localStorage.setItem(LS_BACKUP, JSON.stringify({products, settings, salesHistory, backupAt:new Date().toISOString(), reason:reason||''}));
+    return true;
+  }catch(e){ return false; }
+}
 function clearAll(){
-  if(!products.length){ toast('当前无数据'); return; }
-  if(!confirm('确认清空全部 '+products.length+' 条产品数据？清空前会自动留一份本地备份。')) return;
-  try{ localStorage.setItem('channelTool_backup', JSON.stringify({products,settings,backupAt:new Date().toISOString()})); }catch(e){}
-  products=[]; render(); toast('已清空（旧数据已备份到 channelTool_backup）');
+  let hasBackup=false;
+  try{ hasBackup = !!localStorage.getItem(LS_BACKUP); }catch(e){}
+  if(!products.length && !hasBackup){ toast('当前无数据'); return; }
+  if(!confirm('确认清空全部 '+products.length+' 条产品数据？清空前会自动留一份本地备份；清空后会以"空数据"保存，刷新不会恢复示例。')) return;
+  const backedUp = backupLocal('清空前自动备份');
+  products=[];
+  salesHistory={};
+  render();
+  if(markDirty()) toast('已清空并保存为空数据'+(backedUp?'（旧数据已备份，可用「恢复上次备份」找回）':'（备份写入失败）'));
+  else toast('⚠️ 未成功保存：清空仅在内存中生效');
+}
+function restoreBackup(){
+  try{
+    const b = JSON.parse(localStorage.getItem(LS_BACKUP) || 'null');
+    if(!b || !Array.isArray(b.products)){ toast('未找到可用备份'); return; }
+    if(!confirm('确认用备份恢复 '+b.products.length+' 条产品？（备份时间 '+(b.backupAt||'未知')+(b.reason?('，原因：'+b.reason):'')+'）')) return;
+    const validList = [], invalidList = [];
+    (b.products||[]).forEach(p=>{
+      const r = validateProduct(p);
+      if(r.errors.length) invalidList.push({raw:p, errors:r.errors});
+      else validList.push(r.product);
+    });
+    products = validList;
+    quarantinedProducts = invalidList;
+    if(b.salesHistory && typeof b.salesHistory === 'object' && !Array.isArray(b.salesHistory)) salesHistory = b.salesHistory;
+    if(!Object.keys(salesHistory).length) products.forEach(recordHistorySnapshot);
+    if(invalidList.length) toast('⚠️ 备份中有 '+invalidList.length+' 条无效记录已隔离，原始内容仍保留在备份中。');
+    if(b.settings && typeof b.settings === 'object') settings = {...settings, ...b.settings};
+    products.forEach(p=>{ const nd=normalizeDate(p.date); if(nd) p.date=nd; });
+    ensureRepSettings();
+    repCache = null;
+    loadSettingsForm(); loadRepParams(); render();
+    if(markDirty()) toast('已从备份恢复并保存'); else toast('⚠️ 未成功保存：恢复仅在内存中生效');
+  }catch(e){ toast('备份恢复失败：'+e.message); }
 }
 
 /* ============ 设置 ============ */
@@ -1295,135 +2682,482 @@ function loadSettingsForm(){
   document.getElementById('s_to_good').value=settings.toGood;
   document.getElementById('s_shelf_warn').value=settings.shelfWarnDays;
   document.getElementById('s_shelf_cover').value=settings.shelfCoverSafe;
+  document.getElementById('s_tz').value=settings.businessTimeZone||'Asia/Shanghai';
+  document.getElementById('s_adate').value=settings.analysisDate||'';
+  document.getElementById('s_fresh_warn').value=finiteOr(settings.dataFreshWarnDays,7);
+  document.getElementById('s_fresh_block').value=finiteOr(settings.dataFreshBlockDays,14);
 }
 function saveSettings(){
   const g=id=>+document.getElementById(id).value;
-  settings.feeTax=g('s_ftax'); settings.feeOther=g('s_fother'); settings.targetMargin=g('s_target');
-  settings.isrLow=g('s_isr_low'); settings.isrHealthy=g('s_isr_healthy'); settings.isrHigh=g('s_isr_high');
-  settings.toSlow=g('s_to_slow'); settings.toHealthy=g('s_to_healthy'); settings.toGood=g('s_to_good');
-  settings.shelfWarnDays=g('s_shelf_warn'); settings.shelfCoverSafe=g('s_shelf_cover');
-  render(); toast('参数已保存，全部重算完成');
+  const next={
+    feeTax:g('s_ftax'), feeOther:g('s_fother'), targetMargin:g('s_target'),
+    isrLow:g('s_isr_low'), isrHealthy:g('s_isr_healthy'), isrHigh:g('s_isr_high'),
+    toSlow:g('s_to_slow'), toHealthy:g('s_to_healthy'), toGood:g('s_to_good'),
+    shelfWarnDays:g('s_shelf_warn'), shelfCoverSafe:g('s_shelf_cover')
+  };
+  /* 阈值顺序与目标利润率合法性：不合法则拒绝保存，保持原生效值 */
+  if(!Number.isFinite(next.targetMargin)||next.targetMargin<0){ toast('❌ 目标利润率需为≥0的数值，未保存'); return; }
+  if(!Number.isFinite(next.feeTax)||!Number.isFinite(next.feeOther)||next.feeTax<0||next.feeOther<0){ toast('❌ 费率需为≥0的数值，未保存'); return; }
+  if(Number.isFinite(next.feeTax)&&Number.isFinite(next.feeOther)&&next.feeTax+next.feeOther>=100){ toast('❌ 费率合计≥100%，利润率分母≤0，未保存'); return; }
+  if(!(next.isrLow<=next.isrHealthy&&next.isrHealthy<=next.isrHigh)){ toast('❌ 库销比阈值顺序不合法（需 断货线 ≤ 健康上限 ≤ 积压线），未保存'); return; }
+  if(!(next.toSlow<=next.toHealthy&&next.toHealthy<=next.toGood)){ toast('❌ 周转阈值顺序不合法（需 滞销线 ≤ 健康下限 ≤ 优秀线），未保存'); return; }
+  Object.assign(settings,next);
+  const tz=document.getElementById('s_tz').value.trim();
+  settings.businessTimeZone=tz||'Asia/Shanghai';
+  const rawDate=document.getElementById('s_adate').value.trim();
+  const normDate=normalizeDate(rawDate);
+  if(rawDate && !normDate){ toast('分析日期「'+rawDate+'」无效，已保留为空（自动取业务时区今天）'); settings.analysisDate=''; }
+  else settings.analysisDate=normDate;
+  settings.dataFreshWarnDays=g('s_fresh_warn');
+  settings.dataFreshBlockDays=g('s_fresh_block');
+  repCache=null; /* 分析日期/费率变化影响补货与效期测算，缓存失效 */
+  loadSettingsForm();
+  render();
+  if(markDirty()) toast('参数已保存，全部重算完成'); else toast('⚠️ 未成功保存：参数仅本次会话生效');
 }
 
 /* ============ CSV ============ */
-const HEADERS=['产品名称','SKU编码','品类','成本','控价','实际支付到手价','最近一周销售件数','最新期末库存','年初期初库存','业务年累计销售件数','数据日期','税运仓储比例%','其他费用比例%','剩余效期天数'];
+const HEADERS=['产品名称','SKU编码','品类','成本','控价','实际支付到手价','最近一周销售件数','最新期末库存','年初期初库存','业务年累计销售件数','数据日期','税运仓储比例%','其他费用比例%','剩余效期天数','经营模式','补货策略','预测日销覆盖','恢复销售价','策略原因','近期缺货确认','MOQ','箱规','采购提前期(天)','新货效期(天)','批次明细JSON','在途明细JSON'];
 function downloadTemplate(){
-  const sample=['鲜食坚果礼盒','SKU007','食品','40','99','89','105','3000','2000','5200','2026-06-28','8','3','90'];
-  const csv='\ufeff'+HEADERS.join(',')+'\n'+sample.join(',')+'\n';
+  const sample=['鲜食坚果礼盒','SKU007','食品','40','99','89','105','3000','2000','5200','2026-06-28','8','3','90','auto','auto','','','','','','','','','',''];
+  const csv='\ufeff'+HEADERS.map(csvCell).join(',')+'\n'+sample.map(csvCell).join(',')+'\n';
   downloadFile(csv,'渠道数据投喂模板.csv');
 }
-function exportData(){
-  let rows=[HEADERS.join(',')];
-  products.forEach(p=>rows.push([csvSafe(p.name),csvSafe(p.sku),csvSafe(p.cat),p.cost,p.price,p.actualPrice,p.weekSales,p.endInv,p.beginInv,p.ytdSales,p.date,p.feeTax,p.feeOther,p.shelfLife].join(',')));
-  downloadFile('\ufeff'+rows.join('\n'),'渠道数据导出.csv');
+function exportData(scope){
+  scope = (scope==='filtered')?'filtered':'all'; /* 导出范围与按钮名称一致：全部 / 筛选结果 */
+  const list = (scope==='filtered') ? getFilteredOverviewRows().map(r=>r.p) : products;
+  let rows=[HEADERS.map(csvCell).join(',')];
+  list.forEach(p=>rows.push([
+    csvCell(p.name),csvCell(p.sku),csvCell(p.cat),
+    p.costMissing?'':numCell(p.cost),numCell(p.price),
+    (p.actualPrice===''||p.actualPrice==null)?'':numCell(p.actualPrice),
+    p.weekSalesMissing?'':numCell(p.weekSales),p.endInvMissing?'':numCell(p.endInv),numCell(p.beginInv),numCell(p.ytdSales),
+    csvCell(p.date),numCell(p.feeTax),numCell(p.feeOther),numCell(p.shelfLife),
+    csvCell(p.salesMode||'auto'),csvCell(p.replenishmentPolicy||'auto'),
+    numCell(p.forecastDailyOverride),numCell(p.restoredSellingPrice),csvCell(p.strategyReason),
+    csvCell(p.stockoutConfirmed?'是':''),numCell(p.moq),numCell(p.casePack),numCell(p.leadTimeDays),numCell(p.newBatchShelfLifeDays),
+    csvCell(Array.isArray(p.batches)&&p.batches.length?JSON.stringify(p.batches):''),csvCell(Array.isArray(p.incoming)&&p.incoming.length?JSON.stringify(p.incoming):'')
+  ].join(',')));
+  downloadFile('\ufeff'+rows.join('\n'),'渠道数据导出'+(scope==='filtered'?'_筛选结果':'_全部')+'.csv');
+  toast('已导出CSV（'+(scope==='filtered'?'筛选结果':'全部')+' '+list.length+' 条）');
 }
 function downloadFile(content,name){
   const blob=new Blob([content],{type:'text/csv;charset=utf-8;'});
   const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; a.click();
 }
 
-/* ============ GitHub 自动推送 ============ */
+/* ============ 团队数据源 / GitHub 同步 ============
+   两个状态严格区分：
+   ①「GitHub 文件提交成功」——PUT 返回 2xx，仅代表文件写入成功；
+   ②「团队部署已更新」——必须团队看板实际读到对应版本才算，本工具不承诺固定几分钟后可见。 */
 const GH_REPO = 'camovibe/guanwangdongxiao';
 const GH_PATH = 'data.json';
 
+function setSyncStatus(msg, isErr){
+  const el = document.getElementById('sync_status'); if(!el) return;
+  el.textContent = msg;
+  el.className = 'text-xs leading-relaxed ' + (isErr ? 'text-rose-600' : 'text-slate-400');
+}
+function defaultDataUrl(){
+  return `https://raw.githubusercontent.com/${GH_REPO}/${teamCfg.branch || 'main'}/${GH_PATH}`;
+}
+function teamReadUrl(){ return teamCfg.dataUrl || defaultDataUrl(); }
+function loadTeamCfgForm(){
+  const m=document.getElementById('team_mode'); if(m) m.value=teamCfg.mode;
+  const b=document.getElementById('gh_branch'); if(b) b.value=teamCfg.branch;
+  const u=document.getElementById('team_dataurl'); if(u) u.value=teamCfg.dataUrl;
+  const st=document.getElementById('gh_status');
+  if(st) st.textContent = ghBaseSHA
+    ? ('上次同步基点 SHA：'+ghBaseSHA+'；远端版本：'+(syncMeta.remoteUpdatedAt||'未知'))
+    : '尚未成功同步过（无 baseSHA）。首次推送若远端已有文件，会先读取并要求确认，不会自动整包覆盖。';
+}
+function saveTeamCfg(){
+  const m=document.getElementById('team_mode'); if(m) teamCfg.mode=m.value;
+  const b=document.getElementById('gh_branch'); if(b) teamCfg.branch=b.value.trim()||'main';
+  const u=document.getElementById('team_dataurl'); if(u) teamCfg.dataUrl=u.value.trim();
+  saveSyncState(); applyModeUI();
+  toast('同步配置已保存');
+  if(teamCfg.mode!=='local') loadTeamDataAtBoot();
+}
+function applyModeUI(){
+  document.body.classList.toggle('mode-readonly', teamCfg.mode==='team-readonly');
+}
+
+/* ---- Token：仅内存。不写 localStorage/sessionStorage/导出文件/日志；刷新即清除 ---- */
 function saveGhToken(){
-  const token = document.getElementById('gh_token').value.trim();
+  const el = document.getElementById('gh_token');
+  const token = el ? el.value.trim() : '';
   if(!token){ toast('请输入 Token'); return; }
-  try{ localStorage.setItem('gh_token', token); }catch(e){}
-  document.getElementById('gh_status').textContent = 'Token 已保存（本地存储，不会上传）';
-  toast('Token 已保存');
+  ghToken = token; // 只存内存变量
+  document.getElementById('gh_status').textContent = 'Token 已载入内存：不写浏览器任何存储，刷新页面后需重新输入。';
+  toast('Token 已载入内存');
 }
 function clearGhToken(){
-  try{ localStorage.removeItem('gh_token'); }catch(e){}
-  document.getElementById('gh_token').value = '';
-  document.getElementById('gh_status').textContent = 'Token 已清除';
+  ghToken = '';
+  const el = document.getElementById('gh_token'); if(el) el.value='';
+  document.getElementById('gh_status').textContent = 'Token 已清除（内存）';
   toast('Token 已清除');
 }
-
-async function pushToGitHub(token, content){
-  const apiBase = `https://api.github.com/repos/${GH_REPO}/contents/${GH_PATH}`;
-  toast('正在同步到团队看板...');
-  try {
-    let sha = null;
-    let getErrMsg = null;
-    const getRes = await fetch(apiBase, {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Accept': 'application/vnd.github+json',
-        'X-GitHub-Api-Version': '2022-11-28'
-      }
-    });
-    if(getRes.ok){
-      const info = await getRes.json();
-      sha = info.sha;
-    } else {
-      getErrMsg = `GET ${getRes.status} ${getRes.statusText}`;
-      try { const errBody = await getRes.json(); getErrMsg += ` — ${errBody.message || ''}`; } catch(e){}
+/* 启动时清理旧版本持久化的 Token 副本与旧的 SEED 版本标记，并如实提示（不宣称旧凭据已安全） */
+function cleanupLegacyToken(){
+  try{
+    let removed = false;
+    if(localStorage.getItem('gh_token') != null){ localStorage.removeItem('gh_token'); removed = true; }
+    if(localStorage.getItem(LS_VER) != null){ localStorage.removeItem(LS_VER); } // 旧版本标记已无用途
+    if(removed){
+      setTimeout(()=>toast('已停止持久保存 GitHub Token：浏览器中的旧副本已删除。旧凭据可能曾落盘，删除副本不等于凭据安全，建议自行轮换。'), 900);
     }
-    const body = {
-      message: `Update data.json via 产品渠道动销与利润罗盘系统 — ${new Date().toLocaleString('zh-CN')}`,
-      content: btoa(unescape(encodeURIComponent(content)))
-    };
-    if(sha) body.sha = sha;
-    const putRes = await fetch(apiBase, {
-      method: 'PUT',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Accept': 'application/vnd.github+json',
-        'Content-Type': 'application/json',
-        'X-GitHub-Api-Version': '2022-11-28'
-      },
-      body: JSON.stringify(body)
-    });
-    if(putRes.ok){ toast('✅ 已同步到团队看板！约 1–2 分钟后刷新可见'); }
-    else {
-      const err = await putRes.json().catch(()=>null);
-      let msg = err?.message || putRes.statusText;
-      if(!sha && msg.includes('sha')){
-        msg += '（无法获取文件SHA，GET阶段：' + (getErrMsg || '未知错误') + '。请检查Token是否有repo权限，或尝试重新保存Token）';
-      }
-      toast('❌ 同步失败: ' + msg);
-    }
-  } catch(e){ toast('❌ 同步失败: ' + e.message); }
+  }catch(e){}
 }
 
-async function exportDataJson(){
-  const data = {products, settings, updatedAt: new Date().toISOString()};
-  const jsonStr = JSON.stringify(data, null, 2);
+/* ---- 本地脏判断：本地修改、远端版本、分析日期三者分别记录，绝不混用 ---- */
+function isLocalDirty(){
+  return !!localModifiedAt && dataRevision !== lastSyncedRevision;
+}
+/* 采用远端数据：整包替换（不做不透明的字段自动合并），替换前自动备份本地 */
+function adoptRemoteData(d){
+  backupLocal('采用团队数据前自动备份');
+  const validList = [], invalidList = [];
+  (Array.isArray(d.products) ? d.products : []).forEach(p=>{
+    const r = validateProduct(p); /* JSON/远端入口同样过校验 */
+    if(r.errors.length) invalidList.push({raw:p, errors:r.errors});
+    else validList.push(r.product);
+  });
+  products = validList;
+  quarantinedProducts = invalidList; /* 无效数据隔离提示，不静默丢弃 */
+  /* 周销历史随团队数据整体替换；远端无历史字段时清空并由产品快照引导入 */
+  salesHistory = (d.salesHistory && typeof d.salesHistory === 'object' && !Array.isArray(d.salesHistory)) ? d.salesHistory : {};
+  if(!Object.keys(salesHistory).length) products.forEach(recordHistorySnapshot);
+  if(invalidList.length) toast('⚠️ 团队数据中有 '+invalidList.length+' 条无效记录已隔离（未参与KPI），原始内容已备份。');
+  repCache = null; /* 数据已整体替换，补货缓存失效 */
+  products.forEach(p=>{ const nd=normalizeDate(p.date); if(nd) p.date=nd; });
+  settings = JSON.parse(JSON.stringify(DEFAULT_SETTINGS));
+  if(d.settings && typeof d.settings === 'object') Object.assign(settings, d.settings);
+  ensureRepSettings();
+  localModifiedAt = null;
+  lastSyncedRevision = dataRevision;
+  saveLocal(); saveSyncState();
+  loadSettingsForm(); loadRepParams(); render();
+}
+function showRemoteConflictBanner(){
+  dismissRemoteConflictBanner();
+  const el=document.createElement('div');
+  el.id='remoteConflictBanner';
+  el.className='fixed top-3 left-1/2 -translate-x-1/2 z-50 bg-amber-500 text-white text-xs px-4 py-2 rounded-lg shadow-lg flex items-center gap-2 flex-wrap max-w-[95vw]';
+  const span=document.createElement('span');
+  span.innerHTML='<b>本地存在未同步修改，远端也有数据（版本 '+escapeHtml(syncMeta.remoteUpdatedAt||'未知')+'）。</b>如何处理？';
+  el.appendChild(span);
+  const mk=(label,fn)=>{const b=document.createElement('button');b.className='underline font-semibold shrink-0';b.textContent=label;b.onclick=fn;el.appendChild(b);};
+  mk('保留本地',()=>{dismissRemoteConflictBanner();setSyncStatus('已保留本地修改，未采用远端数据。');});
+  mk('备份并采用远端',()=>{dismissRemoteConflictBanner();if(pendingRemote)adoptRemoteData(pendingRemote);});
+  mk('取消',()=>{dismissRemoteConflictBanner();});
+  document.body.appendChild(el);
+}
+function dismissRemoteConflictBanner(){
+  const el=document.getElementById('remoteConflictBanner');
+  if(el && el.remove) el.remove();
+}
+/* 启动时的团队读取：HTTP 状态检查 -> 结构校验 -> 脏检查三选一。
+   远端失败只展示本地缓存并提示离线/可能过时，绝不回退 SEED 冒充团队真实数据。 */
+async function loadTeamDataAtBoot(){
+  const url = teamReadUrl();
+  setSyncStatus('正在从团队数据源读取：'+url);
+  try{
+    const res = await fetch(url, {cache:'no-store'});
+    if(!res.ok) throw new Error('HTTP '+res.status+' '+res.statusText);
+    const text = await res.text();
+    let d;
+    try{ d = JSON.parse(text); }catch(e){ throw new Error('JSON 解析失败'); }
+    if(!d || !Array.isArray(d.products)) throw new Error('结构校验失败：缺少 products 数组');
+    syncMeta.lastRemoteOkAt = new Date().toISOString();
+    syncMeta.remoteUpdatedAt = d.remoteUpdatedAt || d.updatedAt || null;
+    saveSyncState();
+    if(isLocalDirty()){
+      pendingRemote = d;
+      showRemoteConflictBanner();
+      setSyncStatus('远端已读取成功（版本 '+(syncMeta.remoteUpdatedAt||'未知')+' · 读取时间 '+syncMeta.lastRemoteOkAt+'），但本地存在未同步修改，请在下拉横幅中选择处理方式。');
+    }else{
+      adoptRemoteData(d);
+      setSyncStatus('团队数据已读取（远端版本 '+(syncMeta.remoteUpdatedAt||'未知')+' · 最后成功读取 '+syncMeta.lastRemoteOkAt+'）。注意：「看板是否已生效」以看板实际读到的版本为准。');
+    }
+  }catch(err){
+    setSyncStatus('⚠️ 团队数据源读取失败（'+err.message+'）。当前展示本地已有数据'+(syncMeta.lastRemoteOkAt?('（最后成功读取 '+syncMeta.lastRemoteOkAt+'，内容可能过时）'):'（若首次使用且读取失败，则仅为内置示例，不代表团队真实数据）')+'。不会用示例数据冒充团队数据。', true);
+  }
+}
+
+/* ---- GitHub 写入：GET 与 PUT 同一分支；baseSHA 冲突阻断；失败即停，不盲目重试 ---- */
+async function pushToGitHub(token, content){
+  const branch = teamCfg.branch || 'main';
+  const apiBase = `https://api.github.com/repos/${GH_REPO}/contents/${GH_PATH}?ref=${encodeURIComponent(branch)}`;
+  const headers = {
+    'Authorization': `Bearer ${token}`,
+    'Accept': 'application/vnd.github+json',
+    'X-GitHub-Api-Version': '2022-11-28'
+  };
+  const revAtStart = dataRevision; // 记录上传开始时的数据版本，用于判断"上传期间是否又有编辑"
+  setSyncStatus('① 正在读取远端 '+GH_PATH+'（分支 '+branch+'）…');
+  let remoteSHA = null;
+  try{
+    const getRes = await fetch(apiBase, {headers});
+    if(getRes.status === 401 || getRes.status === 403){
+      setSyncStatus('❌ 读取被拒绝（HTTP '+getRes.status+'）：Token 无效或无权限，已停止——不会发送写入请求。请检查 Token 与仓库权限。', true);
+      return false;
+    }
+    if(getRes.status === 404){
+      if(!confirm('远端未找到 '+GH_PATH+'（分支 '+branch+'）。可能是文件不存在，也可能是 Token 无权访问该仓库/分支。\n请确认仓库与分支权限无误后：点「确定」= 明确创建该文件；点「取消」= 停止。')){
+        setSyncStatus('已取消写入：远端文件状态未确认，不做盲目标创建。', true);
+        return false;
+      }
+    }else if(!getRes.ok){
+      setSyncStatus('❌ 读取远端失败（HTTP '+getRes.status+' '+getRes.statusText+'），已停止——不会盲目标写入。请稍后重试。', true);
+      return false;
+    }else{
+      const info = await getRes.json();
+      remoteSHA = info.sha;
+      if(ghBaseSHA && remoteSHA !== ghBaseSHA){
+        setSyncStatus('❌ 写入被阻止：远端已被其他人更新（本地基点 '+ghBaseSHA.slice(0,7)+' → 远端 '+remoteSHA.slice(0,7)+'，版本冲突）。为避免覆盖他人更新，本次不会提交。请先在另一窗口用「团队读取」查看远端最新数据，人工合并后再同步。', true);
+        return false;
+      }
+      if(!ghBaseSHA && remoteSHA){
+        if(!confirm('本地没有该文件的同步基点（baseSHA），但远端已存在 '+GH_PATH+'。直接推送会用本地整包覆盖远端当前内容。\n建议先在另一窗口「团队读取」核对远端数据。确认仍要覆盖吗？')){
+          setSyncStatus('已取消写入：未取得你的明确确认。', true);
+          return false;
+        }
+      }
+    }
+  }catch(e){
+    setSyncStatus('❌ 网络错误，读取远端失败：'+e.message+'。已停止——不会盲目标写入。', true);
+    return false;
+  }
+  const body = {
+    message: `Update ${GH_PATH} via 产品渠道动销与利润罗盘系统 — ${new Date().toLocaleString('zh-CN')}（dataRevision ${revAtStart}）`,
+    content: btoa(unescape(encodeURIComponent(content))), // 仅为 Base64 编码，不是加密
+    branch: branch
+  };
+  if(remoteSHA) body.sha = remoteSHA;
+  setSyncStatus('② 正在写入 '+GH_PATH+'（分支 '+branch+'）…');
+  try{
+    const putRes = await fetch(apiBase, {
+      method:'PUT',
+      headers:{...headers, 'Content-Type':'application/json'},
+      body: JSON.stringify(body)
+    });
+    if(putRes.status === 409 || putRes.status === 422){
+      const err = await putRes.json().catch(()=>null);
+      setSyncStatus('❌ 写入被拒（HTTP '+putRes.status+'）：'+(err?.message || putRes.statusText)+'。通常是远端在此期间又发生了变化；请重新读取、核对后再手动重试（本工具不会自动取新 SHA 强制覆盖）。', true);
+      return false;
+    }
+    if(!putRes.ok){
+      const err = await putRes.json().catch(()=>null);
+      setSyncStatus('❌ 同步失败（HTTP '+putRes.status+'）：'+(err?.message || putRes.statusText), true);
+      return false;
+    }
+    const putData = await putRes.json();
+    ghBaseSHA = (putData.content && putData.content.sha) || remoteSHA;
+    let msg = '✅ GitHub 文件提交成功（分支 '+branch+(ghBaseSHA?('，提交 SHA '+ghBaseSHA.slice(0,7)):'')+'）。';
+    if(dataRevision !== revAtStart){
+      msg += ' ⚠️ 上传期间您又修改了数据：本次同步的是修改前版本（dataRevision '+revAtStart+'），最新修改尚未同步，请再次同步。';
+    }else{
+      lastSyncedRevision = revAtStart;
+      localModifiedAt = null;
+      saveLocal(); saveSyncState();
+      msg += ' 本地同步状态已更新。';
+    }
+    msg += ' 「GitHub 提交成功」≠「团队看板已更新」：看板是否生效，请以看板实际读到的版本为准。';
+    setSyncStatus(msg);
+    toast('GitHub 文件提交成功');
+    return true;
+  }catch(e){
+    setSyncStatus('❌ 网络错误，写入失败：'+e.message, true);
+    return false;
+  }
+}
+
+/* ---- 导出与同步拆分：exportDataJson 只做本地下载，不含任何网络写入 ---- */
+function buildDataJson(){
+  const info = dataQualityInfo();
+  return {
+    schemaVersion: SCHEMA_VERSION,
+    products,
+    settings,
+    salesHistory,                      // 周销历史自动留存（轻量模式预测与对比用）
+    analysisDate: info.asOf,          // 分析日期：独立字段
+    businessTimeZone: info.zone,
+    localModifiedAt,                   // 本地修改时间：独立字段
+    remoteUpdatedAt: syncMeta.remoteUpdatedAt, // 远端版本：独立字段，不与上面混用
+    dataQuality:{
+      asOf: info.asOf, timeZone: info.zone, maxDataAgeDays: info.maxAge,
+      stale: info.stale,
+      note: info.stale ? ('⚠️ 基于旧快照的情景测算（数据已超过阻断阈值 '+info.blockDays+' 天，仅供参考）') : ''
+    }
+  };
+}
+function exportDataJson(){
+  const jsonStr = JSON.stringify(buildDataJson(), null, 2);
   const blob = new Blob([jsonStr], {type:'application/json'});
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
   a.download = 'data.json';
   a.click();
-  let token=null; try{ token = localStorage.getItem('gh_token'); }catch(e){}
-  if(token){ await pushToGitHub(token, jsonStr); }
-  else { toast('已本地导出；未配置 GitHub Token，跳过自动同步'); }
+  toast('已本地下载 data.json（仅本地文件，无网络写入；文件不含任何凭据）');
+}
+async function syncTeamData(){
+  if(!products.length && !confirm('当前产品数据为空，确认把"空数据"同步到团队看板？')) return;
+  if(!ghToken){
+    const el = document.getElementById('gh_token');
+    const v = el ? el.value.trim() : '';
+    if(v) ghToken = v;
+    else { toast('请先输入 GitHub Token（仅保存在本页内存）'); return; }
+  }
+  const ok = await pushToGitHub(ghToken, JSON.stringify(buildDataJson(), null, 2));
+  if(ok) toast('同步流程结束：文件已提交到 GitHub；看板是否已更新以看板实际读取为准');
+}
+
+/* ============ CSV 解析（状态机，符合常用 CSV 引号规则） ============
+   支持：UTF-8 BOM、CRLF/LF、双引号包裹、字段内逗号、字段内换行、双引号双写转义("")。 */
+function parseCSVText(text){
+  if(text==null) return [];
+  if(text.charCodeAt(0)===0xFEFF) text=text.slice(1); /* UTF-8 BOM */
+  const rows=[]; let row=[], field='', inQuotes=false, i=0;
+  const pushField=()=>{ row.push(field); field=''; };
+  const pushRow=()=>{ pushField(); rows.push(row); row=[]; };
+  while(i<text.length){
+    const ch=text[i];
+    if(inQuotes){
+      if(ch==='"'){
+        if(text[i+1]==='"'){ field+='"'; i+=2; continue; } /* 双写转义 */
+        inQuotes=false; i++; continue;
+      }
+      field+=ch; i++; continue;
+    }
+    if(ch==='"'){ inQuotes=true; i++; continue; }
+    if(ch===','){ pushField(); i++; continue; }
+    if(ch==='\r'){ if(text[i+1]==='\n') i++; pushRow(); i++; continue; }
+    if(ch==='\n'){ pushRow(); i++; continue; }
+    field+=ch; i++;
+  }
+  if(field!==''||row.length) pushRow(); /* 收尾（无换行结尾的末行） */
+  return rows;
+}
+
+/* 表头名 -> 字段映射：按表头名映射字段（不依赖列位置）；原14列模板兼容，新字段追加不破坏旧顺序 */
+const CSV_FIELD_MAP = {
+  name:      ['产品名称','产品','name'],
+  sku:       ['SKU编码','SKU','sku'],
+  cat:       ['品类','类目','cat','category'],
+  cost:      ['成本','cost'],
+  price:     ['控价','price'],
+  actualPrice:['实际支付到手价','到手价','actualprice','actual price','actual'],
+  weekSales: ['最近一周销售件数','周销','weeksales','week sales'],
+  endInv:    ['最新期末库存','期末库存','endinv','end inv'],
+  beginInv:  ['年初期初库存','期初库存','begininv','begin inv'],
+  ytdSales:  ['业务年累计销售件数','年累计销售','ytdsales','ytd sales'],
+  date:      ['数据日期','日期','date'],
+  feeTax:    ['税运仓储比例%','税运仓储比例','feetax','fee tax'],
+  feeOther:  ['其他费用比例%','其他费用比例','feeother','fee other'],
+  shelfLife: ['剩余效期天数','效期','shelflife','shelf life'],
+  salesMode: ['经营模式','销售模式','salesmode','sales mode'],
+  replenishmentPolicy:['补货策略','replenishmentpolicy','replenishment policy'],
+  forecastDailyOverride:['预测日销覆盖','预测日销覆盖(件/日)','forecastdailyoverride','forecast daily override'],
+  restoredSellingPrice:['恢复销售价','restoredsellingprice','restored selling price'],
+  strategyReason:['策略原因','strategyreason','strategy reason'],
+  stockoutConfirmed:['近期缺货确认','近期缺货','stockoutconfirmed','stockout confirmed'],
+  moq:['MOQ','moq','起订量'],
+  casePack:['箱规','casepack','case pack'],
+  leadTimeDays:['采购提前期(天)','采购提前期','leadtimedays','lead time days','提前期'],
+  newBatchShelfLifeDays:['新货效期(天)','新货效期','newbatchshelflifedays','new batch shelf life'],
+  batches:['批次明细JSON','批次明细','batches'],
+  incoming:['在途明细JSON','在途明细','在途订单','incoming']
+};
+/* 原14列模板的列顺序（表头缺失/不匹配时按位置兜底） */
+const CSV_LEGACY_ORDER = ['name','sku','cat','cost','price','actualPrice','weekSales','endInv','beginInv','ytdSales','date','feeTax','feeOther','shelfLife'];
+function mapCSVHeader(headerRow){
+  const idx = {};
+  const norm = h => String(h==null?'':h).trim().toLowerCase();
+  const headerNorm = (headerRow||[]).map(norm);
+  Object.keys(CSV_FIELD_MAP).forEach(key=>{
+    for(const alias of CSV_FIELD_MAP[key]){
+      const at = headerNorm.indexOf(norm(alias));
+      if(at>=0){ idx[key]=at; return; }
+    }
+  });
+  /* 兜底：未按表头名识别的字段退回原模板列位置（新字段追加在旧顺序之后，不破坏旧模板） */
+  CSV_LEGACY_ORDER.forEach((key,pos)=>{ if(!(key in idx)) idx[key]=pos; });
+  return idx;
+}
+function pickField(row, idx, key){
+  const at=idx[key];
+  return (at!=null && at<row.length) ? row[at] : '';
 }
 
 function importCSV(e){
   const file=e.target.files[0]; if(!file)return;
   const reader=new FileReader();
   reader.onload=ev=>{
-    let txt=ev.target.result.replace(/^\ufeff/,'');
-    const lines=txt.split(/\r?\n/).filter(l=>l.trim());
-    let added=0;
-    for(let i=1;i<lines.length;i++){
-      const c=lines[i].split(',');
-      if(c.length<10||!c[1])continue;
-      const obj={name:c[0].trim(),sku:c[1].trim(),cat:(c[2]||'未分类').trim(),
-        cost:+c[3]||0,price:+c[4]||0,actualPrice:(c[5]||'').trim(),
-        weekSales:+c[6]||0,endInv:+c[7]||0,beginInv:+c[8]||0,ytdSales:+c[9]||0,
-        date:(c[10]||'').trim(),feeTax:(c[11]||'').trim(),feeOther:(c[12]||'').trim(),
-        shelfLife:(c[13]||'').trim()};
-      const idx=products.findIndex(x=>x.sku===obj.sku);
-      if(idx>=0)products[idx]=obj; else products.push(obj);
-      added++;
+    const rows=parseCSVText(String(ev.target.result)); /* 状态机解析：引号/内嵌逗号/内嵌换行/""转义 */
+    e.target.value='';
+    if(rows.length<2){ toast('CSV 中没有可导入的数据行'); return; }
+    const idx=mapCSVHeader(rows[0]);
+    const seen=new Set();     /* 文件内重复SKU检测 */
+    /* 本批数据日期：整份导入文件共用，仅对行内未填日期的行生效（行内已填优先） */
+    const fileDateEl=document.getElementById('f_filedate');
+    const fileDate=normalizeDate(fileDateEl?fileDateEl.value:'');
+    const addList=[], updateList=[], errorList=[];
+    for(let i=1;i<rows.length;i++){
+      const row=rows[i];
+      if(row.every(c=>String(c).trim()==='')) continue; /* 跳过纯空行 */
+      const rowDate=pickField(row,idx,'date');
+      const raw={
+        name:pickField(row,idx,'name'), sku:pickField(row,idx,'sku'), cat:pickField(row,idx,'cat'),
+        cost:pickField(row,idx,'cost'), price:pickField(row,idx,'price'), actualPrice:pickField(row,idx,'actualPrice'),
+        weekSales:pickField(row,idx,'weekSales'), endInv:pickField(row,idx,'endInv'),
+        beginInv:pickField(row,idx,'beginInv'), ytdSales:pickField(row,idx,'ytdSales'),
+        date:(rowDate==null||String(rowDate).trim()==='')?(fileDate||''):rowDate,
+        feeTax:pickField(row,idx,'feeTax'), feeOther:pickField(row,idx,'feeOther'),
+        shelfLife:pickField(row,idx,'shelfLife'),
+        salesMode:pickField(row,idx,'salesMode'), replenishmentPolicy:pickField(row,idx,'replenishmentPolicy'),
+        forecastDailyOverride:pickField(row,idx,'forecastDailyOverride'), restoredSellingPrice:pickField(row,idx,'restoredSellingPrice'),
+        strategyReason:pickField(row,idx,'strategyReason'),
+        stockoutConfirmed:pickField(row,idx,'stockoutConfirmed'),
+        moq:pickField(row,idx,'moq'), casePack:pickField(row,idx,'casePack'),
+        leadTimeDays:pickField(row,idx,'leadTimeDays'), newBatchShelfLifeDays:pickField(row,idx,'newBatchShelfLifeDays'),
+        batches:pickField(row,idx,'batches'), incoming:pickField(row,idx,'incoming')
+      };
+      const skuKey=String(raw.sku==null?'':raw.sku).trim();
+      if(!skuKey){ errorList.push({line:i+1, reason:'SKU为空'}); continue; }
+      if(seen.has(skuKey)){ errorList.push({line:i+1, reason:'文件内SKU「'+skuKey+'」重复（同一文件内不允许重复，未静默覆盖）'}); continue; }
+      seen.add(skuKey);
+      /* 统一校验：非法数值进入错误行列表，绝不批量吞成0 */
+      const r=validateProduct(raw);
+      if(r.errors.length){ errorList.push({line:i+1, reason:r.errors.join('；')}); continue; }
+      const exists=products.some(x=>String(x.sku)===skuKey);
+      (exists?updateList:addList).push(r.product);
     }
-    render(); loadRepParams(); toast('成功导入/更新 '+added+' 条'); e.target.value='';
+    /* 导入前预览：新增/更新/重复SKU/错误行，附原行号与原因 */
+    let msg='导入预览：新增 '+addList.length+' 条，更新（覆盖已有SKU） '+updateList.length+' 条，错误 '+errorList.length+' 条。';
+    if(errorList.length){
+      msg+='\n\n错误行（前10条）：\n'+errorList.slice(0,10).map(x=>'第'+x.line+'行：'+x.reason).join('\n')+(errorList.length>10?('\n……共 '+errorList.length+' 条错误'):'');
+    }
+    const total=addList.length+updateList.length;
+    if(!total){ toast(msg.replace(/\n/g,' ')); return; }
+    msg+='\n\n确认后将写入 '+total+' 条（写入前自动备份当前数据到「恢复上次备份」）。是否继续？';
+    if(!confirm(msg)){ toast('已取消导入，数据未改动'); return; }
+    backupLocal('CSV导入前自动备份');
+    addList.forEach(p=>products.push(p));
+    updateList.forEach(p=>{ const i=products.findIndex(x=>String(x.sku)===String(p.sku)); if(i>=0) products[i]=p; else products.push(p); });
+    addList.concat(updateList).forEach(recordHistorySnapshot);   /* 周销历史自动留存：同 SKU+同日期=更新，不重复累计 */
+    repCache=null;
+    render(); loadRepParams();
+    if(markDirty()) toast('成功导入 '+total+' 条（新增 '+addList.length+' / 更新 '+updateList.length+'）'+(errorList.length?('，跳过错误行 '+errorList.length+' 条'):''));
+    else toast('⚠️ 未成功保存：导入仅在内存中生效，请检查浏览器存储');
   };
   reader.readAsText(file,'UTF-8');
 }
 function loadSample(){
+  if(products.length){
+    if(!confirm('当前有 '+products.length+' 条真实数据，载入示例将<strong>覆盖</strong>它们（已自动备份，可用「恢复上次备份」找回）。确认继续？')) return;
+    backupLocal('载入示例前自动备份');
+  }
   products=[
     {name:'便携榨汁杯',sku:'SKU001',cat:'小家电',cost:35,price:89,actualPrice:79,weekSales:420,endInv:1200,beginInv:800,ytdSales:9600,shelfLife:'',date:'2026-06-28',feeTax:'',feeOther:''},
     {name:'无线蓝牙耳机',sku:'SKU002',cat:'数码',cost:68,price:159,actualPrice:139,weekSales:95,endInv:2400,beginInv:1500,ytdSales:3100,shelfLife:'',date:'2026-06-28',feeTax:'',feeOther:''},
@@ -1433,7 +3167,11 @@ function loadSample(){
     {name:'益生菌软糖',sku:'SKU006',cat:'保健食品',cost:25,price:79,actualPrice:69,weekSales:350,endInv:2000,beginInv:1800,ytdSales:11200,shelfLife:300,date:'2026-06-28',feeTax:'',feeOther:''},
     {name:'鲜食坚果礼盒',sku:'SKU007',cat:'食品',cost:40,price:99,actualPrice:89,weekSales:105,endInv:3000,beginInv:2000,ytdSales:5200,shelfLife:90,date:'2026-06-28',feeTax:'',feeOther:''}
   ];
-  render(); loadRepParams(); toast('已载入示例数据（含效期示例）');
+  salesHistory = {};
+  products.forEach(recordHistorySnapshot);
+  repCache = null;
+  render(); loadRepParams();
+  if(markDirty()) toast('已载入示例数据（含效期示例）'); else toast('⚠️ 未成功保存：示例数据仅在内存中生效');
 }
 
 /* ============ Tab & Toast ============ */
@@ -1474,26 +3212,66 @@ function goTop(){
 })();
 
 /* ============ 初始化 ============ */
-function boot(){
-  restore(); loadSettingsForm();
-  if(!products.length){
-    products = JSON.parse(JSON.stringify(SEED.products));
-    if(SEED.settings) settings = {...settings, ...SEED.settings};
-    ensureRepSettings();
-  }
-  if(!products.length) loadSample();
-  loadRepParams();
-  try{ render(); }catch(e){ console.error('初始渲染失败：',e); }
-  switchTab('dashboard');
+function loadSeedForDisplay(){
+  const validList = [], invalidList = [];
+  JSON.parse(JSON.stringify(SEED.products)).forEach(p=>{
+    const r = validateProduct(p); /* SEED 入口同样过校验 */
+    if(r.errors.length) invalidList.push({raw:p, errors:r.errors});
+    else validList.push(r.product);
+  });
+  products = validList;
+  quarantinedProducts = invalidList;
+  products.forEach(p=>{ const nd=normalizeDate(p.date); if(nd) p.date=nd; });
+  salesHistory = {};
+  products.forEach(recordHistorySnapshot);   /* 示例数据同样进入周销历史（同日期不重复累计） */
+  if(SEED.settings) settings = {...settings, ...SEED.settings};
+  ensureRepSettings();
+  repCache = null;
+  /* 首次初始化：参数表单显示值=实际生效值（下方 loadSettingsForm 读取的就是这里合并后的 settings） */
 }
-// 只读版：阻止 boot() 自动执行，改由密码验证后调用 loadDashboardData()
-// if(document.readyState==='loading'){
-//   document.addEventListener('DOMContentLoaded', boot);
-// }else{
-//   boot();
-// }
+function showCorruptBanner(){
+  const el=document.createElement('div');
+  el.className='fixed top-3 left-1/2 -translate-x-1/2 z-50 bg-rose-600 text-white text-xs px-4 py-2 rounded-lg shadow-lg flex items-center gap-3 flex-wrap max-w-[95vw]';
+  const span=document.createElement('span');
+  span.innerHTML='<b>⚠️ 本地数据已损坏</b>：当前展示的是内置示例（SEED），损坏原文已完整保留、未被覆盖。';
+  el.appendChild(span);
+  const btn=document.createElement('button');
+  btn.className='underline font-semibold shrink-0';
+  btn.textContent='导出损坏原文以便人工修复';
+  btn.onclick=()=>{ downloadFile(corruptRaw || '', 'channelTool_损坏原文.json.txt'); };
+  el.appendChild(btn);
+  document.body.appendChild(el);
+}
+function boot(){
+  /* 1. 读取并校验本地数据（found / missing / corrupt / unavailable） */
+  const status = restore();
+  if(status === 'unavailable'){
+    toast('⚠️ 浏览器 localStorage 不可用：数据无法本地保存，所有修改仅在内存中生效');
+  }
+  /* 2. 必要时迁移数据结构（restore 内已执行 migrateData） */
+  /* 3. 只有确实没有初始化数据时才加载 SEED；损坏时仅展示 SEED 供继续工作，但保留损坏原文并明确提示 */
+  if(status === 'found'){
+    /* 用户数据有效（含 products=[] 的空数据）：SEED_VERSION 变化不影响用户数据 */
+  }else if(status === 'corrupt'){
+    loadSeedForDisplay();
+    showCorruptBanner();
+  }else{ /* missing / unavailable */
+    loadSeedForDisplay();
+  }
+  /* 4. 合并最终设置 */
+  ensureRepSettings();
+  /* 5. 表单与渲染 */
+  cleanupLegacyToken();
+  loadSettingsForm(); loadRepParams(); loadTeamCfgForm(); applyModeUI();
+  try{ render(); }catch(e){ console.error('初始渲染失败：',e); }
+  if(typeof Chart==='undefined'){ ['chartCategory','chartHealth','chartMix','chartBubble','chartReplenish'].forEach(showChartError); }
+  switchTab('dashboard');
+  /* 团队数据源读取（异步；本地脏数据不会被静默覆盖） */
+  if(teamCfg.mode !== 'local') loadTeamDataAtBoot();
+}
+/* 只读版：boot 不再自动运行，密码校验通过后由 loadDashboardData() 驱动渲染 */
 
-// ====== 密码保护 + data.json 加载 ======
+// ====== 密码保护 + data.json 加载（只读版）======
 const DASHBOARD_PASSWORD = '2026';
 
 function checkPwd(){
@@ -1521,6 +3299,7 @@ function loadDashboardData(){
     const el = document.getElementById('updateInfo');
     if(el) el.textContent = '数据更新时间：' + updatedAt + ' · 本页面为只读看板，如需修改请联系管理员';
     try{ render(); console.log('[只读版] render() 成功'); }catch(e){ console.error('[只读版] render() 失败:', e); }
+    if(typeof Chart==='undefined'){ ['chartCategory','chartHealth','chartMix','chartBubble','chartReplenish'].forEach(showChartError); }
     switchTab('dashboard');
   })
   .catch(e=>{
@@ -1529,7 +3308,6 @@ function loadDashboardData(){
     if(el) el.textContent = '数据加载失败：' + e.message + '（请确认 data.json 已部署且可访问）';
   });
 }
-
 </script>
 </body>
 </html>
