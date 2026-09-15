@@ -3295,7 +3295,7 @@ function loadDashboardData(){
     products = d.products || [];
     if(d.settings) settings = {...settings, ...d.settings};
     ensureRepSettings();
-    const updatedAt = d.updatedAt || '未知';
+    const updatedAt = d.updatedAt || d.localModifiedAt || d.remoteUpdatedAt || '未知';
     const el = document.getElementById('updateInfo');
     if(el) el.textContent = '数据更新时间：' + updatedAt + ' · 本页面为只读看板，如需修改请联系管理员';
     try{ render(); console.log('[只读版] render() 成功'); }catch(e){ console.error('[只读版] render() 失败:', e); }
