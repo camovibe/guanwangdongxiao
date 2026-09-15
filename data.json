@@ -2556,7 +2556,7 @@
     "toGood": 6,
     "shelfWarnDays": 90,
     "shelfCoverSafe": 1.5,
-    "repRecentWeight": 0.8,
+    "repRecentWeight": 0.6,
     "repSafetyMonths": 1,
     "repSpikeSensitivity": 2,
     "repClearanceThreshold": 100,
@@ -3529,7 +3529,7 @@
   },
   "analysisDate": "2026-09-15",
   "businessTimeZone": "Asia/Shanghai",
-  "localModifiedAt": "2026-09-15T03:00:25.309Z",
+  "localModifiedAt": "2026-09-15T03:16:17.675Z",
   "remoteUpdatedAt": null,
   "dataQuality": {
     "asOf": "2026-09-15",
