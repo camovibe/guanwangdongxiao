@@ -1498,19 +1498,18 @@ function dataQualityInfo(){
   const warnDays=finiteOr(settings.dataFreshWarnDays,7);
   const blockDays=finiteOr(settings.dataFreshBlockDays,14);
   const asOfOrd=dateOrdinal(asOf);
-  let minOrd=null,maxOrd=null,noDate=0,staleCnt=0,fallbackCnt=0,maxAge=null,fallbackList=[];
+  let minOrd=null,maxOrd=null,noDate=0,staleCnt=0,fallbackCnt=0,fallbackList=[];
   products.forEach(p=>{
     const ord=dateOrdinal(p.date);
     if(ord==null){noDate++;return;}
     if(minOrd==null||ord<minOrd)minOrd=ord;
     if(maxOrd==null||ord>maxOrd)maxOrd=ord;
     const age=asOfOrd==null?null:(asOfOrd-ord);
-    if(age!=null){
-      if(age>warnDays)staleCnt++;
-      if(maxAge==null||age>maxAge)maxAge=age;
-    }
+    if(age!=null&&age>warnDays)staleCnt++;
     if(compute(p).actualPriceFallback){fallbackCnt++;fallbackList.push({sku:String(p.sku),name:String(p.name||'')});}
   });
+  /* 快照新旧 = 最新一条数据的年龄；个别未更新SKU的年龄由 staleCnt 单独计数 */
+  const maxAge=(asOfOrd!=null&&maxOrd!=null)?asOfOrd-maxOrd:null;
   const stale=maxAge!=null&&maxAge>blockDays;
   const aged=maxAge!=null&&maxAge>warnDays;
   return {asOf,zone,warnDays,blockDays,minOrd,maxOrd,noDate,staleCnt,fallbackCnt,maxAge,stale,aged,fallbackList,quarantined:quarantinedProducts.length};
@@ -2716,6 +2715,19 @@ function saveSettings(){
   if(markDirty()) toast('参数已保存，全部重算完成'); else toast('⚠️ 未成功保存：参数仅本次会话生效');
 }
 
+/* 一键清空全部 SKU 逐条费率，改由「参数设置」全局渠道费用统一计算 */
+function clearAllSkuFees(){
+  if(!products.length){toast('暂无产品数据');return;}
+  const affected=products.filter(p=>p.feeTax!==''||p.feeOther!=='').length;
+  if(!affected){toast('所有 SKU 均已使用全局费率，无需清空');return;}
+  if(!confirm('将清空 '+affected+' 个 SKU 的逐条费率（税运仓储% / 其他费用%），全部改由「参数设置」里的全局渠道费用统一计算。\n清空后可随时重新导入 CSV 或在编辑表单中单独填写。是否继续？'))return;
+  products.forEach(p=>{p.feeTax='';p.feeOther='';});
+  repCache=null;
+  render();
+  if(markDirty()) toast('已清空 '+affected+' 个 SKU 逐条费率，现按全局设置计算');
+  else toast('⚠️ 未成功保存：本次清空仅本次会话生效');
+}
+
 /* ============ CSV ============ */
 const HEADERS=['产品名称','SKU编码','品类','成本','控价','实际支付到手价','最近一周销售件数','最新期末库存','年初期初库存','业务年累计销售件数','数据日期','税运仓储比例%','其他费用比例%','剩余效期天数','经营模式','补货策略','预测日销覆盖','恢复销售价','策略原因','近期缺货确认','MOQ','箱规','采购提前期(天)','新货效期(天)','批次明细JSON','在途明细JSON'];
 function downloadTemplate(){
@@ -2984,6 +2996,7 @@ function buildDataJson(){
     analysisDate: info.asOf,          // 分析日期：独立字段
     businessTimeZone: info.zone,
     localModifiedAt,                   // 本地修改时间：独立字段
+    updatedAt: localModifiedAt,        // 兼容别名：旧版只读看板/旧脚本读取此字段
     remoteUpdatedAt: syncMeta.remoteUpdatedAt, // 远端版本：独立字段，不与上面混用
     dataQuality:{
       asOf: info.asOf, timeZone: info.zone, maxDataAgeDays: info.maxAge,
