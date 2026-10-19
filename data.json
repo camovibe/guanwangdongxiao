@@ -5555,8 +5555,8 @@
   },
   "analysisDate": "2026-10-19",
   "businessTimeZone": "Asia/Shanghai",
-  "localModifiedAt": "2026-10-19T03:28:05.671Z",
-  "updatedAt": "2026-10-19T03:28:05.671Z",
+  "localModifiedAt": null,
+  "updatedAt": null,
   "remoteUpdatedAt": "2026-09-21T08:12:40.778Z",
   "dataQuality": {
     "asOf": "2026-10-19",
