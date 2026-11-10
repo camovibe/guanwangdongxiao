@@ -1469,8 +1469,9 @@ function renderAlerts(){
         <div class="font-semibold">${escapeHtml(p.name)} <span class="text-xs text-slate-400">${escapeHtml(p.sku)} · ${escapeHtml(p.cat)}</span></div>
         <div class="flex gap-1 flex-wrap">${a.tags.map(t=>badge(t.c,t.t)).join('')}</div>
       </div>
-      <div class="grid grid-cols-2 sm:grid-cols-4 xl:grid-cols-7 gap-2 text-xs text-slate-500 mb-3">
+      <div class="grid grid-cols-2 sm:grid-cols-4 xl:grid-cols-8 gap-2 text-xs text-slate-500 mb-3">
         <div>库销比 <b class="text-slate-800">${fmt(m.isr,2)}</b></div>
+        <div>库存件数 <b class="text-slate-800">${fmt(p.endInv)}</b></div>
         <div>可售天数 <b class="text-slate-800">${isFinite(m.sellDays)?fmt(m.sellDays)+'天':'∞'}</b></div>
         ${shelfMetric}
         <div>年累计周转率(估算) <b class="text-slate-800">${m.turnover==null?'—':m.turnover.toFixed(2)}</b></div>
@@ -2521,7 +2522,7 @@ function openProductList(title,list){
        SKU 不再拼进 onclick 字符串，点击行为用 addEventListener 闭包绑定 */
     list.forEach(({p,m,inv,turn,shelf,profit})=>{
       const shelfBadge = shelf.none?'':badge(shelf.c,shelf.t);
-      const lossLine = (m.expiryLoss&&m.expiryLoss>0)? ` · 预计报损¥${fmt(m.expiryLoss)}`:'';
+      const lossLine = (m.expiryLoss&&m.expiryLoss>0)? ` · 预计报损${Math.round(m.expiryQty)}件/¥${fmt(m.expiryLoss)}`:'';
       const shelfLine = m.shelfLife!=null? ` · 效期${m.shelfLife}天`:'';
       const profitLine = ` · 单件利润¥${fmt(m.unitProfit,2)}`;
       const btn=document.createElement('button');
